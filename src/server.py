@@ -6,12 +6,12 @@ import logging
 import contextvars
 from typing import Optional
 from contextlib import asynccontextmanager
-from dotenv import load_dotenv
 
 from mcp.server import Server
 from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 import mcp.types as types
 
+from .config import settings
 from .connection import blender, logger
 from .tools import get_mcp_tools
 from .sessions import SessionRecorder
@@ -22,7 +22,6 @@ from starlette.staticfiles import StaticFiles
 from starlette.responses import Response
 from starlette.routing import Route, Mount
 
-load_dotenv()
 
 # Lifecycle / Recording State
 recorder: Optional[SessionRecorder] = None
@@ -37,7 +36,7 @@ logging.getLogger("starlette").setLevel(logging.WARNING)
 # Initialize MCP Server
 app = Server("blender-mcp-n8n")
 
-ASSETS_DIR = os.getenv("BLENDER_ASSETS_DIR")
+ASSETS_DIR = settings.assets_dir
 
 
 def resolve_path(args):
@@ -117,6 +116,13 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
         if isinstance(blender_res, dict) and "status" not in blender_res:
             blender_res["status"] = status_val
 
+    # Guard: tool returned None (missing return statement) — convert to a safe dict
+    if blender_res is None:
+        blender_res = {
+            "status": "success",
+            "message": f"{name} completed (no result returned).",
+        }
+
     # Add success indicator to the message
     log_status = "OK"
     if isinstance(blender_res, dict):
@@ -160,7 +166,11 @@ async def lifespan(app: Starlette):
 async def mcp_asgi(scope, receive, send):
     """Raw ASGI bridge to MCP session manager. Handles OPTIONS for CORS preflight."""
     if scope["type"] == "http":
-        if scope.get("method") == "OPTIONS":
+        method = scope.get("method")
+        path = scope.get("path", "")
+        # logger.info(f"[ASGI] {method} path='{path}'")
+
+        if method == "OPTIONS":
             # Return 200 for CORS preflight — middleware will add the headers
             await send({"type": "http.response.start", "status": 200, "headers": []})
             await send({"type": "http.response.body", "body": b""})

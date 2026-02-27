@@ -48,7 +48,10 @@ def get_modifier_tools() -> list[types.Tool]:
                         "items": {"type": "number"},
                         "description": "For ARRAY: Relative XYZ offset",
                     },
-                    "thickness": {"type": "number", "description": "For SOLIDIFY"},
+                    "thickness": {
+                        "type": "number",
+                        "description": "For SOLIDIFY, WIREFRAME",
+                    },
                     "offset": {"type": "number", "description": "For SOLIDIFY"},
                     "width": {"type": "number", "description": "For BEVEL"},
                     "segments": {"type": "integer", "description": "For BEVEL"},
@@ -79,12 +82,14 @@ def get_modifier_tools() -> list[types.Tool]:
                     },
                     "operation": {
                         "type": "string",
-                        "enum": ["INTERSECT", "UNION", "DIFFERENCE"],
+                        "enum": ["INTERSECT", "UNION", "DIFFERENCE", "N.A"],
+                        "default": "N.A",
                         "description": "For BOOLEAN",
                     },
                     "solver": {
                         "type": "string",
-                        "enum": ["FLOAT", "EXACT"],
+                        "enum": ["FLOAT", "EXACT", "N.A"],
+                        "default": "N.A",
                         "description": "For BOOLEAN",
                     },
                     "hide_cutter": {
@@ -171,7 +176,7 @@ GUIDANCE:
                     },
                     "solver": {
                         "type": "string",
-                        "enum": ["FLOAT", "EXACT", "MANIFOLD"],
+                        "enum": ["FLOAT", "EXACT", "MANIFOLD", "N.A"],
                         "default": "EXACT",
                         "description": "Solver algorithm: FLOAT (legacy/fast), EXACT (reliable), MANIFOLD (mesh-safe)",
                     },

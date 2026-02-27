@@ -1,6 +1,10 @@
+import asyncio
 import uvicorn
 import logging
 import click
+import socket
+import threading
+from .config import settings
 from .sessions import SessionRecorder, SessionMetadata, BridgeSession, SessionPlayer
 
 # Setup logging
@@ -10,6 +14,29 @@ logging.basicConfig(
 logger = logging.getLogger("mcp_server")
 
 
+def _blender_health_check(host: str, port: int, interval: int = 5):
+    """Background thread: logs when Blender addon connects or disconnects."""
+    was_connected = None
+    while True:
+        try:
+            s = socket.create_connection((host, port), timeout=2)
+            s.close()
+            connected = True
+        except OSError:
+            connected = False
+
+        if connected != was_connected:
+            if connected:
+                logger.info(f"[Blender] 🟢 Connected to addon at {host}:{port}")
+            else:
+                logger.warning(
+                    f"[Blender] 🔴 Disconnected — addon not reachable at {host}:{port}"
+                )
+            was_connected = connected
+
+        threading.Event().wait(interval)
+
+
 @click.group()
 def cli():
     """Blender MCP Bridge CLI"""
@@ -17,8 +44,8 @@ def cli():
 
 
 @cli.command()
-@click.option("--host", default="0.0.0.0", help="Host to bind the server to")
-@click.option("--port", default=8000, help="Port to bind the server to")
+@click.option("--host", default=settings.bridge_host, help="Host to bind the server to")
+@click.option("--port", default=settings.bridge_port, help="Port to bind the server to")
 @click.option(
     "--record",
     "record_path",
@@ -45,6 +72,14 @@ def serve(host, port, record_path, name, model, description, doc_url):
     print(f"HTTP Streamable: http://{host}:{port}/mcp")
     print("============================================================")
 
+    # Start Blender addon health check in background
+    t = threading.Thread(
+        target=_blender_health_check,
+        args=(settings.addon_host, settings.addon_port),
+        daemon=True,
+    )
+    t.start()
+
     uvicorn.run(
         server_mod.app, host=host, port=port, log_level="warning", access_log=False
     )
@@ -58,13 +93,13 @@ def serve(host, port, record_path, name, model, description, doc_url):
     default="stateful",
     help="Transport mode to use",
 )
-@click.option("--host", default="http://localhost:8000", help="Target MCP Server URL")
+@click.option("--host", default=settings.bridge_url, help="Target MCP Server URL")
 def play(path, transport, host):
     """Playback a recorded session JSON file"""
     print(f"Playing back session from {path}...")
     session = BridgeSession.load(path)
     player = SessionPlayer(transport=transport, host=host)
-    player.play(session)
+    asyncio.run(player.play(session))
 
 
 if __name__ == "__main__":

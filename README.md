@@ -24,6 +24,18 @@ graph LR
 pip install -r requirements.txt
 ```
 
+## Configuration
+
+Create a `.env` file in the root directory to customize your setup:
+
+| Variable | Description | Default |
+|---|---|---|
+| `MCP_BRIDGE_HOST` | Host IP for the MCP Bridge Server | `0.0.0.0` |
+| `MCP_BRIDGE_PORT` | Port for the MCP Bridge Server (n8n connects here) | `8008` |
+| `BLENDER_ADDON_HOST` | IP where Blender is running (for Bridge to connect to) | `127.0.0.1` |
+| `BLENDER_ADDON_PORT` | Port Blender addon is listening on | `8888` |
+| `BLENDER_ASSETS_DIR` | Directory to resolve relative textures/HDRIs | (Optional) |
+
 ## Installation
 
 ### Method 1: Zip & Install (Recommended)
@@ -61,7 +73,7 @@ python -m src.main serve
 python -m src.main serve --record my_session.json --name "Building My House"
 ```
 
-The server will start on `http://localhost:8000` with HTTP Streamable endpoint at `/mcp`. It uses detailed logging to show exactly which tools are being called and their results.
+The server will start on `http://localhost:8008` with HTTP Streamable endpoint at `/mcp`. It uses detailed logging to show exactly which tools are being called and their results.
 
 ## Bridge Sessions (Record & Playback)
 
@@ -98,8 +110,9 @@ We provide a built-in static web editor to inspect and edit your recordings:
 3. You can:
    - Edit metadata (Session Name, Description).
    - Filter commands by tool name.
+   - **Add & Edit Commands**: Use the interactive modal with schema validation to discover tools, safely modify arguments, or add entirely new steps.
    - Edit tool arguments directly in the JSON editor cards.
-   - Delete unnecessary commands.
+   - Reorder or delete unnecessary commands.
    - **Export JSON** to save your changes to a new file.
 
 ### 3. Configure n8n Workflow
@@ -108,7 +121,7 @@ We provide a built-in static web editor to inspect and edit your recordings:
 
 1. Add **MCP Client Tool** node
 2. Configure:
-   - **HTTP Streamable Endpoint**: `http://localhost:8000/mcp`
+   - **HTTP Streamable Endpoint**: `http://localhost:8008/mcp`
    - **Authentication**: None
    - **Tools to Include**: All
 3. Connect to an **AI Agent** node
@@ -126,9 +139,9 @@ If you modify the addon code or the MCP server logic, follow these steps to ensu
 
 ## Available Tools
 
-The server exposes **45+ Blender tools** across several categories:
+The server exposes **70+ Blender tools** across several categories:
 
-### Scene & Inspection
+### Inspection
 | Tool | Explanation |
 |---|---|
 | `get_scene_info` | Get information about the current Blender scene (objects, collections, etc.). |
@@ -144,51 +157,72 @@ The server exposes **45+ Blender tools** across several categories:
 | `set_active_collection` | Set the active collection for new objects. |
 | `move_to_collection` | Move objects to a specific collection. |
 | `get_collections` | Get the hierarchy of all collections in the scene. |
+| `remove_collection` | Delete a collection and optionally its contents. |
+| `duplicate_collection` | Duplicate an entire collection hierarchy. |
+| `set_collection_visibility`| Toggle visibility of a collection in viewport/render. |
 
 ### Modeling
 | Tool | Explanation |
 |---|---|
 | `create_cube` | Create/update a cube mesh. |
 | `create_cylinder` | Create/update a cylinder mesh. |
-| `create_sphere` | Create/update a UV sphere mesh. |
 | `create_icosphere` | Create/update an Ico sphere mesh. |
+| `create_sphere` | Create/update a UV sphere mesh. |
 | `create_torus` | Create/update a torus mesh. |
 | `create_plane` | Create/update a plane mesh. |
 | `create_text` | Create/update a 3D text object. |
-| `duplicate_object` | Duplicate an object with optional transformations. |
-| `create_and_array` | Create a primitive and apply a linear array modifier in one step. |
-| `batch_transform` | Transform multiple existing objects at once. |
+| `create_empty` | Create an Empty object for reference or rigging. |
 | `apply_modifier` | Add and configure a modifier (ARRAY, SOLIDIFY, BEVEL, etc.). |
-| `copy_modifier` | Copy a modifier from a source object to targets. |
 | `remove_modifier` | Remove a modifier from an object. |
+| `copy_modifier` | Copy a modifier from a source object to targets. |
 | `boolean_operation` | Perform INTERSECT, UNION, or DIFFERENCE between objects. |
+| `duplicate_object` | Duplicate an object with optional transformations. |
+| `duplicate_selection` | Duplicate all currently selected objects. |
 | `transform_object` | Transform an existing object (location, rotation, scale). |
-| `circular_array` | Create objects arranged in a circular/radial pattern. |
+| `set_object_dimensions` | Set exact dimensions for an object in meters. |
+| `batch_transform` | Transform multiple existing objects at once. |
 | `select_objects` | Select multiple objects by name. |
 | `select_by_pattern` | Select objects matching a glob pattern (e.g., 'Facade_Fin*'). |
-| `set_object_dimensions` | Set exact dimensions for an object in meters. |
-| `join_objects` | Join multiple objects into a single mesh. |
-| `random_distribute` | Randomly distribute copies of an object with constraints. |
+| `select_by_collection` | Select all objects within a specific collection. |
+| `invert_mesh_selection` | Invert the current mesh element selection (vertices, edges, faces). |
+| `circular_array` | Create objects arranged in a radial pattern with optional collection targeting and immediate joining. |
+| `join_objects` | Join multiple objects into a single mesh. TIP: Use after `select_by_pattern`. |
+| `create_and_array` | Create a primitive and apply a linear array modifier in one step. |
+| `random_distribute` | Randomly distribute copies of an object with deterministic seed support. |
+| `extrude_mesh` | Extrude mesh geometry (vertices/edges/faces) with normal filtering. |
+| `inset_faces` | Inset faces of a mesh (great for creating walls from floors). |
+| `shear_mesh` | Shear mesh geometry along an axis (useful for sloped roofs). |
+| `delete_object` | Delete object(s) by name or pattern (e.g. 'Test_*'). |
+| `set_object_visibility`| Quickly hide/show objects to look inside Shells or isolate items. |
 
 ### Architectural Modeling
 | Tool | Explanation |
 |---|---|
-| `build_room_shell` | Create a 3D building shell (floor, walls, ceiling) from a 2D perimeter with door/window openings. |
-| `build_wall_segment` | Create a solid interior partition wall with a specified thickness. |
-| `build_wall_with_door` | Create an interior wall with a door opening (clean geometry, no booleans). |
-| `build_column` | Create structural columns at specific locations, optionally merged with wall objects. |
-| `toggle_ceiling` | Show or hide ceiling objects to inspect building interiors. |
-| `set_view` | Quickly switch viewport orientation (TOP, ISO, FRONT, SIDE) for precision modeling. |
+| `build_room_shell` | PRIMARY TOOL: Create a full building shell (floor, walls, ceiling) from vertices in one call. |
+| `build_wall_segment` | Create solid interior partition walls with specified thickness. |
+| `build_wall_with_door` | Create interior walls with clean door apertures (no booleans). |
+| `set_view` | Switch viewport (TOP, ISO, FRONT, SIDE) for precision drafting. |
+| `build_column` | Create structural columns, optionally merged (union) with walls. |
+
+### MEP (Systems) Engineering
+| Tool | Explanation |
+|---|---|
+| `build_pipe_run` | Create color-coded pipe segments (WATER, CHILLER, FIRE, etc.) with optional auto-fittings. |
+| `build_cable_tray` | Create electrical containment runs (LADDER, TROUGH) with automated supports. |
+| `add_tray_support` | Move existing supports or add new ones (TRAPEZE, CANTILEVER, WALL) to tray runs. |
+| `add_auto_cable_drops` | Automatically generate smooth Bezier cable drops from trays to racks/equipment beneath. |
 
 ### Materials
 | Tool | Explanation |
 |---|---|
-| `create_material` | Create a material with PBR presets and assign it to objects. |
-| `assign_material` | Assign an existing material to objects or patterns. |
-| `set_material_properties` | Modify properties of an existing material. |
-| `add_shader_node` | Add a shader node to a material's node tree. |
-| `connect_shader_nodes` | Connect two shader nodes in a material. |
-| `assign_builtin_texture` | Apply a procedural texture to a material. |
+| `create_material` | **POWER TOOL**: Create PBR materials and assign to `pattern` or `collection` in ONE call. |
+| `assign_material` | Assign existing materials to bulk objects/collections without selection turns. |
+| `set_material_properties` | Modify color, metallic, roughness, and emission of existing materials. |
+| `add_shader_node` | Add procedural or image-based nodes to a material tree. |
+| `connect_shader_nodes` | Link nodes to build complex custom shaders. |
+| `assign_builtin_texture` | Apply noise, voronoi, or wave textures to a material. |
+| `assign_texture_map` | Apply an image texture directly to a material map. |
+| `set_world_background` | Set scene background (color, HDRI, sky texture). |
 
 ### Animation
 | Tool | Explanation |
@@ -217,6 +251,12 @@ The server exposes **45+ Blender tools** across several categories:
 |---|---|
 | `create_light` | Create POINT, SUN, SPOT, or AREA lights. |
 | `configure_light` | Update light properties like energy, color, and size. |
+
+### History
+| Tool | Explanation |
+|---|---|
+| `undo` | Undo the last Blender action. |
+| `redo` | Redo the last undone Blender action. |
 
 ## Example Usage in n8n
 
@@ -366,7 +406,7 @@ See the [Integration Testing Guide](docs/integration_tests.md) for full details 
 
 **Dependency Graph Error**: If you see this, ensure you have the latest `blender_mcp_addon` package which implements the main-thread command queue.
 
-**Tools not appearing in n8n**: Check the HTTP Streamable endpoint URL is correct (`http://localhost:8000/mcp`)
+**Tools not appearing in n8n**: Check the HTTP Streamable endpoint URL is correct (`http://localhost:8008/mcp`)
 
 ## Acknowledgments
 

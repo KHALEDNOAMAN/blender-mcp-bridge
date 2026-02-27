@@ -10,6 +10,7 @@ class ModelingOperators:
         primitive_type,
         location,
         name=None,
+        collection=None,
         array_count=2,
         array_offset=(0, 0, 1),
         scale=(1, 1, 1),
@@ -24,6 +25,7 @@ class ModelingOperators:
             scale=scale,
             rotation=rotation,
             name=name,
+            collection=collection,
             **primitive_kwargs,
         )
         obj_name = result["name"]
@@ -48,7 +50,7 @@ class ModelingOperators:
         object_name,
         count,
         radius,
-        center=(0, 0, 0),
+        center=None,
         start_angle=0,
         axis="Z",
         use_radial_rotation=True,
@@ -58,8 +60,16 @@ class ModelingOperators:
         **kwargs,
     ):
         obj = get_object(object_name)
+        # Default center to current object location if not provided
+        if center is None:
+            center = list(obj.location)
+        elif len(center) == 2:
+            # Inherit Z from object if only X,Y provided
+            center = [center[0], center[1], obj.location[2]]
+
         created = []
         angle_step = 360.0 / count
+
         for i in range(count):
             angle_rad = math.radians(start_angle + i * angle_step)
             if axis == "Z":
@@ -187,22 +197,62 @@ class ModelingOperators:
         z_position=0.0,
         seed=None,
     ):
-        if seed is not None:
-            random.seed(seed)
         obj = get_object(object_name)
-        dist_center = center if center else obj.location
+
+        # ── Normalise origin to geometry center ──
+        # After join_objects the origin can be far from the mesh.
+        # Copies inherit that mesh-offset, so trees appear shifted.
+        # Setting origin to geometry makes .location == visual center.
+        prev_active = bpy.context.view_layer.objects.active
+        prev_selected = [o for o in bpy.context.selected_objects]
+        bpy.ops.object.select_all(action="DESELECT")
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.origin_set(type="ORIGIN_GEOMETRY", center="MEDIAN")
+        # Restore selection state
+        bpy.ops.object.select_all(action="DESELECT")
+        for o in prev_selected:
+            try:
+                o.select_set(True)
+            except Exception:
+                pass
+        if prev_active:
+            try:
+                bpy.context.view_layer.objects.active = prev_active
+            except Exception:
+                pass
+
+        prototype_loc = list(obj.location)
+
+        # Use a local Random instance to avoid global state interference
+        rng = random.Random(seed)
+
+        # Robust center selection
+        if center is not None and len(center) >= 2:
+            dist_center = list(center)
+            if len(dist_center) == 2:
+                dist_center.append(obj.location[2])
+            use_fixed_z = True
+        else:
+            dist_center = prototype_loc
+            use_fixed_z = False
+
         created = []
-        for _ in range(count):
-            while True:
-                # Calculate relative offset
-                off_x, off_y = (
-                    random.uniform(-max_distance, max_distance),
-                    random.uniform(-max_distance, max_distance),
-                )
-                if min_distance <= math.sqrt(off_x**2 + off_y**2) <= max_distance:
-                    break
+        for i in range(count):
+            angle = rng.uniform(0, 2 * math.pi)
+            r = math.sqrt(rng.uniform(min_distance**2, max_distance**2))
+
+            off_x = r * math.cos(angle)
+            off_y = r * math.sin(angle)
+
             new_obj = obj.copy()
-            new_obj.data = obj.data.copy()
+            if obj.data:
+                new_obj.data = obj.data.copy()
+
+            # Absolute independence
+            new_obj.parent = None
+            new_obj.delta_location = (0, 0, 0)
+
             # Link to the same collection as source
             coll = (
                 obj.users_collection[0]
@@ -210,15 +260,25 @@ class ModelingOperators:
                 else bpy.context.collection
             )
             coll.objects.link(new_obj)
+
+            # Set location directly (safer than matrix_world for new objects)
+            target_z = z_position if use_fixed_z else dist_center[2]
             new_obj.location = (
                 dist_center[0] + off_x,
                 dist_center[1] + off_y,
-                z_position if center else dist_center[2],
+                target_z,
             )
+
             created.append(new_obj.name)
+
+        # Force a scene update
+        bpy.context.view_layer.update()
+
         return {
             "success": True,
-            "message": f"Distributed {len(created)} copies around {dist_center}.",
+            "count": len(created),
+            "center_used": dist_center,
+            "message": f"Distributed {len(created)} objects around {dist_center}.",
         }
 
     def _select_faces_by_normal(self, obj, target_normal, angle_threshold_deg=1.0):
@@ -450,3 +510,34 @@ class ModelingOperators:
         obj = get_object(object_name)
         bpy.data.objects.remove(obj, do_unlink=True)
         return {"success": True, "message": f"Deleted object '{object_name}'"}
+
+    def set_object_visibility(
+        self, object_name, hide_viewport=None, hide_render=None, **kwargs
+    ):
+        """Toggle or set visibility of an object."""
+        obj = get_object(object_name)
+
+        # SMART TOGGLE: If no parameters provided, flip the current state
+        if hide_viewport is None and hide_render is None:
+            hide_viewport = not obj.hide_viewport
+            hide_render = hide_viewport
+
+        msg_parts = []
+        if hide_viewport is not None:
+            obj.hide_viewport = hide_viewport
+            state = "hidden" if hide_viewport else "visible"
+            msg_parts.append(f"viewport: {state}")
+
+        if hide_render is not None:
+            obj.hide_render = hide_render
+            state = "hidden" if hide_render else "visible"
+            msg_parts.append(f"render: {state}")
+
+        settings = ", ".join(msg_parts) if msg_parts else "unchanged"
+
+        return {
+            "success": True,
+            "verified": True,
+            "object": object_name,
+            "message": f"'{object_name}' visibility updated ({settings}).",
+        }

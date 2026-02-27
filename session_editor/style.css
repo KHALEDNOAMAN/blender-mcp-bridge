@@ -18,11 +18,11 @@
 
 .light-theme {
     --bg-color: #f6f8fa;
-    --card-bg: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(0, 0, 0, 0.1);
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(0, 0, 0, 0.15);
     --text-primary: #24292f;
     --text-secondary: #57606a;
-    --input-bg: #ffffff;
+    --input-bg: rgba(255, 255, 255, 0.8);
     --logo-gradient: linear-gradient(135deg, #24292f 0%, #57606a 100%);
     --accent-secondary: #0969da;
     --accent-color: #0969da;
@@ -40,6 +40,12 @@ body {
     padding: 0;
 }
 
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-primary);
@@ -50,17 +56,32 @@ body {
 
 .app-container {
     max-width: 1000px;
+    height: 100%;
     margin: 0 auto;
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    /* constrains flex child without creating a scroll container */
+}
+
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 3rem;
+    margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--glass-border);
+    flex-shrink: 0;
 }
 
 .logo-section h1 {
@@ -149,7 +170,186 @@ header {
 
 .card {
     padding: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
+}
+
+/* Collapsible Metadata Panel */
+.metadata-collapsible {
+    padding: 0;
+}
+
+.metadata-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 12px;
+    transition: background 0.2s;
+}
+
+.metadata-header:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.metadata-header h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.metadata-chevron {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+    opacity: 0.6;
+}
+
+.metadata-collapsible.collapsed .metadata-chevron {
+    transform: rotate(-90deg);
+}
+
+.metadata-body {
+    overflow: hidden;
+    max-height: 400px;
+    transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease;
+    opacity: 1;
+    padding: 0 1.5rem 1.5rem;
+}
+
+.metadata-collapsible.collapsed .metadata-body {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 1.5rem;
+}
+
+/* Collapsible Commands Panel */
+.commands-collapsible {
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.commands-collapsible.collapsed {
+    flex: 0 0 auto;
+}
+
+.commands-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 12px;
+    transition: background 0.2s;
+}
+
+.commands-header:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.commands-header h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.commands-chevron {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+    opacity: 0.6;
+}
+
+.commands-collapsible.collapsed .commands-chevron {
+    transform: rotate(-90deg);
+}
+
+.commands-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease;
+    opacity: 1;
+    padding: 0 1.5rem 1.5rem;
+}
+
+.commands-collapsible.collapsed .commands-body {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 1.5rem;
+    flex: 0;
+}
+
+/* Collapsible Command List Header Panel */
+.command-list-header-collapsible {
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.command-list-header-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 12px;
+    transition: background 0.2s;
+}
+
+.command-list-header-header:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.command-list-header-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.command-list-header-chevron {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+    opacity: 0.6;
+}
+
+.command-list-header-collapsible.collapsed .command-list-header-chevron {
+    transform: rotate(-90deg);
+}
+
+.command-list-header-body {
+    overflow: hidden;
+    max-height: 500px;
+    transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease;
+    opacity: 1;
+    padding: 0 1.5rem 1.5rem;
+}
+
+.command-list-header-collapsible.collapsed .command-list-header-body {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 1.5rem;
+}
+
+.command-list-header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 0;
 }
 
 /* Buttons */
@@ -242,6 +442,61 @@ label {
     text-transform: uppercase;
 }
 
+/* Nested Form Groups */
+.arg-field {
+    margin-bottom: 1rem;
+}
+
+.arg-field label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+}
+
+.nested-group {
+    margin-left: 1.5rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--glass-border);
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.nested-group-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+    font-weight: 800;
+}
+
+/* Array Item Padding */
+.array-item {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+    border: 1px solid var(--glass-border);
+}
+
+/* Optgroup Styling */
+optgroup {
+    background: var(--card-bg);
+    color: var(--accent-color);
+    font-weight: 800;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+}
+
+option {
+    color: var(--text-primary);
+    font-weight: 400;
+    padding: 0.3rem;
+    background: var(--card-bg);
+}
+
 input,
 textarea {
     background: var(--input-bg);
@@ -259,12 +514,19 @@ textarea:focus {
     border-color: var(--accent-color);
 }
 
-/* Command List Header */
+/* Command List Header — no longer needs to be sticky;
+   the #commandList below it is the scroll container */
+.sticky-header-container {
+    flex-shrink: 0;
+    margin-bottom: 0.75rem;
+    padding-bottom: 2px;
+}
+
 .command-list-header {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 0;
 }
 
 .header-top {
@@ -349,24 +611,62 @@ textarea:focus {
 
 
 .command-list {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
+    position: relative;
+    /* makes card.offsetTop relative to this container */
+    /* custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--glass-border) transparent;
+}
+
+.command-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.command-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.command-list::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 3px;
+}
+
+.command-list::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
 }
 
 .command-card {
-    padding: 1rem;
-    transition: transform 0.2s;
+    padding: 0;
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+    margin-bottom: 0;
+    scroll-margin-top: 8px;
+    flex-shrink: 0;
 }
 
 .command-card:hover {
-    transform: translateX(10px);
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .command-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 1rem;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.command-header:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .command-info {
@@ -415,11 +715,50 @@ textarea:focus {
     color: var(--danger-color);
 }
 
-.args-editor {
+/* Accordion Logic */
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease;
+    padding: 0 1.5rem;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.command-card.expanded .accordion-content {
+    max-height: 2000px;
+    /* Large enough to fit content */
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
+}
+
+.accordion-icon {
+    font-size: 0.8rem;
+    transition: transform 0.3s;
+    opacity: 0.5;
+    margin-left: 0.5rem;
+}
+
+.command-card.expanded .accordion-icon {
+    transform: rotate(180deg);
+}
+
+.args-editor-wrapper {
     margin-top: 0.5rem;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--input-bg);
+    border: 1px solid var(--glass-border);
     border-radius: 8px;
     padding: 0.5rem;
+}
+
+.args-editor {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    resize: none;
+    overflow: hidden;
+    outline: none;
 }
 
 .command-body label {
@@ -439,8 +778,13 @@ textarea:focus {
     color: var(--text-primary);
     font-family: inherit;
     font-size: 0.9rem;
-    resize: vertical;
+    resize: none;
+    overflow: hidden;
     min-height: 60px;
+}
+
+.auto-expand {
+    transition: height 0.1s ease;
 }
 
 .empty-state {
@@ -479,6 +823,31 @@ textarea:focus {
     opacity: 0.7;
     cursor: default;
 }
+
+/* Active (currently expanded) card */
+.command-card.active-card {
+    border-color: rgba(88, 166, 255, 0.5);
+    box-shadow: 0 0 0 1px rgba(88, 166, 255, 0.2), 0 4px 20px rgba(88, 166, 255, 0.1);
+    position: relative;
+}
+
+.command-card.active-card::after {
+    content: 'Active';
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--accent-secondary);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-bottom-left-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 10;
+    opacity: 0.85;
+}
+
 
 .command-card.moved-highlight {
     border-color: var(--accent-color);
@@ -521,21 +890,25 @@ textarea:focus {
     }
 }
 
-/* Modal System */
+/* Modal System OVERHAUL */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
     z-index: 2000;
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: fadeInModal 0.2s ease-out;
+    animation: fadeInModal 0.3s ease-out;
+}
+
+body.light-theme .modal-overlay {
+    background: rgba(255, 255, 255, 0.6);
 }
 
 .modal-overlay[hidden] {
@@ -543,15 +916,17 @@ textarea:focus {
 }
 
 .modal {
-    width: 90%;
-    max-width: 500px;
+    width: 95%;
+    max-width: 650px;
+    /* Increased width */
     padding: 2.5rem;
-    background: var(--bg-color);
-    border: 2px solid var(--accent-color);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
-    animation: scaleUpModal 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    border-radius: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 20px rgba(52, 116, 222, 0.2);
+    animation: scaleUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 24px;
     z-index: 2001;
+    overflow: hidden;
 }
 
 .modal-header {
@@ -563,8 +938,9 @@ textarea:focus {
 
 .modal-header h3 {
     margin: 0;
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     font-weight: 800;
+    letter-spacing: -0.02em;
     color: var(--accent-color);
 }
 
@@ -574,13 +950,154 @@ textarea:focus {
     line-height: 1.6;
     font-size: 1.1rem;
     font-weight: 500;
-    white-space: pre-wrap;
+}
+
+.modal-testing-bar {
+    background: rgba(52, 116, 222, 0.05);
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 1rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.modal-testing-bar[hidden] {
+    display: none !important;
+}
+
+.modal-testing-bar .bar-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: var(--accent-color);
+    opacity: 0.8;
+}
+
+.modal-testing-bar .bar-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
 }
 
 .modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 1.2rem;
+    /* Removed large negative margin to play nice with testing bar */
+    padding: 1.5rem 2.5rem;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.selection-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.selection-grid .form-group label {
+    font-size: 0.7rem;
+    color: var(--accent-color);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+    opacity: 0.9;
+}
+
+.form-select {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: all 0.2s ease;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.1em;
+}
+
+body.light-theme .form-select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(0,0,0,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+.form-select:hover:not(:disabled) {
+    border-color: rgba(52, 116, 222, 0.5);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 12px rgba(52, 116, 222, 0.2);
+}
+
+.form-select:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.form-select option {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    padding: 1rem;
+}
+
+.tool-args-form {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* 2 Column Grid for arguments */
+    gap: 1.25rem;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+
+/* Ensure wide items take full width */
+.tool-args-form>.nested-group,
+.tool-args-form>.full-width,
+.tool-args-form>.arg-field[data-full="true"] {
+    grid-column: span 2;
+}
+
+.arg-field label {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+}
+
+.nested-group {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    padding: 1.25rem;
+    border: 1px solid var(--glass-border);
+    margin-left: 0;
+    /* Removing large margin-left for new contained look */
+    margin-top: 1rem;
+}
+
+.nested-group-title {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 @keyframes fadeInModal {
@@ -606,9 +1123,5 @@ textarea:focus {
 }
 
 footer {
-    text-align: center;
-    margin-top: 4rem;
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    opacity: 0.6;
+    display: none;
 }

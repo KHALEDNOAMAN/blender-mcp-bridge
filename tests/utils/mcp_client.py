@@ -3,10 +3,11 @@ import json
 import random
 import string
 import traceback
+from src.config import settings
 
 
 class MCPClient:
-    def __init__(self, base_url="http://localhost:8000"):
+    def __init__(self, base_url=settings.bridge_url):
         self.base_url = base_url
         self.mcp_url = f"{base_url}/mcp/"
         self.session_id = "".join(
@@ -52,13 +53,15 @@ class MCPClient:
                     # The text field contains a stringified JSON of the tool result
                     tool_result_str = content_list[0]["text"]
                     result = json.loads(tool_result_str)
-                    print(f"  [CLIENT] {name}: {result.get('status', 'ok')}")
+                    status = result.get("status", "ok")
+                    emoji = "❌ " if status == "error" else ""
+                    print(f"  [CLIENT] {name}: {emoji}{status}")
                     return result
 
             print(f"  [CLIENT] {name}: raw response")
             return data
         except Exception as e:
-            print(f"  [CLIENT ERROR] {name}: {e}")
+            print(f"  [CLIENT ERROR] {name}: ❌ {e}")
             traceback.print_exc()
             return {
                 "status": "error",

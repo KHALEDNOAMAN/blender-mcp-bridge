@@ -67,6 +67,52 @@ class ModelingSelection:
             "message": f"Selected {len(selected)} object(s) matching '{pattern}': ({summary}){greedy_note}. TIP: For materials, use the 'pattern' parameter inside the material tool directly.",
         }
 
+    def select_by_collection(self, collection_names, extend=False, **kwargs):
+        """Select all objects within specific collections"""
+        # Ensure we're in Object mode
+        if bpy.context.mode != "OBJECT":
+            bpy.ops.object.mode_set(mode="OBJECT")
+
+        if not extend:
+            bpy.ops.object.select_all(action="DESELECT")
+
+        if isinstance(collection_names, str):
+            collection_names = [collection_names]
+
+        selected_count = 0
+        active = None
+
+        def select_collection_recursive(collection):
+            nonlocal selected_count, active
+            for obj in collection.objects:
+                try:
+                    obj.select_set(True)
+                    selected_count += 1
+                    if not active:
+                        active = obj
+                except RuntimeError:
+                    pass  # Object might be hidden
+
+            for child_coll in collection.children:
+                select_collection_recursive(child_coll)
+
+        for name in collection_names:
+            coll = bpy.data.collections.get(name)
+            if not coll:
+                print(f"[MCP] Warning: Collection '{name}' not found during selection.")
+                continue
+
+            select_collection_recursive(coll)
+
+        if active:
+            bpy.context.view_layer.objects.active = active
+
+        return {
+            "success": True,
+            "count": selected_count,
+            "message": f"Selected {selected_count} object(s) from collections: {', '.join(collection_names)}.",
+        }
+
     def invert_mesh_selection(self, object_name, **kwargs):
         """Invert selection of mesh components (verts/edges/faces)"""
         from ...utils import get_object

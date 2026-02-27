@@ -3,6 +3,8 @@ from tests.utils.mcp_client import MCPClient
 
 def create_transforms_row(client: MCPClient, y_offset: float = 40.0):
     print(f"Creating Transforms Row at Y={y_offset}...")
+    collection = "TRSF_BASIC"
+    client.call_tool("create_collection", {"name": collection})
 
     # 1. Duplicate Object (x=0)
     # Testing renaming, moving, and removing modifiers in one call
@@ -12,6 +14,7 @@ def create_transforms_row(client: MCPClient, y_offset: float = 40.0):
             "size": 2.0,
             "location": [0, y_offset, 0.0],
             "name": "Transform_Source_Cube",
+            "collection": collection,
         },
     )
     client.call_tool(
@@ -39,7 +42,12 @@ def create_transforms_row(client: MCPClient, y_offset: float = 40.0):
     # 2. Transform Object (x=5)
     client.call_tool(
         "create_cube",
-        {"size": 1.0, "location": [5.0, y_offset, 0.0], "name": "Transform_Move_Cube"},
+        {
+            "size": 1.0,
+            "location": [5.0, y_offset, 0.0],
+            "name": "Transform_Move_Cube",
+            "collection": collection,
+        },
     )
     client.call_tool(
         "transform_object",
@@ -54,7 +62,12 @@ def create_transforms_row(client: MCPClient, y_offset: float = 40.0):
     # 3. Set Object Dimensions (x=10)
     client.call_tool(
         "create_cube",
-        {"size": 1.0, "location": [10.0, y_offset, 0.0], "name": "Transform_Dim_Cube"},
+        {
+            "size": 1.0,
+            "location": [10.0, y_offset, 0.0],
+            "name": "Transform_Dim_Cube",
+            "collection": collection,
+        },
     )
     client.call_tool(
         "set_object_dimensions",
@@ -70,11 +83,21 @@ def create_transforms_row(client: MCPClient, y_offset: float = 40.0):
     # Create two spheres to transform
     client.call_tool(
         "create_sphere",
-        {"radius": 0.5, "location": [15.0, y_offset, 0.0], "name": "Transform_Batch_1"},
+        {
+            "radius": 0.5,
+            "location": [15.0, y_offset, 0.0],
+            "name": "Transform_Batch_1",
+            "collection": collection,
+        },
     )
     client.call_tool(
         "create_sphere",
-        {"radius": 0.5, "location": [17.0, y_offset, 0.0], "name": "Transform_Batch_2"},
+        {
+            "radius": 0.5,
+            "location": [17.0, y_offset, 0.0],
+            "name": "Transform_Batch_2",
+            "collection": collection,
+        },
     )
     client.call_tool(
         "batch_transform",

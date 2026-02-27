@@ -29,6 +29,11 @@ def get_primitive_tools() -> list[types.Tool]:
                         "description": "Optional: Absolute XYZ dimensions in meters.",
                     },
                     "name": {"type": "string", "description": "Object name"},
+                    "rotation": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: Euler rotation in degrees [X, Y, Z]",
+                    },
                     "collection": {
                         "type": "string",
                         "description": "Optional: Name of the collection to move the object to.",
@@ -66,6 +71,11 @@ def get_primitive_tools() -> list[types.Tool]:
                         "description": "Number of segments (e.g., 32 or 64)",
                     },
                     "name": {"type": "string", "description": "Object name"},
+                    "rotation": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: Euler rotation in degrees [X, Y, Z]",
+                    },
                     "collection": {
                         "type": "string",
                         "description": "Optional: Name of the collection to move the object to.",
@@ -96,6 +106,11 @@ def get_primitive_tools() -> list[types.Tool]:
                         "default": 2,
                     },
                     "name": {"type": "string", "description": "Object name"},
+                    "rotation": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: Euler rotation in degrees [X, Y, Z]",
+                    },
                     "collection": {
                         "type": "string",
                         "description": "Optional: Name of the collection to move the object to.",
@@ -117,6 +132,11 @@ def get_primitive_tools() -> list[types.Tool]:
                     },
                     "radius": {"type": "number", "description": "Radius of the sphere"},
                     "name": {"type": "string", "description": "Object name"},
+                    "rotation": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: Euler rotation in degrees [X, Y, Z]",
+                    },
                     "collection": {
                         "type": "string",
                         "description": "Optional: Name of the collection to move the object to.",
@@ -153,6 +173,11 @@ def get_primitive_tools() -> list[types.Tool]:
                         "description": "Smoothness of the tube circle",
                     },
                     "name": {"type": "string", "description": "Object name"},
+                    "rotation": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: Euler rotation in degrees [X, Y, Z]",
+                    },
                     "collection": {
                         "type": "string",
                         "description": "Optional: Name of the collection to move the object to.",
@@ -173,7 +198,17 @@ def get_primitive_tools() -> list[types.Tool]:
                         "description": "XYZ position",
                     },
                     "size": {"type": "number", "description": "Size of the plane"},
+                    "dimensions": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: Absolute XYZ dimensions.",
+                    },
                     "name": {"type": "string", "description": "Object name"},
+                    "rotation": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: Euler rotation in degrees [X, Y, Z]",
+                    },
                     "collection": {
                         "type": "string",
                         "description": "Optional: Name of the collection to move the object to.",
@@ -216,9 +251,66 @@ def get_primitive_tools() -> list[types.Tool]:
                         "items": {"type": "number"},
                         "description": "Euler rotation in degrees [X, Y, Z]",
                     },
-                    "collection": {"type": "string"},
+                    "collection": {
+                        "type": "string",
+                        "description": "Optional: Name of the collection to move the object to.",
+                    },
                 },
                 "required": ["text", "location"],
+            },
+        ),
+        types.Tool(
+            name="create_empty",
+            description="Create an Empty object, often used for instancing collections or as rigging roots.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "XYZ position",
+                    },
+                    "name": {"type": "string", "description": "Object name"},
+                    "empty_display_type": {
+                        "type": "string",
+                        "enum": [
+                            "PLAIN_AXES",
+                            "ARROWS",
+                            "SINGLE_ARROW",
+                            "CIRCLE",
+                            "CUBE",
+                            "SPHERE",
+                            "CONE",
+                            "IMAGE",
+                        ],
+                        "default": "PLAIN_AXES",
+                        "description": "Visual representation of the Empty",
+                    },
+                    "empty_display_size": {
+                        "type": "number",
+                        "default": 1.0,
+                        "description": "Size of the Empty representation",
+                    },
+                    "instance_collection": {
+                        "type": "string",
+                        "description": "Optional: Collection to instance on this Empty",
+                    },
+                    "collection": {
+                        "type": "string",
+                        "description": "Optional: Name of the collection to move the empty to.",
+                    },
+                    "hide_viewport": {
+                        "type": "boolean",
+                        "description": "If true, hides the object in the viewport.",
+                        "default": False,
+                    },
+                    "hide_render": {
+                        "type": "boolean",
+                        "description": "If true, hides the object in renders.",
+                        "default": False,
+                    },
+                },
+                "required": ["location"],
             },
         ),
     ]

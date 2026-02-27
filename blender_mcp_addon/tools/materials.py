@@ -9,13 +9,13 @@ class MaterialTools:
         name,
         preset=None,
         base_color=None,
-        metallic=0.0,
-        roughness=0.5,
+        metallic=None,
+        roughness=None,
         emission_color=None,
-        emission_strength=0.0,
-        alpha=1.0,
-        transmission=0.0,
-        ior=1.45,
+        emission_strength=None,
+        alpha=None,
+        transmission=None,
+        ior=None,
         object_names=None,
         pattern=None,
         collection=None,
@@ -81,13 +81,26 @@ class MaterialTools:
             p = PRESETS[preset]
             if base_color is None:
                 base_color = p.get("base_color")
-            metallic = p.get("metallic", metallic)
-            roughness = p.get("roughness", roughness)
-            transmission = p.get("transmission", transmission)
-            ior = p.get("ior", ior)
+            if metallic is None:
+                metallic = p.get("metallic")
+            if roughness is None:
+                roughness = p.get("roughness")
+            if transmission is None:
+                transmission = p.get("transmission")
+            if ior is None:
+                ior = p.get("ior")
             if emission_color is None:
                 emission_color = p.get("emission_color")
-            emission_strength = p.get("emission_strength", emission_strength)
+            if emission_strength is None:
+                emission_strength = p.get("emission_strength")
+
+        # Apply final fallbacks for any values still None
+        metallic = metallic if metallic is not None else 0.0
+        roughness = roughness if roughness is not None else 0.5
+        emission_strength = emission_strength if emission_strength is not None else 0.0
+        alpha = alpha if alpha is not None else 1.0
+        transmission = transmission if transmission is not None else 0.0
+        ior = ior if ior is not None else 1.45
 
         mat = bpy.data.materials.get(name)
         status = "existing" if mat else "created"
@@ -109,18 +122,22 @@ class MaterialTools:
             bsdf.inputs["Alpha"].default_value = alpha
 
         # Cycles vs EEVEE check
-        if "Transmission" in bsdf.inputs:
-            bsdf.inputs["Transmission"].default_value = transmission
-        elif "Transmission Weight" in bsdf.inputs:
+        # In Blender 4.0+, the property is 'Transmission Weight' instead of 'Transmission'
+        if "Transmission Weight" in bsdf.inputs:
             bsdf.inputs["Transmission Weight"].default_value = transmission
+        elif "Transmission" in bsdf.inputs:
+            bsdf.inputs["Transmission"].default_value = transmission
 
         if emission_color:
             e_rgb = hex_to_rgb(emission_color)
-            if "Emission" in bsdf.inputs:
+            if "Emission Color" in bsdf.inputs:  # Blender 4.0+
+                bsdf.inputs["Emission Color"].default_value = (*e_rgb, 1.0)
+            elif "Emission" in bsdf.inputs:  # Pre-4.0
                 bsdf.inputs["Emission"].default_value = (*e_rgb, 1.0)
             if "Emission Strength" in bsdf.inputs:
                 bsdf.inputs["Emission Strength"].default_value = emission_strength
 
+        # Blender 4.0+ uses IOR under the base layer
         if "IOR" in bsdf.inputs:
             bsdf.inputs["IOR"].default_value = ior
 
@@ -154,24 +171,27 @@ class MaterialTools:
         bsdf = mat.node_tree.nodes.get("Principled BSDF")
 
         inputs = {
-            "base_color": ("Base Color", True),
-            "metallic": ("Metallic", False),
-            "roughness": ("Roughness", False),
-            "alpha": ("Alpha", False),
-            "transmission": ("Transmission", False),
-            "emission_color": ("Emission", True),
-            "emission_strength": ("Emission Strength", False),
+            "base_color": (["Base Color"], True),
+            "metallic": (["Metallic"], False),
+            "roughness": (["Roughness"], False),
+            "alpha": (["Alpha"], False),
+            "transmission": (["Transmission Weight", "Transmission"], False),
+            "emission_color": (["Emission Color", "Emission"], True),
+            "emission_strength": (["Emission Strength"], False),
+            "ior": (["IOR"], False),
         }
 
-        for key, (input_name, is_color) in inputs.items():
+        for key, (input_names, is_color) in inputs.items():
             if key in kwargs and kwargs[key] is not None:
                 val = kwargs[key]
-                if input_name in bsdf.inputs:
+                # Find the first valid input name in the BSDF node
+                valid_input = next((n for n in input_names if n in bsdf.inputs), None)
+                if valid_input:
                     if is_color:
                         rgb = hex_to_rgb(val)
-                        bsdf.inputs[input_name].default_value = (*rgb, 1.0)
+                        bsdf.inputs[valid_input].default_value = (*rgb, 1.0)
                     else:
-                        bsdf.inputs[input_name].default_value = val
+                        bsdf.inputs[valid_input].default_value = val
 
         return {
             "success": True,

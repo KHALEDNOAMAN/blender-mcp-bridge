@@ -61,7 +61,7 @@ class ModelingModifiers:
             if "thickness" in kwargs:
                 mod.thickness = kwargs["thickness"]
             if "use_replace_original" in kwargs:
-                mod.use_replace_original = kwargs["use_replace_original"]
+                mod.use_replace = kwargs["use_replace_original"]
         elif modifier_type == "SMOOTH":
             if "factor" in kwargs:
                 mod.factor = kwargs["factor"]
@@ -71,9 +71,9 @@ class ModelingModifiers:
             if "object_b" in kwargs or "operand" in kwargs:
                 operand_name = kwargs.get("object_b") or kwargs.get("operand")
                 mod.object = get_object(operand_name)
-            if "operation" in kwargs:
+            if "operation" in kwargs and kwargs["operation"] != "N.A":
                 mod.operation = kwargs["operation"]
-            if "solver" in kwargs:
+            if "solver" in kwargs and kwargs["solver"] != "N.A":
                 mod.solver = kwargs["solver"]
             if hide_cutter:
                 operand_name = kwargs.get("object_b") or kwargs.get("operand")
@@ -292,14 +292,14 @@ class ModelingModifiers:
             mod_name = f"Bool_{operation}_{object_b}"
             mod = obj_a.modifiers.new(name=mod_name, type="BOOLEAN")
             mod.operation = operation
-            mod.solver = solver
+            mod.solver = solver if solver != "N.A" else "EXACT"
             mod.operand_type = operand_type
             if operand_type == "COLLECTION":
                 mod.collection = cutter
             else:
                 mod.object = cutter
         else:
-            mod.solver = solver
+            mod.solver = solver if solver != "N.A" else "EXACT"
 
         if hide_cutter and operand_type == "OBJECT":
             # Aggressive hiding for object cutters

@@ -18,13 +18,16 @@ def get_architectural_tools() -> list[types.Tool]:
                 "properties": {
                     "vertices": {
                         "type": "array",
+                        "minItems": 3,
                         "items": {
                             "type": "array",
+                            "minItems": 2,
                             "items": {"type": "number"},
                             "description": "[x, y] or [x, y, z] — z is ignored, floor is always at Z=0",
                         },
                         "description": (
                             "Ordered perimeter vertices of the building/unit footprint. "
+                            "Minimum 3 vertices required. "
                             "E.g. for a 10x6 rectangle: [[0,0],[10,0],[10,6],[0,6]]"
                         ),
                     },
@@ -60,22 +63,22 @@ def get_architectural_tools() -> list[types.Tool]:
                                     "type": "integer",
                                     "description": "0-indexed index of the edge in the vertices loop",
                                 },
-                                "offset": {
+                                "door_offset": {
                                     "type": "number",
                                     "description": "Distance from the start vertex of the edge",
                                 },
-                                "width": {
+                                "door_width": {
                                     "type": "number",
                                     "default": 0.9,
                                     "description": "Width of the door opening",
                                 },
-                                "height": {
+                                "door_height": {
                                     "type": "number",
                                     "default": 2.1,
                                     "description": "Height of the door opening",
                                 },
                             },
-                            "required": ["edge_index", "offset"],
+                            "required": ["edge_index", "door_offset"],
                         },
                         "description": "List of door openings to cut into the exterior walls",
                     },
@@ -88,27 +91,27 @@ def get_architectural_tools() -> list[types.Tool]:
                                     "type": "integer",
                                     "description": "0-indexed index of the edge in the vertices loop",
                                 },
-                                "offset": {
+                                "window_offset": {
                                     "type": "number",
                                     "description": "Distance from the start vertex of the edge",
                                 },
-                                "width": {
+                                "window_width": {
                                     "type": "number",
                                     "default": 1.2,
                                     "description": "Width of the window opening",
                                 },
-                                "height": {
+                                "window_height": {
                                     "type": "number",
                                     "default": 1.5,
                                     "description": "Height of the window opening",
                                 },
-                                "sill_height": {
+                                "window_sill_height": {
                                     "type": "number",
                                     "default": 0.9,
                                     "description": "Height from floor to bottom of window",
                                 },
                             },
-                            "required": ["edge_index", "offset"],
+                            "required": ["edge_index", "window_offset"],
                         },
                         "description": "List of window openings to cut into the exterior walls",
                     },
@@ -209,27 +212,6 @@ def get_architectural_tools() -> list[types.Tool]:
                     },
                 },
                 "required": ["start_point", "end_point"],
-            },
-        ),
-        types.Tool(
-            name="toggle_ceiling",
-            description=(
-                "Show or hide a ceiling (or any) object by name. "
-                "Use visible=false to look inside the building shell."
-            ),
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "object_name": {
-                        "type": "string",
-                        "description": "Name of the object to toggle (e.g. 'Apartment_Ceiling')",
-                    },
-                    "visible": {
-                        "type": "boolean",
-                        "description": "true = show, false = hide",
-                    },
-                },
-                "required": ["object_name", "visible"],
             },
         ),
         types.Tool(

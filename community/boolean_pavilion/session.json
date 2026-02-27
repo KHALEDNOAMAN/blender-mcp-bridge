@@ -8,6 +8,14 @@
   },
   "commands": [
     {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "*"
+      },
+      "timestamp": 1771681497,
+      "description": ""
+    },
+    {
       "tool": "create_collection",
       "arguments": {
         "name": "Boolean_Pavilion"

@@ -4,6 +4,8 @@ from tests.utils.mcp_client import MCPClient
 def create_primitives_row(client: MCPClient, y_offset: float = 0.0):
     """Creates a row of primitive objects at the specified Y offset."""
     print(f"Creating Primitives Row at Y={y_offset}...")
+    collection_name = "PRIM_BASIC"
+    client.call_tool("create_collection", {"name": collection_name})
 
     primitives = [
         ("create_cube", {"size": 2.0}, "Cube"),
@@ -17,6 +19,7 @@ def create_primitives_row(client: MCPClient, y_offset: float = 0.0):
     for i, (tool, args, name_suffix) in enumerate(primitives):
         x = i * 5.0
         args["location"] = [x, y_offset, 0.0]
-        args["name"] = f"Test_Primitive_{name_suffix}"
+        args["name"] = f"PRIM_{name_suffix}"
+        args["collection"] = collection_name
         print(f"Creating {args['name']} at {args['location']}")
         client.call_tool(tool, args)

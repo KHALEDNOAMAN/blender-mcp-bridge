@@ -8,6 +8,14 @@
   },
   "commands": [
     {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "*"
+      },
+      "timestamp": 1771681497,
+      "description": ""
+    },
+    {
       "tool": "create_collection",
       "arguments": {
         "name": "Condominium_Tower"
@@ -264,7 +272,7 @@
         "center": [
           0,
           0,
-          42
+          0
         ],
         "use_radial_rotation": true
       },

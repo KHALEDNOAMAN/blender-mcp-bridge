@@ -88,47 +88,50 @@ class ModelingTransforms:
         if not selected:
             raise ValueError("No objects selected to duplicate")
 
+        count = kwargs.get("count", 1)
         duplicated = []
         for obj in selected:
-            new_obj = obj.copy()
-            if hasattr(obj.data, "copy"):
-                new_obj.data = obj.data.copy()
+            for c in range(1, count + 1):
+                new_obj = obj.copy()
+                if hasattr(obj.data, "copy"):
+                    new_obj.data = obj.data.copy()
 
-            if collection:
-                target_coll = get_collection(collection)
-                target_coll.objects.link(new_obj)
-            else:
-                bpy.context.collection.objects.link(new_obj)
+                if collection:
+                    target_coll = get_collection(collection)
+                    target_coll.objects.link(new_obj)
+                else:
+                    bpy.context.collection.objects.link(new_obj)
 
-            if location_offset:
-                new_obj.location = [
-                    obj.location[i] + location_offset[i] for i in range(3)
-                ]
-            if rotation_offset:
-                new_obj.rotation_euler = [
-                    obj.rotation_euler[i] + math.radians(rotation_offset[i])
-                    for i in range(3)
-                ]
-            if scale:
-                new_obj.scale = scale
+                if location_offset:
+                    new_obj.location = [
+                        obj.location[i] + (location_offset[i] * c) for i in range(3)
+                    ]
+                if rotation_offset:
+                    new_obj.rotation_euler = [
+                        obj.rotation_euler[i] + (math.radians(rotation_offset[i]) * c)
+                        for i in range(3)
+                    ]
+                if scale:
+                    # Scale doesn't compound in duplicate_selection natively
+                    new_obj.scale = scale
 
-            if collection:
-                self._move_to_collection_helper(new_obj, collection)
+                if collection:
+                    self._move_to_collection_helper(new_obj, collection)
 
-            removed_count = 0
-            if remove_modifiers:
-                for mod_name in remove_modifiers:
-                    mod = new_obj.modifiers.get(mod_name)
-                    if not mod:
-                        for m in new_obj.modifiers:
-                            if m.name.lower() == mod_name.lower():
-                                mod = m
-                                break
-                    if mod:
-                        new_obj.modifiers.remove(mod)
-                        removed_count += 1
+                removed_count = 0
+                if remove_modifiers:
+                    for mod_name in remove_modifiers:
+                        mod = new_obj.modifiers.get(mod_name)
+                        if not mod:
+                            for m in new_obj.modifiers:
+                                if m.name.lower() == mod_name.lower():
+                                    mod = m
+                                    break
+                        if mod:
+                            new_obj.modifiers.remove(mod)
+                            removed_count += 1
 
-            duplicated.append(new_obj.name)
+                duplicated.append(new_obj.name)
 
         return {
             "success": True,
@@ -160,29 +163,75 @@ class ModelingTransforms:
 
     def transform_object(
         self,
-        object_name,
+        object_name=None,
+        pattern=None,
         location=None,
+        location_offset=None,
         rotation=None,
+        rotation_offset=None,
         scale=None,
         hide_viewport=None,
         hide_render=None,
+        **kwargs,
     ):
-        obj = get_object(object_name)
-        if location:
-            obj.location = location
-        if rotation:
-            obj.rotation_euler = [math.radians(r) for r in rotation]
-        if scale:
-            obj.scale = scale
+        import fnmatch
 
-        if hide_viewport is not None:
-            obj.hide_viewport = hide_viewport
-        if hide_render is not None:
-            obj.hide_render = hide_render
+        targets = set()
+        if object_name:
+            if isinstance(object_name, str):
+                targets.add(object_name)
+            elif isinstance(object_name, list):
+                targets.update(object_name)
+
+        if pattern:
+            matches = fnmatch.filter(bpy.data.objects.keys(), pattern)
+            targets.update(matches)
+
+        if not targets:
+            return {
+                "success": False,
+                "message": "No objects provided via 'object_name' or 'pattern'.",
+            }
+
+        count = 0
+        for obj_name in targets:
+            obj = get_object(obj_name)
+
+            if location:
+                obj.location = location
+
+            if location_offset:
+                curr_loc = obj.location.copy()
+                obj.location = (
+                    curr_loc[0] + location_offset[0],
+                    curr_loc[1] + location_offset[1],
+                    curr_loc[2] + location_offset[2],
+                )
+
+            if rotation:
+                obj.rotation_euler = [math.radians(r) for r in rotation]
+
+            if rotation_offset:
+                curr_rot = obj.rotation_euler.copy()
+                obj.rotation_euler = (
+                    curr_rot[0] + math.radians(rotation_offset[0]),
+                    curr_rot[1] + math.radians(rotation_offset[1]),
+                    curr_rot[2] + math.radians(rotation_offset[2]),
+                )
+
+            if scale:
+                obj.scale = scale
+
+            if hide_viewport is not None:
+                obj.hide_viewport = hide_viewport
+            if hide_render is not None:
+                obj.hide_render = hide_render
+            count += 1
 
         return {
             "success": True,
-            "message": f"Transformed object '{object_name}'",
+            "transformed": count,
+            "message": f"Transformed {count} object(s)",
         }
 
     def set_object_dimensions(self, object_name, x, y, z):

@@ -1,27 +1,48 @@
 import asyncio
 import json
-import traceback
+import threading
 from mcp.client.session import ClientSession
-from mcp.client.streamable_http import streamable_http_client
+from mcp.client.streamable_http import streamablehttp_client
+from src.config import settings
 
 
 class StatefulMCPClient:
-    def __init__(self, base_url="http://localhost:8000"):
+    def __init__(self, base_url=settings.bridge_url):
         self.base_url = base_url
         self.mcp_url = f"{base_url}/mcp/?transport=stateful"
-        self._session = None
-        self._exit_stack = None
 
-    async def _get_session(self):
-        """Internal helper to get or create a persistent session"""
-        if self._session is None:
-            from contextlib import AsyncExitStack
+        # Background worker state
+        self._loop = None
+        self._thread = None
+        self._command_queue = None
+        self._ready = threading.Event()
+        self._worker_task = None
 
-            self._exit_stack = AsyncExitStack()
+    def _ensure_worker(self):
+        """Starts the background worker if not already running"""
+        if self._thread is None:
+            self._thread = threading.Thread(target=self._thread_entry, daemon=True)
+            self._thread.start()
+            self._ready.wait()
 
-            # Establish the stream and session
-            streams = await self._exit_stack.enter_async_context(
-                streamable_http_client(self.mcp_url)
+    def _thread_entry(self):
+        """Thread entry point: runs the worker coroutine"""
+        asyncio.run(self._worker())
+
+    async def _worker(self):
+        """Persistent worker task that manages the connection lifecycle"""
+        self._loop = asyncio.get_running_loop()
+        self._command_queue = asyncio.Queue()
+        self._ready.set()
+
+        from contextlib import AsyncExitStack
+
+        async with AsyncExitStack() as stack:
+            print(f"  [CLIENT] Connecting to {self.mcp_url}...")
+
+            # Connect (this task enters the context)
+            streams = await stack.enter_async_context(
+                streamablehttp_client(self.mcp_url)
             )
 
             if isinstance(streams, tuple):
@@ -29,49 +50,105 @@ class StatefulMCPClient:
             else:
                 raise ValueError(f"Unexpected stream return type: {type(streams)}")
 
-            session = await self._exit_stack.enter_async_context(
+            session = await stack.enter_async_context(
                 ClientSession(read_stream, write_stream)
             )
             await session.initialize()
-            self._session = session
 
-        return self._session
+            # Request loop
+            while True:
+                cmd, name, args, future = await self._command_queue.get()
 
-    async def _call_tool_async(self, name, arguments=None):
-        if arguments is None:
-            arguments = {}
+                if cmd == "call":
+                    try:
+                        result = await session.call_tool(name, args or {})
+                        # Parse content
+                        if result.content and hasattr(result.content[0], "text"):
+                            raw_text = result.content[0].text
+                            if not raw_text or not raw_text.strip():
+                                future.set_result(
+                                    {
+                                        "status": "error",
+                                        "message": f"Empty response from Blender for tool '{name}'. Check Blender console for errors.",
+                                    }
+                                )
+                            else:
+                                try:
+                                    parsed = json.loads(raw_text)
+                                    future.set_result(parsed)
+                                except json.JSONDecodeError as e:
+                                    future.set_result(
+                                        {
+                                            "status": "error",
+                                            "message": f"Invalid JSON from Blender for tool '{name}': {e}. Raw: {raw_text[:200]}",
+                                        }
+                                    )
+                        else:
+                            future.set_result(
+                                {"status": "success", "raw": str(result.content)}
+                            )
+                    except Exception as e:
+                        future.set_exception(e)
 
-        session = await self._get_session()
-        result = await session.call_tool(name, arguments)
+                elif cmd == "close":
+                    # This task will now exit the context
+                    future.set_result(None)
+                    break
 
-        # result.content is a list of content items (TextContent, ImageContent etc.)
-        if result.content and hasattr(result.content[0], "text"):
-            return json.loads(result.content[0].text)
-        return {"status": "success", "raw_result": str(result.content)}
+                self._command_queue.task_done()
+
+    async def call_tool_async(self, name, arguments=None):
+        """Async tool call (Thread-safe dispatch to worker)"""
+        self._ensure_worker()
+
+        # Dispatch to worker thread and wait for it
+        item_future = asyncio.run_coroutine_threadsafe(
+            self._dispatch_to_worker("call", name, arguments), self._loop
+        )
+        # Wrap concurrent.futures.Future for the current loop
+        return await asyncio.wrap_future(item_future)
 
     def call_tool(self, name, arguments=None):
-        """Synchronous wrapper for async tool call"""
-        try:
-            # We use a persistent loop to keep the session alive if needed,
-            # but for simple CLI scripts, asyncio.run works as long as the
-            # object instance (self) persists and we manage the loop correctly.
-            # Using a custom loop for the class instance:
-            if not hasattr(self, "_loop"):
-                self._loop = asyncio.new_event_loop()
+        """Synchronous tool call (dispatches to worker)"""
+        self._ensure_worker()
 
-            result = self._loop.run_until_complete(
-                self._call_tool_async(name, arguments)
+        # Create a future that works across threads
+        # We need to be careful here: self._loop is for the worker thread
+        # We use a threadsafe future
+        item_future = asyncio.run_coroutine_threadsafe(
+            self._dispatch_to_worker("call", name, arguments), self._loop
+        )
+        result = item_future.result()
+        status = result.get("status", "ok")
+        emoji = "❌ " if status == "error" else ""
+        print(f"  [CLIENT] {name}: {emoji}{status}")
+        return result
+
+    async def _dispatch_to_worker(self, cmd, name=None, args=None):
+        """Helper to push to the worker queue from within the same loop"""
+        future = self._loop.create_future()
+        await self._command_queue.put((cmd, name, args, future))
+        return await future
+
+    async def aclose(self):
+        """Explicitly close by signaling the worker to exit (Thread-safe)"""
+        if self._command_queue:
+            item_future = asyncio.run_coroutine_threadsafe(
+                self._dispatch_to_worker("close"), self._loop
             )
-            print(f"  [CLIENT] {name}: {result.get('status', 'ok')}")
-            return result
-        except Exception as e:
-            print(f"  [CLIENT ERROR] {name}: {type(e).__name__}: {e}")
-            traceback.print_exc()
-            return {"status": "error", "message": str(e)}
+            await asyncio.wrap_future(item_future)
+
+    def close(self):
+        """Synchronous close"""
+        if self._loop and self._loop.is_running():
+            future = asyncio.run_coroutine_threadsafe(self.aclose(), self._loop)
+            future.result()
+            # The worker thread will exit naturally when the coroutine finishes
+            self._thread.join(timeout=2.0)
+            self._thread = None
+            self._loop = None
 
     def __del__(self):
-        """Cleanup persistent resources"""
-        if hasattr(self, "_exit_stack") and self._exit_stack:
-            if hasattr(self, "_loop") and self._loop.is_running():
-                # Cannot easily close async stack from sync __del__ without a running loop
-                pass
+        """Graceful ish cleanup"""
+        if self._loop and self._loop.is_running():
+            asyncio.run_coroutine_threadsafe(self.aclose(), self._loop)

@@ -95,213 +95,227 @@ class ModelingArchitectural:
         3. Build faces for the grid, skipping the 'holes' defined by openings.
         4. Solidify the entire manifold ring at once.
         """
-        # --- resolve collection ---
-        if collection:
-            coll = get_collection(collection)
-        else:
-            coll = bpy.context.scene.collection
+        try:
+            # --- resolve collection ---
+            if collection:
+                coll = get_collection(collection)
+            else:
+                coll = bpy.context.scene.collection
 
-        # Normalise vertices to (x, y, z=0)
-        pts2d = []
-        for p in vertices:
-            pts2d.append(mathutils.Vector((p[0], p[1], 0.0)))
+            # Deduplicate consecutive identical points
+            pts2d = []
+            for p in vertices:
+                v = mathutils.Vector((p[0], p[1], 0.0))
+                if not pts2d or (v - pts2d[-1]).length > 1e-4:
+                    pts2d.append(v)
 
-        if len(pts2d) < 3:
+            # Remove redundant last point if it matches the first
+            if len(pts2d) > 2 and (pts2d[-1] - pts2d[0]).length < 1e-4:
+                pts2d.pop()
+
+            if len(pts2d) < 3:
+                return {
+                    "success": False,
+                    "message": "Need at least 3 unique vertices to form a room shell footprint.",
+                }
+
+            def _make_obj(mesh_name):
+                mesh = bpy.data.meshes.new(mesh_name)
+                obj = bpy.data.objects.new(mesh_name, mesh)
+                if obj.name not in coll.objects:
+                    coll.objects.link(obj)
+                return obj, mesh
+
+            # ── 1. FLOOR ──────────────────────────────────────────────────────────
+            floor_name = f"{name}_Floor"
+            floor_obj, floor_mesh = _make_obj(floor_name)
+            bm_floor = bmesh.new()
+            floor_verts = [bm_floor.verts.new(p) for p in pts2d]
+            floor_face = bm_floor.faces.new(floor_verts)
+            bm_floor.normal_update()
+            # Solidify creates a slab
+            bmesh.ops.solidify(bm_floor, geom=[floor_face], thickness=-floor_thickness)
+
+            # Ensure floor is BELOW Z=0
+            bm_floor.verts.ensure_lookup_table()
+            max_z = max(v.co.z for v in bm_floor.verts)
+            if max_z > 1e-6:
+                bmesh.ops.translate(
+                    bm_floor, vec=(0, 0, -max_z), verts=list(bm_floor.verts)
+                )
+
+            bm_floor.to_mesh(floor_mesh)
+            bm_floor.free()
+
+            # ── 2. WALLS ──────────────────────────────────────────────────────────
+            wall_name = f"{name}_Walls"
+            wall_obj, wall_mesh = _make_obj(wall_name)
+            bm_walls = bmesh.new()
+
+            # 1. Collect ALL opening heights (Z) building-wide to ensure manifold corners
+            edge_openings = {}
+            # Walls start at -floor_thickness to cover the slab, interior floor is at 0.0
+            global_z_cuts = {-floor_thickness, 0.0, height}
+
+            if doors:
+                for d in doors:
+                    idx = d.get("edge_index")
+                    if idx is not None and 0 <= idx < len(pts2d):
+                        dh = d.get("door_height", d.get("height", 2.1))
+                        do = d.get("door_offset", d.get("offset", 0.0))
+                        dw = d.get("door_width", d.get("width", 0.9))
+                        edge_openings.setdefault(idx, []).append(
+                            ("door", do, dw, dh, 0.0)
+                        )
+                        global_z_cuts.add(max(0.0, min(dh, height)))
+            if windows:
+                for w in windows:
+                    idx = w.get("edge_index")
+                    if idx is not None and 0 <= idx < len(pts2d):
+                        sh = w.get("window_sill_height", w.get("sill_height", 0.9))
+                        wh = w.get("window_height", w.get("height", 1.5))
+                        wo = w.get("window_offset", w.get("offset", 0.0))
+                        ww = w.get("window_width", w.get("width", 1.2))
+                        edge_openings.setdefault(idx, []).append(
+                            ("window", wo, ww, sh + wh, sh)
+                        )
+                        global_z_cuts.add(max(0.0, min(sh, height)))
+                        global_z_cuts.add(max(0.0, min(sh + wh, height)))
+
+            # Sort and merge nearly identical Z-cuts (1mm tolerance)
+            z_raw = sorted(list(global_z_cuts))
+            z_sorted = [z_raw[0]]
+            for z in z_raw[1:]:
+                if z - z_sorted[-1] > 0.001:
+                    z_sorted.append(z)
+
+            n = len(pts2d)
+            up = mathutils.Vector((0, 0, 1.0))
+
+            # Vertex Cache for core corners (strictly shared between edges)
+            v_base_cache = [bm_walls.verts.new(p - up * floor_thickness) for p in pts2d]
+            v_bot_cache = [bm_walls.verts.new(p) for p in pts2d]
+            v_top_cache = [bm_walls.verts.new(p + up * height) for p in pts2d]
+
+            for i in range(n):
+                j = (i + 1) % n
+                p1, p2 = pts2d[i], pts2d[j]
+                wall_vec = p2 - p1
+                length = wall_vec.length
+                if length < 1e-6:
+                    continue
+
+                unit = wall_vec.normalized()
+                openings = edge_openings.get(i, [])
+
+                # 2. Collect X-cuts for this specific wall and merge duplicates
+                x_raw = {0.0, length}
+                for ot, oo, ow, otop, osill in openings:
+                    x_raw.add(max(0.0, min(oo, length)))
+                    x_raw.add(max(0.0, min(oo + ow, length)))
+
+                x_sorted_pre = sorted(list(x_raw))
+                x_sorted = [x_sorted_pre[0]]
+                for x in x_sorted_pre[1:]:
+                    if x - x_sorted[-1] > 0.001:
+                        x_sorted.append(x)
+
+                # 3. Build Vertex Grid for this wall
+                grid = []
+                for xi, x in enumerate(x_sorted):
+                    stack = []
+                    for zi, z in enumerate(z_sorted):
+                        if xi == 0 and zi == 0:
+                            v = v_base_cache[i]
+                        elif xi == 0 and z == 0.0:
+                            v = v_bot_cache[i]
+                        elif xi == 0 and zi == len(z_sorted) - 1:
+                            v = v_top_cache[i]
+                        elif xi == len(x_sorted) - 1 and zi == 0:
+                            v = v_base_cache[j]
+                        elif xi == len(x_sorted) - 1 and z == 0.0:
+                            v = v_bot_cache[j]
+                        elif xi == len(x_sorted) - 1 and zi == len(z_sorted) - 1:
+                            v = v_top_cache[j]
+                        else:
+                            v = bm_walls.verts.new(p1 + unit * x + up * z)
+                        stack.append(v)
+                    grid.append(stack)
+
+                # 4. Create quad faces, skipping opening areas
+                for xi in range(len(x_sorted) - 1):
+                    x_mid = (x_sorted[xi] + x_sorted[xi + 1]) / 2.0
+                    active_openings = [
+                        o
+                        for o in openings
+                        if o[1] - 1e-4 <= x_mid <= o[1] + o[2] + 1e-4
+                    ]
+
+                    for zi in range(len(z_sorted) - 1):
+                        z_mid = (z_sorted[zi] + z_sorted[zi + 1]) / 2.0
+
+                        is_hole = False
+                        # Only cut holes ABOVE floor level (Z=0)
+                        if z_mid > 1e-4:
+                            for ot, oo, ow, otop, osill in active_openings:
+                                if osill - 1e-4 <= z_mid <= otop + 1e-4:
+                                    is_hole = True
+                                    break
+
+                        if not is_hole:
+                            bm_walls.faces.new(
+                                [
+                                    grid[xi][zi],
+                                    grid[xi + 1][zi],
+                                    grid[xi + 1][zi + 1],
+                                    grid[xi][zi + 1],
+                                ]
+                            )
+
+            bm_walls.normal_update()
+            # Clean up any coincident vertices
+            bmesh.ops.remove_doubles(bm_walls, verts=list(bm_walls.verts), dist=0.0001)
+            # Apply solidification to the wall ring
+            if len(bm_walls.faces):
+                bmesh.ops.solidify(
+                    bm_walls, geom=list(bm_walls.faces), thickness=-wall_thickness
+                )
+            bm_walls.to_mesh(wall_mesh)
+            bm_walls.free()
+
+            # ── 3. CEILING ────────────────────────────────────────────────────────
+            ceil_name = f"{name}_Ceiling"
+            ceil_obj, ceil_mesh = _make_obj(ceil_name)
+            bm_ceil = bmesh.new()
+            ceil_verts = [
+                bm_ceil.verts.new(mathutils.Vector((p.x, p.y, height))) for p in pts2d
+            ]
+            bm_ceil.faces.new(ceil_verts)
+            bm_ceil.normal_update()
+            bm_ceil.to_mesh(ceil_mesh)
+            bm_ceil.free()
+
+            # Make floor active / selected for convenience
+            bpy.context.view_layer.objects.active = floor_obj
+            floor_obj.select_set(True)
+
             return {
-                "success": False,
-                "message": "Need at least 3 vertices to form a room shell.",
+                "success": True,
+                "verified": True,
+                "floor": floor_name,
+                "walls": wall_name,
+                "ceiling": ceil_name,
+                "message": (
+                    f"Room shell '{name}' created with {len(pts2d)} vertices. "
+                    f"Objects: {floor_name}, {wall_name}, {ceil_name}."
+                ),
             }
+        except Exception as e:
+            import traceback
 
-        def _make_obj(mesh_name):
-            mesh = bpy.data.meshes.new(mesh_name)
-            obj = bpy.data.objects.new(mesh_name, mesh)
-            if obj.name not in coll.objects:
-                coll.objects.link(obj)
-            return obj, mesh
-
-        # ── 1. FLOOR ──────────────────────────────────────────────────────────
-        floor_name = f"{name}_Floor"
-        floor_obj, floor_mesh = _make_obj(floor_name)
-        bm = bmesh.new()
-        floor_verts = [bm.verts.new(p) for p in pts2d]
-        floor_face = bm.faces.new(floor_verts)
-        bm.normal_update()
-        bmesh.ops.solidify(bm, geom=[floor_face], thickness=-floor_thickness)
-        bm.to_mesh(floor_mesh)
-        bm.free()
-
-        # ── 2. WALLS ──────────────────────────────────────────────────────────
-        wall_name = f"{name}_Walls"
-        wall_obj, wall_mesh = _make_obj(wall_name)
-        bm = bmesh.new()
-
-        # 1. Collect ALL opening heights (Z) building-wide to ensure manifold corners
-        edge_openings = {}
-        global_z_cuts = {0.0, height}
-
-        if doors:
-            for d in doors:
-                idx = d.get("edge_index")
-                if idx is not None and 0 <= idx < len(pts2d):
-                    dh = d.get("height", 2.1)
-                    edge_openings.setdefault(idx, []).append(
-                        ("door", d.get("offset", 0.0), d.get("width", 0.9), dh, 0.0)
-                    )
-                    global_z_cuts.add(max(0.0, min(dh, height)))
-        if windows:
-            for w in windows:
-                idx = w.get("edge_index")
-                if idx is not None and 0 <= idx < len(pts2d):
-                    sh = w.get("sill_height", 0.9)
-                    wh = w.get("height", 1.5)
-                    edge_openings.setdefault(idx, []).append(
-                        (
-                            "window",
-                            w.get("offset", 0.0),
-                            w.get("width", 1.2),
-                            sh + wh,
-                            sh,
-                        )
-                    )
-                    global_z_cuts.add(max(0.0, min(sh, height)))
-                    global_z_cuts.add(max(0.0, min(sh + wh, height)))
-
-        # Sort and merge nearly identical Z-cuts (1mm tolerance)
-        z_raw = sorted(list(global_z_cuts))
-        z_sorted = [z_raw[0]]
-        for z in z_raw[1:]:
-            if z - z_sorted[-1] > 0.001:
-                z_sorted.append(z)
-
-        n = len(pts2d)
-        up = mathutils.Vector((0, 0, 1.0))
-
-        # Vertex Cache for core corners (strictly shared between edges)
-        v_bot_cache = [bm.verts.new(p) for p in pts2d]
-        v_top_cache = [bm.verts.new(p + up * height) for p in pts2d]
-
-        for i in range(n):
-            j = (i + 1) % n
-            p1, p2 = pts2d[i], pts2d[j]
-            wall_vec = p2 - p1
-            length = wall_vec.length
-            if length < 1e-6:
-                continue
-
-            unit = wall_vec.normalized()
-            openings = edge_openings.get(i, [])
-
-            # 2. Collect X-cuts for this specific wall and merge duplicates
-            x_raw = {0.0, length}
-            for ot, oo, ow, otop, osill in openings:
-                x_raw.add(max(0.0, min(oo, length)))
-                x_raw.add(max(0.0, min(oo + ow, length)))
-
-            x_sorted_pre = sorted(list(x_raw))
-            x_sorted = [x_sorted_pre[0]]
-            for x in x_sorted_pre[1:]:
-                if x - x_sorted[-1] > 0.001:
-                    x_sorted.append(x)
-
-            # 3. Build Vertex Grid for this wall
-            # grid[xi][zi] = vertex
-            grid = []
-            for xi, x in enumerate(x_sorted):
-                stack = []
-                for zi, z in enumerate(z_sorted):
-                    # Use shared corner vertices for base/top boundaries
-                    if xi == 0 and zi == 0:
-                        v = v_bot_cache[i]
-                    elif xi == 0 and zi == len(z_sorted) - 1:
-                        v = v_top_cache[i]
-                    elif xi == len(x_sorted) - 1 and zi == 0:
-                        v = v_bot_cache[j]
-                    elif xi == len(x_sorted) - 1 and zi == len(z_sorted) - 1:
-                        v = v_top_cache[j]
-                    else:
-                        v = bm.verts.new(p1 + unit * x + up * z)
-                    stack.append(v)
-                grid.append(stack)
-
-            # 4. Create quad faces, skipping opening areas
-            for xi in range(len(x_sorted) - 1):
-                x_mid = (x_sorted[xi] + x_sorted[xi + 1]) / 2.0
-                active_openings = [
-                    o for o in openings if o[1] - 1e-4 <= x_mid <= o[1] + o[2] + 1e-4
-                ]
-
-                for zi in range(len(z_sorted) - 1):
-                    z_mid = (z_sorted[zi] + z_sorted[zi + 1]) / 2.0
-
-                    is_hole = False
-                    for ot, oo, ow, otop, osill in active_openings:
-                        if osill - 1e-4 <= z_mid <= otop + 1e-4:
-                            is_hole = True
-                            break
-
-                    if not is_hole:
-                        # Normal points outward for CCW perimeter
-                        bm.faces.new(
-                            [
-                                grid[xi][zi],
-                                grid[xi + 1][zi],
-                                grid[xi + 1][zi + 1],
-                                grid[xi][zi + 1],
-                            ]
-                        )
-
-        bm.normal_update()
-        # Clean up any coincident vertices
-        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
-        # Apply solidification to the entire manifold mesh ring
-        bmesh.ops.solidify(bm, geom=bm.faces, thickness=-wall_thickness)
-        bm.to_mesh(wall_mesh)
-        bm.free()
-
-        # ── 3. CEILING ────────────────────────────────────────────────────────
-        ceil_name = f"{name}_Ceiling"
-        ceil_obj, ceil_mesh = _make_obj(ceil_name)
-        bm = bmesh.new()
-        ceil_verts = [bm.verts.new(mathutils.Vector((p.x, p.y, height))) for p in pts2d]
-        bm.faces.new(ceil_verts)
-        bm.normal_update()
-        bm.to_mesh(ceil_mesh)
-        bm.free()
-
-        # Hide ceiling by default (user request)
-        ceil_obj.hide_viewport = True
-        ceil_obj.hide_render = True
-
-        # Make floor active / selected for convenience
-        bpy.context.view_layer.objects.active = floor_obj
-        floor_obj.select_set(True)
-
-        return {
-            "success": True,
-            "verified": True,
-            "floor": floor_name,
-            "walls": wall_name,
-            "ceiling": ceil_name,
-            "message": (
-                f"Room shell '{name}' created — {len(pts2d)} vertices, "
-                f"{height}m tall, {wall_thickness}m walls, {floor_thickness}m floor slab. "
-                f"Objects: {floor_name}, {wall_name}, {ceil_name}."
-            ),
-        }
-
-    def toggle_ceiling(self, object_name, visible=False, **kwargs):
-        """Show or hide an object (intended for ceiling objects)."""
-        obj = get_object(object_name)
-        obj.hide_viewport = not visible
-        obj.hide_render = not visible
-        state = "visible" if visible else "hidden"
-        return {
-            "success": True,
-            "verified": True,
-            "object": object_name,
-            "state": state,
-            "message": f"'{object_name}' is now {state} in viewport and render.",
-        }
+            error_msg = f"Error in build_room_shell: {str(e)}\n{traceback.format_exc()}"
+            print(error_msg)
+            return {"success": False, "message": error_msg}
 
     def build_wall_with_door(
         self,

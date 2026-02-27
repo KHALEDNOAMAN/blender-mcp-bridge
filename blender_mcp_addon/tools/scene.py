@@ -13,7 +13,7 @@ class SceneTools:
             "collections": [c.name for c in bpy.data.collections],
         }
 
-        for obj in bpy.context.scene.objects[:100]:
+        for obj in bpy.context.scene.objects[:1000]:
             scene_info["objects"].append(
                 {
                     "name": obj.name,

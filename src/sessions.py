@@ -20,6 +20,7 @@ class SessionCommand:
     arguments: Dict[str, Any]
     description: Optional[str] = None
     timestamp: float = field(default_factory=time.time)
+    execution_status: Optional[str] = None
 
 
 @dataclass
@@ -35,8 +36,19 @@ class BridgeSession:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]):
-        metadata = SessionMetadata(**data.get("metadata", {}))
-        commands = [SessionCommand(**cmd) for cmd in data.get("commands", [])]
+        metadata_data = data.get("metadata", {})
+        # Filter metadata keys to match class
+        metadata_keys = {f.name for f in SessionMetadata.__dataclass_fields__.values()}
+        metadata_clean = {k: v for k, v in metadata_data.items() if k in metadata_keys}
+        metadata = SessionMetadata(**metadata_clean)
+
+        command_list = data.get("commands", [])
+        command_keys = {f.name for f in SessionCommand.__dataclass_fields__.values()}
+        commands = []
+        for cmd in command_list:
+            clean_cmd = {k: v for k, v in cmd.items() if k in command_keys}
+            commands.append(SessionCommand(**clean_cmd))
+
         return cls(metadata=metadata, commands=commands)
 
     def save(self, path: str):
@@ -68,13 +80,13 @@ class SessionRecorder:
 
 class SessionPlayer:
     def __init__(
-        self, transport: str = "stateful", host: str = "http://localhost:8000"
+        self, transport: str = "stateful", host: str = "http://localhost:8008"
     ):
         self.transport = transport
         self.host = host
         self._client = None
 
-    def _get_client(self):
+    async def _get_client(self):
         if self._client:
             return self._client
 
@@ -88,8 +100,8 @@ class SessionPlayer:
             self._client = MCPClient(base_url=self.host)
         return self._client
 
-    def play(self, session: BridgeSession):
-        client = self._get_client()
+    async def play(self, session: BridgeSession):
+        client = await self._get_client()
 
         # ANSI Color codes
         green = "\033[92m"
@@ -106,39 +118,49 @@ class SessionPlayer:
         success_count = 0
         fail_count = 0
 
-        for i, cmd in enumerate(session.commands):
-            # Print command and header
-            print(
-                f"{bold}[{i + 1}/{len(session.commands)}]{reset} Calling {cyan}{cmd.tool}{reset}..."
-            )
-
-            # Print description if available
-            if cmd.description:
-                # Indent and prefix descriptions for readability
-                indented_desc = "\n".join(
-                    [f"  | {line}" for line in cmd.description.splitlines()]
+        try:
+            for i, cmd in enumerate(session.commands):
+                # Print command and header
+                print(
+                    f"{bold}[{i + 1}/{len(session.commands)}]{reset} Calling {cyan}{cmd.tool}{reset}..."
                 )
-                print(f"{indented_desc}")
 
-            try:
-                client.call_tool(cmd.tool, cmd.arguments)
-                # Success indicator
-                print(f"  {bold}{green}✓ SUCCESS{reset}")
-                success_count += 1
-            except Exception as e:
-                # Failure indicator
-                print(f"  {bold}{red}✘ ERROR:{reset} {e}")
-                fail_count += 1
+                # Print description if available
+                if cmd.description:
+                    # Indent and prefix descriptions for readability
+                    indented_desc = "\n".join(
+                        [f"  | {line}" for line in cmd.description.splitlines()]
+                    )
+                    print(f"{indented_desc}")
 
-            print("-" * 60)
+                try:
+                    # Use the async version of call_tool to avoid loop nesting issues
+                    if hasattr(client, "call_tool_async"):
+                        await client.call_tool_async(cmd.tool, cmd.arguments)
+                    else:
+                        client.call_tool(cmd.tool, cmd.arguments)
+                    # Success indicator
+                    print(f"  {bold}{green}✓ SUCCESS{reset}")
+                    success_count += 1
+                except Exception as e:
+                    # Failure indicator
+                    print(f"  {bold}{red}✘ ERROR:{reset} {e}")
+                    fail_count += 1
 
-        # Final Summary
-        label_width = 16
-        print(f"\n{bold}Playback Summary:{reset}")
-        print(f"  {'Total Commands:':<{label_width}} {len(session.commands)}")
-        print(f"  {green}{'Successes:':<{label_width}} {success_count}{reset}")
+                print("-" * 60)
 
-        fail_color = red if fail_count > 0 else green
-        print(f"  {fail_color}{'Failures:':<{label_width}} {fail_count}{reset}")
+            # Final Summary
+            label_width = 16
+            print(f"\n{bold}Playback Summary:{reset}")
+            print(f"  {'Total Commands:':<{label_width}} {len(session.commands)}")
+            print(f"  {green}{'Successes:':<{label_width}} {success_count}{reset}")
 
-        print(f"\n{bold}{green if fail_count == 0 else red}Playback finished.{reset}")
+            fail_color = red if fail_count > 0 else green
+            print(f"  {fail_color}{'Failures:':<{label_width}} {fail_count}{reset}")
+
+            print(
+                f"\n{bold}{green if fail_count == 0 else red}Playback finished.{reset}"
+            )
+        finally:
+            if hasattr(client, "aclose"):
+                await client.aclose()

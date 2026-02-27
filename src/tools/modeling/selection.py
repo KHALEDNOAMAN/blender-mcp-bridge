@@ -42,6 +42,26 @@ def get_selection_tools() -> list[types.Tool]:
             },
         ),
         types.Tool(
+            name="select_by_collection",
+            description="Select all objects within a specific collection.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "collection_names": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Exact names of the collections to select objects from",
+                    },
+                    "extend": {
+                        "type": "boolean",
+                        "default": False,
+                        "description": "If true, add to current selection instead of replacing it.",
+                    },
+                },
+                "required": ["collection_names"],
+            },
+        ),
+        types.Tool(
             name="invert_mesh_selection",
             description="Invert selection of mesh components (verts/edges/faces) inside an object.",
             inputSchema={

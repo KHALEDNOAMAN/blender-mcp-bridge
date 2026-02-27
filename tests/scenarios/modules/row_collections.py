@@ -16,7 +16,8 @@ def create_collections_row(client: MCPClient, y_offset: float = 20.0):
     """Creates objects within specific collections."""
     print(f"Creating Collections Row at Y={y_offset}...")
 
-    collection_name = "Test_Integration_Collection"
+    collection_name = "COL_INTEGRATION"
+    # Ensure collection exists (handled gracefully by tool if already exists)
     client.call_tool("create_collection", {"name": collection_name})
 
     # Create cube in collection
@@ -25,7 +26,7 @@ def create_collections_row(client: MCPClient, y_offset: float = 20.0):
         {
             "size": 2.0,
             "location": [0.0, y_offset, 0.0],
-            "name": "Test_Col_Cube",
+            "name": "COL_Cube",
             "collection": collection_name,
         },
     )
@@ -36,12 +37,12 @@ def create_collections_row(client: MCPClient, y_offset: float = 20.0):
         {
             "radius": 1.0,
             "location": [5.0, y_offset, 0.0],
-            "name": "Test_Col_Sphere",
+            "name": "COL_Sphere",
         },
     )
     client.call_tool(
         "move_to_collection",
-        {"object_names": ["Test_Col_Sphere"], "collection_name": collection_name},
+        {"object_names": ["COL_Sphere"], "target_collection": collection_name},
     )
 
     # Create cylinder OUTSIDE the collection (should not be duplicated)
@@ -51,7 +52,7 @@ def create_collections_row(client: MCPClient, y_offset: float = 20.0):
             "radius": 0.5,
             "depth": 2.0,
             "location": [10.0, y_offset, 0.0],
-            "name": "Test_Col_Cylinder_Outside",
+            "name": "COL_Cylinder_Outside",
         },
     )
 
@@ -65,10 +66,8 @@ def create_collections_row(client: MCPClient, y_offset: float = 20.0):
     print("")
 
     # Select objects in the collection using pattern
-    client.call_tool("select_by_pattern", {"pattern": "Test_Col_Cube"})
-    client.call_tool(
-        "select_by_pattern", {"pattern": "Test_Col_Sphere", "extend": True}
-    )
+    client.call_tool("select_by_pattern", {"pattern": "COL_Cube"})
+    client.call_tool("select_by_pattern", {"pattern": "COL_Sphere", "extend": True})
 
     # Set active collection
     client.call_tool("set_active_collection", {"collection_name": collection_name})
@@ -82,13 +81,12 @@ def create_collections_row(client: MCPClient, y_offset: float = 20.0):
     )
 
     # Test remove_collection
-    to_remove_coll = "Test_Collection_ToRemove"
-    client.call_tool("create_collection", {"name": to_remove_coll})
+    to_remove_coll = "COL_REMOVAL"
     client.call_tool(
         "move_to_collection",
         {
-            "object_names": ["Test_Col_Cylinder_Outside"],
-            "collection_name": to_remove_coll,
+            "object_names": ["COL_Cylinder_Outside"],
+            "target_collection": to_remove_coll,
         },
     )
 
@@ -100,6 +98,6 @@ def create_collections_row(client: MCPClient, y_offset: float = 20.0):
         "remove_collection", {"name": to_remove_coll, "delete_objects": True}
     )
 
-    print("\nAfter removal (Cylinder and Collection should be gone):")
+    print(f"\nAfter removal ({to_remove_coll} and its objects should be gone):")
     coll_info_after = client.call_tool("get_collections", {})
     print_collection_tree(coll_info_after)

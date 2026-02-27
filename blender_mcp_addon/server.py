@@ -177,6 +177,7 @@ class BlenderMCPServer(
             command.get("request_id", "unknown"),
         )
         print(f"[MCP][{rid}] Executing: {cmd_type}")
+        print(f"[MCP][{rid}] Params: {params}")
 
         # Map types to methods (inherited from tool classes)
         # This keeps the dispatcher dynamic and maintains compatibility with existing client
@@ -192,6 +193,8 @@ class BlenderMCPServer(
             "move_to_collection": self.move_to_collection,
             "get_collections": self.get_collections,
             "remove_collection": self.remove_collection,
+            "duplicate_collection": self.duplicate_collection,
+            "set_collection_visibility": self.set_collection_visibility,
             # Modeling
             "create_primitive": self.create_primitive,
             "create_cube": self.create_cube,
@@ -201,6 +204,7 @@ class BlenderMCPServer(
             "create_torus": self.create_torus,
             "create_text": self.create_text,
             "create_plane": self.create_plane,
+            "create_empty": self.create_empty,
             "duplicate_object": self.duplicate_object,
             "duplicate_selection": self.duplicate_selection,
             "create_and_array": self.create_and_array,
@@ -213,6 +217,7 @@ class BlenderMCPServer(
             "circular_array": self.circular_array,
             "select_objects": self.select_objects,
             "select_by_pattern": self.select_by_pattern,
+            "select_by_collection": self.select_by_collection,
             "delete_object": self.delete_object,
             "set_object_dimensions": self.set_object_dimensions,
             "join_objects": self.join_objects,
@@ -221,13 +226,17 @@ class BlenderMCPServer(
             "inset_faces": self.inset_faces,
             "shear_mesh": self.shear_mesh,
             "invert_mesh_selection": self.invert_mesh_selection,
+            "set_object_visibility": self.set_object_visibility,
             # Architectural (ArchBuilder)
             "build_room_shell": self.build_room_shell,
             "build_wall_segment": self.build_wall_segment,
             "build_wall_with_door": self.build_wall_with_door,
             "build_column": self.build_column,
-            "toggle_ceiling": self.toggle_ceiling,
             "set_view": self.set_view,
+            # MEP Systems
+            "build_pipe_run": self.build_pipe_run,
+            "build_cable_tray": self.build_cable_tray,
+            "add_tray_support": self.add_tray_support,
             # Animation
             "set_keyframe": self.set_keyframe,
             "get_keyframes": self.get_keyframes,

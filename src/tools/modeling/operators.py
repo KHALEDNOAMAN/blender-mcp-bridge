@@ -37,6 +37,19 @@ def get_operator_tools() -> list[types.Tool]:
                         "description": "Face the center of the ring",
                         "default": True,
                     },
+                    "collection": {
+                        "type": "string",
+                        "description": "Optional: Place copies in this collection",
+                    },
+                    "join_immediately": {
+                        "type": "boolean",
+                        "default": False,
+                        "description": "If true, joins all generated copies into a single mesh immediately.",
+                    },
+                    "joined_name": {
+                        "type": "string",
+                        "description": "Name for the joined object if join_immediately is true.",
+                    },
                 },
                 "required": ["object_name", "count", "radius"],
             },
@@ -79,6 +92,10 @@ def get_operator_tools() -> list[types.Tool]:
                         "description": "XYZ position",
                     },
                     "name": {"type": "string", "description": "Object name"},
+                    "collection": {
+                        "type": "string",
+                        "description": "Optional: Move the created object to this collection",
+                    },
                     "array_count": {
                         "type": "integer",
                         "description": "Number of copies",
@@ -98,13 +115,39 @@ def get_operator_tools() -> list[types.Tool]:
                         "items": {"type": "number"},
                         "description": "XYZ rotation in degrees",
                     },
-                    "radius": {"type": "number"},
-                    "depth": {"type": "number"},
-                    "vertices": {"type": "integer"},
-                    "major_radius": {"type": "number"},
-                    "minor_radius": {"type": "number"},
-                    "major_segments": {"type": "integer"},
-                    "minor_segments": {"type": "integer"},
+                    "dimensions": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: Absolute XYZ dimensions in metres.",
+                    },
+                    "radius": {
+                        "type": "number",
+                        "description": "Radius for spheres/cylinders",
+                    },
+                    "depth": {
+                        "type": "number",
+                        "description": "Depth/Height for cylinders",
+                    },
+                    "vertices": {
+                        "type": "integer",
+                        "description": "Number of segments/vertices",
+                    },
+                    "major_radius": {
+                        "type": "number",
+                        "description": "Distance from center to center of tube for Torus",
+                    },
+                    "minor_radius": {
+                        "type": "number",
+                        "description": "Thickness of the tube for Torus",
+                    },
+                    "major_segments": {
+                        "type": "integer",
+                        "description": "Smoothness of the main ring for Torus",
+                    },
+                    "minor_segments": {
+                        "type": "integer",
+                        "description": "Smoothness of the tube circle for Torus",
+                    },
                 },
                 "required": ["primitive_type", "location"],
             },
@@ -115,17 +158,36 @@ def get_operator_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "object_name": {"type": "string"},
-                    "count": {"type": "integer"},
-                    "min_distance": {"type": "number"},
-                    "max_distance": {"type": "number"},
+                    "object_name": {
+                        "type": "string",
+                        "description": "Name of the object to distribute",
+                    },
+                    "count": {
+                        "type": "integer",
+                        "description": "Number of random copies to create",
+                    },
+                    "min_distance": {
+                        "type": "number",
+                        "description": "Minimum distance from center",
+                    },
+                    "max_distance": {
+                        "type": "number",
+                        "description": "Maximum distance from center",
+                    },
                     "center": {
                         "type": "array",
                         "items": {"type": "number"},
                         "description": "Optional: XYZ center of distribution. Defaults to object location.",
                     },
-                    "z_position": {"type": "number", "default": 0.0},
-                    "seed": {"type": "integer"},
+                    "z_position": {
+                        "type": "number",
+                        "default": 0.0,
+                        "description": "Vertical position for the distribution",
+                    },
+                    "seed": {
+                        "type": "integer",
+                        "description": "Random seed for reproducible results",
+                    },
                 },
                 "required": ["object_name", "count", "min_distance", "max_distance"],
             },
@@ -207,7 +269,7 @@ def get_operator_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "object_name": {"type": "string"},
+                    "object_name": {"type": "string", "description": "Object to shear"},
                     "value": {"type": "number", "description": "Shear factor"},
                     "axis": {
                         "type": "string",
@@ -248,6 +310,32 @@ def get_operator_tools() -> list[types.Tool]:
                         "description": "Glob pattern for bulk deletion (e.g. 'Test_*')",
                     },
                 },
+            },
+        ),
+        types.Tool(
+            name="set_object_visibility",
+            description=(
+                "Toggle or set visibility of an object in the viewport and/or render. "
+                "SMART TOGGLE: If 'hide_viewport' and 'hide_render' are both omitted, "
+                "the current visibility state will be flipped."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "object_name": {
+                        "type": "string",
+                        "description": "Name of the object to toggle (e.g. 'Apartment_Ceiling')",
+                    },
+                    "hide_viewport": {
+                        "type": "boolean",
+                        "description": "true = hide in viewport, false = show",
+                    },
+                    "hide_render": {
+                        "type": "boolean",
+                        "description": "true = hide in render, false = show",
+                    },
+                },
+                "required": ["object_name"],
             },
         ),
     ]

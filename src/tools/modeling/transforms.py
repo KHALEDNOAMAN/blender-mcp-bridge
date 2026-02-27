@@ -68,6 +68,10 @@ def get_transform_tools() -> list[types.Tool]:
                         "items": {"type": "number"},
                         "description": "Optional: XYZ offset to apply to all duplicates",
                     },
+                    "count": {
+                        "type": "integer",
+                        "description": "Optional: Number of duplicates to create in a linear array. Offsets are multiplied by the count step.",
+                    },
                     "rotation_offset": {
                         "type": "array",
                         "items": {"type": "number"},
@@ -92,7 +96,7 @@ def get_transform_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="transform_object",
-            description="Transform an existing object's position, rotation, or scale.",
+            description="Transform an existing object's position, rotation, or scale. Supports bulk transformation via pattern.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -100,15 +104,29 @@ def get_transform_tools() -> list[types.Tool]:
                         "type": "string",
                         "description": "Name of the object to transform",
                     },
+                    "pattern": {
+                        "type": "string",
+                        "description": "Glob pattern for bulk transformation (e.g. 'Rack_*')",
+                    },
                     "location": {
                         "type": "array",
                         "items": {"type": "number"},
                         "description": "Absolute XYZ position",
                     },
+                    "location_offset": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Relative XYZ translation amount",
+                    },
                     "rotation": {
                         "type": "array",
                         "items": {"type": "number"},
                         "description": "XYZ rotation in degrees",
+                    },
+                    "rotation_offset": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Relative XYZ rotation amount in degrees",
                     },
                     "scale": {
                         "type": "array",
@@ -124,7 +142,6 @@ def get_transform_tools() -> list[types.Tool]:
                         "description": "Hide from render",
                     },
                 },
-                "required": ["object_name"],
             },
         ),
         types.Tool(

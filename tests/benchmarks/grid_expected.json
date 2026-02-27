@@ -1,10 +1,10 @@
 {
   "scene_summary": {
     "name": "Scene",
-    "object_count": 67,
+    "object_count": 139,
     "objects": [
       {
-        "name": "Label_Primitives",
+        "name": "PRIM_Label",
         "type": "FONT",
         "location": [
           -5.0,
@@ -13,7 +13,7 @@
         ]
       },
       {
-        "name": "Test_Primitive_Cube",
+        "name": "PRIM_Cube",
         "type": "MESH",
         "location": [
           0.0,
@@ -22,7 +22,7 @@
         ]
       },
       {
-        "name": "Test_Primitive_Cylinder",
+        "name": "PRIM_Cylinder",
         "type": "MESH",
         "location": [
           5.0,
@@ -31,7 +31,7 @@
         ]
       },
       {
-        "name": "Test_Primitive_IcoSphere",
+        "name": "PRIM_IcoSphere",
         "type": "MESH",
         "location": [
           10.0,
@@ -40,7 +40,7 @@
         ]
       },
       {
-        "name": "Test_Primitive_Sphere",
+        "name": "PRIM_Sphere",
         "type": "MESH",
         "location": [
           15.0,
@@ -49,7 +49,7 @@
         ]
       },
       {
-        "name": "Test_Primitive_Torus",
+        "name": "PRIM_Torus",
         "type": "MESH",
         "location": [
           20.0,
@@ -58,7 +58,7 @@
         ]
       },
       {
-        "name": "Test_Primitive_Plane",
+        "name": "PRIM_Plane",
         "type": "MESH",
         "location": [
           25.0,
@@ -67,7 +67,7 @@
         ]
       },
       {
-        "name": "Label_Modifiers",
+        "name": "MOD_Label",
         "type": "FONT",
         "location": [
           -5.0,
@@ -76,7 +76,7 @@
         ]
       },
       {
-        "name": "Test_Mod_Array",
+        "name": "MOD_Array",
         "type": "MESH",
         "location": [
           0.0,
@@ -85,7 +85,7 @@
         ]
       },
       {
-        "name": "Test_Mod_Solidify",
+        "name": "MOD_Solidify",
         "type": "MESH",
         "location": [
           5.0,
@@ -94,7 +94,7 @@
         ]
       },
       {
-        "name": "Test_Mod_Bevel",
+        "name": "MOD_Bevel",
         "type": "MESH",
         "location": [
           10.0,
@@ -103,7 +103,7 @@
         ]
       },
       {
-        "name": "Test_MirrorCenter_Y",
+        "name": "MOD_MirrorCenter_Y",
         "type": "MESH",
         "location": [
           15.0,
@@ -112,7 +112,7 @@
         ]
       },
       {
-        "name": "Test_Mod_Mirror",
+        "name": "MOD_Mirror",
         "type": "MESH",
         "location": [
           15.0,
@@ -121,7 +121,7 @@
         ]
       },
       {
-        "name": "Test_Mod_Subdiv",
+        "name": "MOD_Subdiv",
         "type": "MESH",
         "location": [
           20.0,
@@ -130,7 +130,7 @@
         ]
       },
       {
-        "name": "Test_Mod_Wire",
+        "name": "MOD_Wire",
         "type": "MESH",
         "location": [
           25.0,
@@ -139,7 +139,7 @@
         ]
       },
       {
-        "name": "Test_Mod_Smooth",
+        "name": "MOD_Smooth",
         "type": "MESH",
         "location": [
           30.0,
@@ -148,7 +148,7 @@
         ]
       },
       {
-        "name": "Test_Mod_BoolBasic_Base",
+        "name": "MOD_BoolBasic_Base",
         "type": "MESH",
         "location": [
           35.0,
@@ -157,11 +157,29 @@
         ]
       },
       {
-        "name": "Test_Mod_BoolBasic_Cutter",
+        "name": "MOD_BoolBasic_Cutter",
         "type": "MESH",
         "location": [
           35.0,
           10.0,
+          0.0
+        ]
+      },
+      {
+        "name": "MOD_RemoveVerify_1",
+        "type": "MESH",
+        "location": [
+          40.0,
+          10.0,
+          0.0
+        ]
+      },
+      {
+        "name": "MOD_RemoveVerify_2",
+        "type": "MESH",
+        "location": [
+          40.0,
+          15.0,
           0.0
         ]
       },
@@ -220,7 +238,7 @@
         ]
       },
       {
-        "name": "Test_BoolOp_Slice_Base",
+        "name": "MOD_BoolOp_Slice_Base",
         "type": "MESH",
         "location": [
           60.0,
@@ -229,7 +247,7 @@
         ]
       },
       {
-        "name": "Test_BoolOp_Slice_Cutter",
+        "name": "MOD_BoolOp_Slice_Cutter",
         "type": "MESH",
         "location": [
           60.0,
@@ -238,7 +256,7 @@
         ]
       },
       {
-        "name": "Test_BoolOp_Slice_Base_slice",
+        "name": "MOD_BoolOp_Slice_Base_slice",
         "type": "MESH",
         "location": [
           60.0,
@@ -247,7 +265,7 @@
         ]
       },
       {
-        "name": "Label_Collections",
+        "name": "COL_Label",
         "type": "FONT",
         "location": [
           -5.0,
@@ -256,61 +274,169 @@
         ]
       },
       {
-        "name": "Test_Mod_RemoveVerify_1",
+        "name": "COL_Cube",
         "type": "MESH",
         "location": [
-          40.0,
-          10.0,
+          0.0,
+          20.0,
           0.0
         ]
       },
       {
-        "name": "Test_Mod_RemoveVerify_2",
+        "name": "COL_Sphere",
         "type": "MESH",
         "location": [
-          40.0,
+          5.0,
+          20.0,
+          0.0
+        ]
+      },
+      {
+        "name": "COL_Cube.001",
+        "type": "MESH",
+        "location": [
+          0.0,
+          25.0,
+          0.0
+        ]
+      },
+      {
+        "name": "COL_Sphere.001",
+        "type": "MESH",
+        "location": [
+          5.0,
+          25.0,
+          0.0
+        ]
+      },
+      {
+        "name": "OP_Rand_Distribute",
+        "type": "MESH",
+        "location": [
           15.0,
+          30.0,
+          2.473221905052725e-10
+        ]
+      },
+      {
+        "name": "OP_Rand_Distribute.001",
+        "type": "MESH",
+        "location": [
+          14.336221694946289,
+          29.203487396240234,
           0.0
         ]
       },
       {
-        "name": "Test_Col_Cube",
+        "name": "OP_Rand_Distribute.002",
+        "type": "MESH",
+        "location": [
+          14.797629356384277,
+          31.27619743347168,
+          0.0
+        ]
+      },
+      {
+        "name": "OP_Rand_Distribute.003",
+        "type": "MESH",
+        "location": [
+          14.85221004486084,
+          28.265567779541016,
+          0.0
+        ]
+      },
+      {
+        "name": "OP_Rand_Distribute.004",
+        "type": "MESH",
+        "location": [
+          15.874899864196777,
+          29.29617691040039,
+          0.0
+        ]
+      },
+      {
+        "name": "OP_Rand_Distribute.005",
+        "type": "MESH",
+        "location": [
+          14.07935905456543,
+          30.491744995117188,
+          0.0
+        ]
+      },
+      {
+        "name": "OP_Rand_Distribute.006",
+        "type": "MESH",
+        "location": [
+          15.31054973602295,
+          31.55551528930664,
+          0.0
+        ]
+      },
+      {
+        "name": "OP_Rand_Distribute.007",
+        "type": "MESH",
+        "location": [
+          16.246009826660156,
+          30.209693908691406,
+          0.0
+        ]
+      },
+      {
+        "name": "OP_Rand_Distribute.008",
+        "type": "MESH",
+        "location": [
+          14.04494571685791,
+          28.687484741210938,
+          0.0
+        ]
+      },
+      {
+        "name": "OP_Rand_Distribute.009",
+        "type": "MESH",
+        "location": [
+          15.307214736938477,
+          31.63505744934082,
+          0.0
+        ]
+      },
+      {
+        "name": "OP_Rand_Distribute.010",
+        "type": "MESH",
+        "location": [
+          15.36833381652832,
+          29.059879302978516,
+          0.0
+        ]
+      },
+      {
+        "name": "Transform_Dup_Cube",
         "type": "MESH",
         "location": [
           0.0,
+          43.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Transform_Batch_1.001",
+        "type": "MESH",
+        "location": [
           20.0,
-          0.0
+          42.0,
+          2.0
         ]
       },
       {
-        "name": "Test_Col_Sphere",
+        "name": "Transform_Batch_2.001",
         "type": "MESH",
         "location": [
-          5.0,
           20.0,
-          0.0
+          42.0,
+          -2.0
         ]
       },
       {
-        "name": "Test_Col_Cube.001",
-        "type": "MESH",
-        "location": [
-          0.0,
-          25.0,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Col_Sphere.001",
-        "type": "MESH",
-        "location": [
-          5.0,
-          25.0,
-          0.0
-        ]
-      },
-      {
-        "name": "Label_Operators",
+        "name": "OP_Label",
         "type": "FONT",
         "location": [
           -5.0,
@@ -319,7 +445,7 @@
         ]
       },
       {
-        "name": "Test_Op_Circ_Base",
+        "name": "OP_CircularArray_Base",
         "type": "MESH",
         "location": [
           2.0,
@@ -328,7 +454,7 @@
         ]
       },
       {
-        "name": "Test_Op_Circ_Base.001",
+        "name": "OP_CircularArray_Base.001",
         "type": "MESH",
         "location": [
           1.0,
@@ -337,7 +463,7 @@
         ]
       },
       {
-        "name": "Test_Op_Circ_Base.002",
+        "name": "OP_CircularArray_Base.002",
         "type": "MESH",
         "location": [
           -1.0,
@@ -346,7 +472,7 @@
         ]
       },
       {
-        "name": "Test_Op_Circ_Base.003",
+        "name": "OP_CircularArray_Base.003",
         "type": "MESH",
         "location": [
           -2.0,
@@ -355,7 +481,7 @@
         ]
       },
       {
-        "name": "Test_Op_Circ_Base.004",
+        "name": "OP_CircularArray_Base.004",
         "type": "MESH",
         "location": [
           -1.0,
@@ -364,7 +490,7 @@
         ]
       },
       {
-        "name": "Test_Op_Circ_Base.005",
+        "name": "OP_CircularArray_Base.005",
         "type": "MESH",
         "location": [
           1.0,
@@ -373,7 +499,7 @@
         ]
       },
       {
-        "name": "Test_Op_Joined_Result",
+        "name": "OP_Joined_Result",
         "type": "MESH",
         "location": [
           6.400000095367432,
@@ -382,7 +508,7 @@
         ]
       },
       {
-        "name": "Test_Op_CreateArray",
+        "name": "OP_CreateArray",
         "type": "MESH",
         "location": [
           10.0,
@@ -391,106 +517,7 @@
         ]
       },
       {
-        "name": "Test_Op_Rand_Base",
-        "type": "MESH",
-        "location": [
-          15.0,
-          30.0,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Rand_Base.001",
-        "type": "MESH",
-        "location": [
-          15.557706832885742,
-          28.10004234313965,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Rand_Base.002",
-        "type": "MESH",
-        "location": [
-          14.100117683410645,
-          28.89284324645996,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Rand_Base.003",
-        "type": "MESH",
-        "location": [
-          15.945884704589844,
-          30.706798553466797,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Rand_Base.004",
-        "type": "MESH",
-        "location": [
-          14.687686920166016,
-          28.11918830871582,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Rand_Base.005",
-        "type": "MESH",
-        "location": [
-          13.874551773071289,
-          30.021421432495117,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Rand_Base.006",
-        "type": "MESH",
-        "location": [
-          13.881762504577637,
-          30.35706329345703,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Rand_Base.007",
-        "type": "MESH",
-        "location": [
-          16.223276138305664,
-          30.792556762695312,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Rand_Base.008",
-        "type": "MESH",
-        "location": [
-          14.361001968383789,
-          28.621917724609375,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Rand_Base.009",
-        "type": "MESH",
-        "location": [
-          16.8288516998291,
-          29.346378326416016,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Rand_Base.010",
-        "type": "MESH",
-        "location": [
-          16.389978408813477,
-          30.41490364074707,
-          0.0
-        ]
-      },
-      {
-        "name": "Test_Op_Extrude",
+        "name": "OP_Extrude",
         "type": "MESH",
         "location": [
           20.0,
@@ -499,7 +526,7 @@
         ]
       },
       {
-        "name": "Test_Op_Inset",
+        "name": "OP_Inset",
         "type": "MESH",
         "location": [
           25.0,
@@ -508,7 +535,7 @@
         ]
       },
       {
-        "name": "Test_Op_Shear_Cylinder",
+        "name": "OP_Shear_Cylinder",
         "type": "MESH",
         "location": [
           30.0,
@@ -517,7 +544,7 @@
         ]
       },
       {
-        "name": "Test_Op_Delete_Torus_Survivor",
+        "name": "OP_Delete_Torus_Survivor",
         "type": "MESH",
         "location": [
           35.0,
@@ -526,7 +553,7 @@
         ]
       },
       {
-        "name": "Label_Transforms",
+        "name": "TRSF_Label",
         "type": "FONT",
         "location": [
           -5.0,
@@ -540,15 +567,6 @@
         "location": [
           0.0,
           40.0,
-          0.0
-        ]
-      },
-      {
-        "name": "Transform_Dup_Cube",
-        "type": "MESH",
-        "location": [
-          0.0,
-          43.0,
           0.0
         ]
       },
@@ -589,35 +607,699 @@
         ]
       },
       {
-        "name": "Transform_Batch_1.001",
+        "name": "SYS_Label",
+        "type": "FONT",
+        "location": [
+          -5.0,
+          50.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Run_Fire_00",
         "type": "MESH",
         "location": [
-          20.0,
-          42.0,
+          5.0,
+          50.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Run_Gas_00",
+        "type": "MESH",
+        "location": [
+          5.0,
+          51.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Run_Chiller_00",
+        "type": "MESH",
+        "location": [
+          2.5,
+          52.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Run_Chiller_01",
+        "type": "MESH",
+        "location": [
+          5.0,
+          52.5,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Run_Chiller_Joint_01_JOINT",
+        "type": "MESH",
+        "location": [
+          5.0,
+          52.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Run_Drainage_Stack_00",
+        "type": "MESH",
+        "location": [
+          0.0,
+          53.0,
           2.0
         ]
       },
       {
-        "name": "Transform_Batch_2.001",
+        "name": "SYS_Routing_90_00",
         "type": "MESH",
         "location": [
-          20.0,
-          42.0,
-          -2.0
+          14.0,
+          50.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_90_01",
+        "type": "MESH",
+        "location": [
+          15.0,
+          50.0,
+          1.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_90_Joint_01_JOINT",
+        "type": "MESH",
+        "location": [
+          15.0,
+          50.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_Z_Skip_00",
+        "type": "MESH",
+        "location": [
+          14.0,
+          52.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_Z_Skip_01",
+        "type": "MESH",
+        "location": [
+          16.0,
+          52.0,
+          1.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_Z_Skip_02",
+        "type": "MESH",
+        "location": [
+          18.0,
+          52.0,
+          2.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_Z_Skip_Joint_01_JOINT",
+        "type": "MESH",
+        "location": [
+          15.0,
+          52.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_Z_Skip_Joint_02_JOINT",
+        "type": "MESH",
+        "location": [
+          17.0,
+          52.0,
+          2.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_Header_Tee_00",
+        "type": "MESH",
+        "location": [
+          14.0,
+          54.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_Header_Tee_01",
+        "type": "MESH",
+        "location": [
+          15.0,
+          54.0,
+          0.75
+        ]
+      },
+      {
+        "name": "SYS_Routing_Header_Tee_02",
+        "type": "MESH",
+        "location": [
+          15.0,
+          54.0,
+          0.75
+        ]
+      },
+      {
+        "name": "SYS_Routing_Header_Tee_03",
+        "type": "MESH",
+        "location": [
+          16.0,
+          54.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_Header_Tee_Joint_01_JOINT",
+        "type": "MESH",
+        "location": [
+          15.0,
+          54.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Routing_Header_Tee_Joint_03_JOINT",
+        "type": "MESH",
+        "location": [
+          15.0,
+          54.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Tray_20x40_00",
+        "type": "MESH",
+        "location": [
+          21.0,
+          50.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Tray_50x100_00",
+        "type": "MESH",
+        "location": [
+          21.0,
+          52.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Tray_100x200_00",
+        "type": "MESH",
+        "location": [
+          21.0,
+          54.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SYS_Mock_Ceiling",
+        "type": "MESH",
+        "location": [
+          25.0,
+          50.0,
+          4.0
+        ]
+      },
+      {
+        "name": "SYS_Ceiling_Run_00",
+        "type": "MESH",
+        "location": [
+          25.0,
+          50.0,
+          3.5
+        ]
+      },
+      {
+        "name": "Tray_Support_TRAPEZE_HANGER",
+        "type": "MESH",
+        "location": [
+          25.0,
+          50.0,
+          3.5
+        ]
+      },
+      {
+        "name": "Tray_Support_TRAPEZE_HANGER.001",
+        "type": "MESH",
+        "location": [
+          25.0,
+          50.150001525878906,
+          3.737499952316284
+        ]
+      },
+      {
+        "name": "Tray_Support_TRAPEZE_HANGER.002",
+        "type": "MESH",
+        "location": [
+          25.0,
+          49.849998474121094,
+          3.737499952316284
+        ]
+      },
+      {
+        "name": "SYS_Standalone_Supp_TRAPEZE_HANGER",
+        "type": "MESH",
+        "location": [
+          24.5,
+          50.0,
+          3.5
+        ]
+      },
+      {
+        "name": "SYS_Standalone_Supp_TRAPEZE_HANGER.001",
+        "type": "MESH",
+        "location": [
+          24.5,
+          50.150001525878906,
+          3.737499952316284
+        ]
+      },
+      {
+        "name": "SYS_Standalone_Supp_TRAPEZE_HANGER.002",
+        "type": "MESH",
+        "location": [
+          24.5,
+          49.849998474121094,
+          3.737499952316284
+        ]
+      },
+      {
+        "name": "SYS_Mock_Wall",
+        "type": "MESH",
+        "location": [
+          24.0,
+          56.0,
+          2.0
+        ]
+      },
+      {
+        "name": "SYS_Big_Cantilever_Run_00",
+        "type": "MESH",
+        "location": [
+          24.0,
+          55.650001525878906,
+          4.0
+        ]
+      },
+      {
+        "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET",
+        "type": "MESH",
+        "location": [
+          22.0,
+          55.80000305175781,
+          3.9700000286102295
+        ]
+      },
+      {
+        "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.001",
+        "type": "MESH",
+        "location": [
+          22.0,
+          56.0,
+          4.0
+        ]
+      },
+      {
+        "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.002",
+        "type": "MESH",
+        "location": [
+          23.5,
+          55.80000305175781,
+          3.9700000286102295
+        ]
+      },
+      {
+        "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.003",
+        "type": "MESH",
+        "location": [
+          23.5,
+          56.0,
+          4.0
+        ]
+      },
+      {
+        "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.004",
+        "type": "MESH",
+        "location": [
+          25.0,
+          55.80000305175781,
+          3.9700000286102295
+        ]
+      },
+      {
+        "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.005",
+        "type": "MESH",
+        "location": [
+          25.0,
+          56.0,
+          4.0
+        ]
+      },
+      {
+        "name": "SYS_Bigger_Wall_Bracket_Run_00",
+        "type": "MESH",
+        "location": [
+          24.0,
+          55.650001525878906,
+          3.0
+        ]
+      },
+      {
+        "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET",
+        "type": "MESH",
+        "location": [
+          21.799999237060547,
+          55.900001525878906,
+          3.0
+        ]
+      },
+      {
+        "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.001",
+        "type": "MESH",
+        "location": [
+          21.799999237060547,
+          55.775001525878906,
+          2.9600000381469727
+        ]
+      },
+      {
+        "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.002",
+        "type": "MESH",
+        "location": [
+          23.0,
+          55.900001525878906,
+          3.0
+        ]
+      },
+      {
+        "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.003",
+        "type": "MESH",
+        "location": [
+          23.0,
+          55.775001525878906,
+          2.9600000381469727
+        ]
+      },
+      {
+        "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.004",
+        "type": "MESH",
+        "location": [
+          24.200000762939453,
+          55.900001525878906,
+          3.0
+        ]
+      },
+      {
+        "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.005",
+        "type": "MESH",
+        "location": [
+          24.200000762939453,
+          55.775001525878906,
+          2.9600000381469727
+        ]
+      },
+      {
+        "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.006",
+        "type": "MESH",
+        "location": [
+          25.399999618530273,
+          55.900001525878906,
+          3.0
+        ]
+      },
+      {
+        "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.007",
+        "type": "MESH",
+        "location": [
+          25.399999618530273,
+          55.775001525878906,
+          2.9600000381469727
+        ]
+      },
+      {
+        "name": "SYS_Bulkhead_High",
+        "type": "MESH",
+        "location": [
+          30.5,
+          52.0,
+          4.0
+        ]
+      },
+      {
+        "name": "SYS_Bulkhead_Low",
+        "type": "MESH",
+        "location": [
+          33.5,
+          52.0,
+          3.5
+        ]
+      },
+      {
+        "name": "SYS_Bulkhead_Face",
+        "type": "MESH",
+        "location": [
+          32.0,
+          52.0,
+          3.75
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_00",
+        "type": "MESH",
+        "location": [
+          30.399999618530273,
+          52.0,
+          3.5
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_01",
+        "type": "MESH",
+        "location": [
+          32.04999923706055,
+          52.0,
+          3.25
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_02",
+        "type": "MESH",
+        "location": [
+          33.650001525878906,
+          52.0,
+          3.0
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_Joint_01",
+        "type": "MESH",
+        "location": [
+          31.799999237060547,
+          52.0,
+          3.5
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_Joint_02",
+        "type": "MESH",
+        "location": [
+          32.29999923706055,
+          52.0,
+          3.0
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER",
+        "type": "MESH",
+        "location": [
+          29.200000762939453,
+          52.0,
+          3.5
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.001",
+        "type": "MESH",
+        "location": [
+          29.200000762939453,
+          52.099998474121094,
+          3.737499952316284
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.002",
+        "type": "MESH",
+        "location": [
+          29.200000762939453,
+          51.900001525878906,
+          3.737499952316284
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.003",
+        "type": "MESH",
+        "location": [
+          30.200000762939453,
+          52.0,
+          3.5
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.004",
+        "type": "MESH",
+        "location": [
+          30.200000762939453,
+          52.099998474121094,
+          3.737499952316284
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.005",
+        "type": "MESH",
+        "location": [
+          30.200000762939453,
+          51.900001525878906,
+          3.737499952316284
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.006",
+        "type": "MESH",
+        "location": [
+          31.200000762939453,
+          52.0,
+          3.5
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.007",
+        "type": "MESH",
+        "location": [
+          31.200000762939453,
+          52.099998474121094,
+          3.737499952316284
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.008",
+        "type": "MESH",
+        "location": [
+          31.200000762939453,
+          51.900001525878906,
+          3.737499952316284
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.009",
+        "type": "MESH",
+        "location": [
+          32.99289321899414,
+          52.0,
+          3.0
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.010",
+        "type": "MESH",
+        "location": [
+          32.99289321899414,
+          52.099998474121094,
+          3.237499952316284
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.011",
+        "type": "MESH",
+        "location": [
+          32.99289321899414,
+          51.900001525878906,
+          3.237499952316284
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.012",
+        "type": "MESH",
+        "location": [
+          33.99289321899414,
+          52.0,
+          3.0
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.013",
+        "type": "MESH",
+        "location": [
+          33.99289321899414,
+          52.099998474121094,
+          3.237499952316284
+        ]
+      },
+      {
+        "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.014",
+        "type": "MESH",
+        "location": [
+          33.99289321899414,
+          51.900001525878906,
+          3.237499952316284
         ]
       }
     ],
     "collections": [
-      "Collection_CopyRemove",
-      "Test_Integration_Collection"
+      "COL_INTEGRATION",
+      "MOD_APPLY",
+      "MOD_BATCH",
+      "MOD_BOOLEAN",
+      "OP_BASIC",
+      "PRIM_BASIC",
+      "SYS_MEP",
+      "TRSF_BASIC"
     ],
     "success": true,
-    "message": "[I9EWNZ] Retrieved scene info for 'Scene'. Found 67 objects across 2 collections.",
+    "message": "[E6DCKC] Retrieved scene info for 'Scene'. Found 139 objects across 8 collections.",
     "status": "success"
   },
   "detailed_objects": {
-    "Test_Primitive_Cube": {
-      "name": "Test_Primitive_Cube",
+    "PRIM_Label": {
+      "name": "PRIM_Label",
+      "type": "FONT",
+      "location": [
+        -5.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        3.8590004444122314,
+        0.6910000443458557,
+        0.10000000149011612
+      ],
+      "modifiers": [],
+      "success": true,
+      "message": "[ONC2GM] Retrieved detailed info for object 'PRIM_Label' (Type: FONT).",
+      "status": "success"
+    },
+    "PRIM_Cube": {
+      "name": "PRIM_Cube",
       "type": "MESH",
       "location": [
         0.0,
@@ -643,11 +1325,11 @@
       "faces": 6,
       "modifiers": [],
       "success": true,
-      "message": "[3CA0WR] Retrieved detailed info for object 'Test_Primitive_Cube' (Type: MESH).",
+      "message": "[K4MNVR] Retrieved detailed info for object 'PRIM_Cube' (Type: MESH).",
       "status": "success"
     },
-    "Test_Primitive_Cylinder": {
-      "name": "Test_Primitive_Cylinder",
+    "PRIM_Cylinder": {
+      "name": "PRIM_Cylinder",
       "type": "MESH",
       "location": [
         5.0,
@@ -673,11 +1355,11 @@
       "faces": 34,
       "modifiers": [],
       "success": true,
-      "message": "[LHMHJX] Retrieved detailed info for object 'Test_Primitive_Cylinder' (Type: MESH).",
+      "message": "[UNTBYA] Retrieved detailed info for object 'PRIM_Cylinder' (Type: MESH).",
       "status": "success"
     },
-    "Test_Primitive_IcoSphere": {
-      "name": "Test_Primitive_IcoSphere",
+    "PRIM_IcoSphere": {
+      "name": "PRIM_IcoSphere",
       "type": "MESH",
       "location": [
         10.0,
@@ -703,11 +1385,11 @@
       "faces": 80,
       "modifiers": [],
       "success": true,
-      "message": "[FKD51C] Retrieved detailed info for object 'Test_Primitive_IcoSphere' (Type: MESH).",
+      "message": "[X408JX] Retrieved detailed info for object 'PRIM_IcoSphere' (Type: MESH).",
       "status": "success"
     },
-    "Test_Primitive_Sphere": {
-      "name": "Test_Primitive_Sphere",
+    "PRIM_Sphere": {
+      "name": "PRIM_Sphere",
       "type": "MESH",
       "location": [
         15.0,
@@ -733,11 +1415,11 @@
       "faces": 512,
       "modifiers": [],
       "success": true,
-      "message": "[K0S9TH] Retrieved detailed info for object 'Test_Primitive_Sphere' (Type: MESH).",
+      "message": "[UOXJ7M] Retrieved detailed info for object 'PRIM_Sphere' (Type: MESH).",
       "status": "success"
     },
-    "Test_Primitive_Torus": {
-      "name": "Test_Primitive_Torus",
+    "PRIM_Torus": {
+      "name": "PRIM_Torus",
       "type": "MESH",
       "location": [
         20.0,
@@ -763,11 +1445,11 @@
       "faces": 576,
       "modifiers": [],
       "success": true,
-      "message": "[J4ZVR8] Retrieved detailed info for object 'Test_Primitive_Torus' (Type: MESH).",
+      "message": "[NA9VEO] Retrieved detailed info for object 'PRIM_Torus' (Type: MESH).",
       "status": "success"
     },
-    "Test_Primitive_Plane": {
-      "name": "Test_Primitive_Plane",
+    "PRIM_Plane": {
+      "name": "PRIM_Plane",
       "type": "MESH",
       "location": [
         25.0,
@@ -793,11 +1475,39 @@
       "faces": 1,
       "modifiers": [],
       "success": true,
-      "message": "[DY8QKE] Retrieved detailed info for object 'Test_Primitive_Plane' (Type: MESH).",
+      "message": "[37WQKV] Retrieved detailed info for object 'PRIM_Plane' (Type: MESH).",
       "status": "success"
     },
-    "Test_Mod_Array": {
-      "name": "Test_Mod_Array",
+    "MOD_Label": {
+      "name": "MOD_Label",
+      "type": "FONT",
+      "location": [
+        -5.0,
+        10.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        3.6780006885528564,
+        0.7004074454307556,
+        0.10000000149011612
+      ],
+      "modifiers": [],
+      "success": true,
+      "message": "[ZB06BK] Retrieved detailed info for object 'MOD_Label' (Type: FONT).",
+      "status": "success"
+    },
+    "MOD_Array": {
+      "name": "MOD_Array",
       "type": "MESH",
       "location": [
         0.0,
@@ -831,11 +1541,11 @@
         }
       ],
       "success": true,
-      "message": "[4SJPSZ] Retrieved detailed info for object 'Test_Mod_Array' (Type: MESH).",
+      "message": "[8C198E] Retrieved detailed info for object 'MOD_Array' (Type: MESH).",
       "status": "success"
     },
-    "Test_Mod_Solidify": {
-      "name": "Test_Mod_Solidify",
+    "MOD_Solidify": {
+      "name": "MOD_Solidify",
       "type": "MESH",
       "location": [
         5.0,
@@ -868,11 +1578,11 @@
         }
       ],
       "success": true,
-      "message": "[ZICHNH] Retrieved detailed info for object 'Test_Mod_Solidify' (Type: MESH).",
+      "message": "[LEDA0R] Retrieved detailed info for object 'MOD_Solidify' (Type: MESH).",
       "status": "success"
     },
-    "Test_Mod_Bevel": {
-      "name": "Test_Mod_Bevel",
+    "MOD_Bevel": {
+      "name": "MOD_Bevel",
       "type": "MESH",
       "location": [
         10.0,
@@ -905,11 +1615,11 @@
         }
       ],
       "success": true,
-      "message": "[UHA13H] Retrieved detailed info for object 'Test_Mod_Bevel' (Type: MESH).",
+      "message": "[DZORL7] Retrieved detailed info for object 'MOD_Bevel' (Type: MESH).",
       "status": "success"
     },
-    "Test_MirrorCenter_Y": {
-      "name": "Test_MirrorCenter_Y",
+    "MOD_MirrorCenter_Y": {
+      "name": "MOD_MirrorCenter_Y",
       "type": "MESH",
       "location": [
         15.0,
@@ -935,11 +1645,11 @@
       "faces": 6,
       "modifiers": [],
       "success": true,
-      "message": "[SH1RVQ] Retrieved detailed info for object 'Test_MirrorCenter_Y' (Type: MESH).",
+      "message": "[SN8XES] Retrieved detailed info for object 'MOD_MirrorCenter_Y' (Type: MESH).",
       "status": "success"
     },
-    "Test_Mod_Mirror": {
-      "name": "Test_Mod_Mirror",
+    "MOD_Mirror": {
+      "name": "MOD_Mirror",
       "type": "MESH",
       "location": [
         15.0,
@@ -977,11 +1687,11 @@
         }
       ],
       "success": true,
-      "message": "[00BFFG] Retrieved detailed info for object 'Test_Mod_Mirror' (Type: MESH).",
+      "message": "[31RG0F] Retrieved detailed info for object 'MOD_Mirror' (Type: MESH).",
       "status": "success"
     },
-    "Test_Mod_Subdiv": {
-      "name": "Test_Mod_Subdiv",
+    "MOD_Subdiv": {
+      "name": "MOD_Subdiv",
       "type": "MESH",
       "location": [
         20.0,
@@ -1014,11 +1724,11 @@
         }
       ],
       "success": true,
-      "message": "[GT9LR6] Retrieved detailed info for object 'Test_Mod_Subdiv' (Type: MESH).",
+      "message": "[HD4XC0] Retrieved detailed info for object 'MOD_Subdiv' (Type: MESH).",
       "status": "success"
     },
-    "Test_Mod_Wire": {
-      "name": "Test_Mod_Wire",
+    "MOD_Wire": {
+      "name": "MOD_Wire",
       "type": "MESH",
       "location": [
         25.0,
@@ -1051,11 +1761,11 @@
         }
       ],
       "success": true,
-      "message": "[C9LWQ4] Retrieved detailed info for object 'Test_Mod_Wire' (Type: MESH).",
+      "message": "[AUEOF1] Retrieved detailed info for object 'MOD_Wire' (Type: MESH).",
       "status": "success"
     },
-    "Test_Mod_Smooth": {
-      "name": "Test_Mod_Smooth",
+    "MOD_Smooth": {
+      "name": "MOD_Smooth",
       "type": "MESH",
       "location": [
         30.0,
@@ -1088,11 +1798,11 @@
         }
       ],
       "success": true,
-      "message": "[HB3L42] Retrieved detailed info for object 'Test_Mod_Smooth' (Type: MESH).",
+      "message": "[X0DTJ0] Retrieved detailed info for object 'MOD_Smooth' (Type: MESH).",
       "status": "success"
     },
-    "Test_Mod_BoolBasic_Base": {
-      "name": "Test_Mod_BoolBasic_Base",
+    "MOD_BoolBasic_Base": {
+      "name": "MOD_BoolBasic_Base",
       "type": "MESH",
       "location": [
         35.0,
@@ -1125,11 +1835,11 @@
         }
       ],
       "success": true,
-      "message": "[7ILXH1] Retrieved detailed info for object 'Test_Mod_BoolBasic_Base' (Type: MESH).",
+      "message": "[PK4QHB] Retrieved detailed info for object 'MOD_BoolBasic_Base' (Type: MESH).",
       "status": "success"
     },
-    "Test_Mod_BoolBasic_Cutter": {
-      "name": "Test_Mod_BoolBasic_Cutter",
+    "MOD_BoolBasic_Cutter": {
+      "name": "MOD_BoolBasic_Cutter",
       "type": "MESH",
       "location": [
         35.0,
@@ -1155,316 +1865,11 @@
       "faces": 34,
       "modifiers": [],
       "success": true,
-      "message": "[RXJDNQ] Retrieved detailed info for object 'Test_Mod_BoolBasic_Cutter' (Type: MESH).",
+      "message": "[OXSWRS] Retrieved detailed info for object 'MOD_BoolBasic_Cutter' (Type: MESH).",
       "status": "success"
     },
-    "Test_BoolOp_Intersect_Base": {
-      "name": "Test_BoolOp_Intersect_Base",
-      "type": "MESH",
-      "location": [
-        45.0,
-        10.0,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        2.0,
-        2.0,
-        1.2000000476837158
-      ],
-      "vertices": 8,
-      "faces": 6,
-      "modifiers": [
-        {
-          "name": "Bool_INTERSECT_Test_BoolOp_Intersect_Cutter",
-          "type": "BOOLEAN",
-          "show_viewport": true,
-          "show_render": true
-        }
-      ],
-      "success": true,
-      "message": "[LRC4GW] Retrieved detailed info for object 'Test_BoolOp_Intersect_Base' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_BoolOp_Intersect_Cutter": {
-      "name": "Test_BoolOp_Intersect_Cutter",
-      "type": "MESH",
-      "location": [
-        45.0,
-        10.0,
-        1.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        2.399998664855957,
-        2.3999996185302734,
-        2.4000000953674316
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[P194VQ] Retrieved detailed info for object 'Test_BoolOp_Intersect_Cutter' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_BoolOp_Union_Base": {
-      "name": "Test_BoolOp_Union_Base",
-      "type": "MESH",
-      "location": [
-        50.0,
-        10.0,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        2.399998664855957,
-        2.3999996185302734,
-        3.200000047683716
-      ],
-      "vertices": 8,
-      "faces": 6,
-      "modifiers": [
-        {
-          "name": "Bool_UNION_Test_BoolOp_Union_Cutter",
-          "type": "BOOLEAN",
-          "show_viewport": true,
-          "show_render": true
-        }
-      ],
-      "success": true,
-      "message": "[0F8BNB] Retrieved detailed info for object 'Test_BoolOp_Union_Base' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_BoolOp_Union_Cutter": {
-      "name": "Test_BoolOp_Union_Cutter",
-      "type": "MESH",
-      "location": [
-        50.0,
-        10.0,
-        1.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        2.399998664855957,
-        2.3999996185302734,
-        2.4000000953674316
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[D7TNLM] Retrieved detailed info for object 'Test_BoolOp_Union_Cutter' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_BoolOp_Diff_Base": {
-      "name": "Test_BoolOp_Diff_Base",
-      "type": "MESH",
-      "location": [
-        55.0,
-        10.0,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        2.0,
-        2.0,
-        2.0
-      ],
-      "vertices": 8,
-      "faces": 6,
-      "modifiers": [
-        {
-          "name": "Bool_DIFFERENCE_Test_BoolOp_Diff_Cutter",
-          "type": "BOOLEAN",
-          "show_viewport": true,
-          "show_render": true
-        }
-      ],
-      "success": true,
-      "message": "[GD4HZW] Retrieved detailed info for object 'Test_BoolOp_Diff_Base' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_BoolOp_Diff_Cutter": {
-      "name": "Test_BoolOp_Diff_Cutter",
-      "type": "MESH",
-      "location": [
-        55.0,
-        10.0,
-        1.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        2.399998664855957,
-        2.3999996185302734,
-        2.4000000953674316
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[LPQLLM] Retrieved detailed info for object 'Test_BoolOp_Diff_Cutter' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_BoolOp_Slice_Base": {
-      "name": "Test_BoolOp_Slice_Base",
-      "type": "MESH",
-      "location": [
-        60.0,
-        10.0,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        2.980299949645996,
-        2.9999990463256836,
-        2.98030161857605
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [
-        {
-          "name": "Bool_DIFFERENCE_Test_BoolOp_Slice_Cutter",
-          "type": "BOOLEAN",
-          "show_viewport": true,
-          "show_render": true
-        }
-      ],
-      "success": true,
-      "message": "[RJBO2D] Retrieved detailed info for object 'Test_BoolOp_Slice_Base' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_BoolOp_Slice_Cutter": {
-      "name": "Test_BoolOp_Slice_Cutter",
-      "type": "MESH",
-      "location": [
-        60.0,
-        10.0,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        3.0,
-        0.20000000298023224,
-        3.0
-      ],
-      "dimensions": [
-        3.0,
-        0.20000000298023224,
-        3.0
-      ],
-      "vertices": 8,
-      "faces": 6,
-      "modifiers": [],
-      "success": true,
-      "message": "[ITYF6S] Retrieved detailed info for object 'Test_BoolOp_Slice_Cutter' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_BoolOp_Slice_Base_slice": {
-      "name": "Test_BoolOp_Slice_Base_slice",
-      "type": "MESH",
-      "location": [
-        60.0,
-        10.0,
-        2.5
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        2.2208847999572754,
-        0.20000000298023224,
-        0.5
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [
-        {
-          "name": "Bool_INTERSECT_Test_BoolOp_Slice_Cutter",
-          "type": "BOOLEAN",
-          "show_viewport": true,
-          "show_render": true
-        }
-      ],
-      "success": true,
-      "message": "[1G9226] Retrieved detailed info for object 'Test_BoolOp_Slice_Base_slice' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Mod_RemoveVerify_1": {
-      "name": "Test_Mod_RemoveVerify_1",
+    "MOD_RemoveVerify_1": {
+      "name": "MOD_RemoveVerify_1",
       "type": "MESH",
       "location": [
         40.0,
@@ -1497,11 +1902,11 @@
         }
       ],
       "success": true,
-      "message": "[WCC5MN] Retrieved detailed info for object 'Test_Mod_RemoveVerify_1' (Type: MESH).",
+      "message": "[FYUMJX] Retrieved detailed info for object 'MOD_RemoveVerify_1' (Type: MESH).",
       "status": "success"
     },
-    "Test_Mod_RemoveVerify_2": {
-      "name": "Test_Mod_RemoveVerify_2",
+    "MOD_RemoveVerify_2": {
+      "name": "MOD_RemoveVerify_2",
       "type": "MESH",
       "location": [
         40.0,
@@ -1527,11 +1932,143 @@
       "faces": 6,
       "modifiers": [],
       "success": true,
-      "message": "[TPJP5S] Retrieved detailed info for object 'Test_Mod_RemoveVerify_2' (Type: MESH).",
+      "message": "[D8XULA] Retrieved detailed info for object 'MOD_RemoveVerify_2' (Type: MESH).",
       "status": "success"
     },
-    "Test_Col_Cube": {
-      "name": "Test_Col_Cube",
+    "MOD_BoolOp_Slice_Base": {
+      "name": "MOD_BoolOp_Slice_Base",
+      "type": "MESH",
+      "location": [
+        60.0,
+        10.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        2.980299949645996,
+        2.9999990463256836,
+        2.98030161857605
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [
+        {
+          "name": "Bool_DIFFERENCE_MOD_BoolOp_Slice_Cutter",
+          "type": "BOOLEAN",
+          "show_viewport": true,
+          "show_render": true
+        }
+      ],
+      "success": true,
+      "message": "[C4SD5R] Retrieved detailed info for object 'MOD_BoolOp_Slice_Base' (Type: MESH).",
+      "status": "success"
+    },
+    "MOD_BoolOp_Slice_Cutter": {
+      "name": "MOD_BoolOp_Slice_Cutter",
+      "type": "MESH",
+      "location": [
+        60.0,
+        10.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        3.0,
+        0.20000000298023224,
+        3.0
+      ],
+      "dimensions": [
+        3.0,
+        0.20000000298023224,
+        3.0
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[69Y3ER] Retrieved detailed info for object 'MOD_BoolOp_Slice_Cutter' (Type: MESH).",
+      "status": "success"
+    },
+    "MOD_BoolOp_Slice_Base_slice": {
+      "name": "MOD_BoolOp_Slice_Base_slice",
+      "type": "MESH",
+      "location": [
+        60.0,
+        10.0,
+        2.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        2.2208847999572754,
+        0.20000000298023224,
+        0.5
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [
+        {
+          "name": "Bool_INTERSECT_MOD_BoolOp_Slice_Cutter",
+          "type": "BOOLEAN",
+          "show_viewport": true,
+          "show_render": true
+        }
+      ],
+      "success": true,
+      "message": "[ITEUOF] Retrieved detailed info for object 'MOD_BoolOp_Slice_Base_slice' (Type: MESH).",
+      "status": "success"
+    },
+    "COL_Label": {
+      "name": "COL_Label",
+      "type": "FONT",
+      "location": [
+        -5.0,
+        20.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        4.515999794006348,
+        0.7000000476837158,
+        0.10000000149011612
+      ],
+      "modifiers": [],
+      "success": true,
+      "message": "[40Q0A0] Retrieved detailed info for object 'COL_Label' (Type: FONT).",
+      "status": "success"
+    },
+    "COL_Cube": {
+      "name": "COL_Cube",
       "type": "MESH",
       "location": [
         0.0,
@@ -1557,11 +2094,11 @@
       "faces": 6,
       "modifiers": [],
       "success": true,
-      "message": "[C08AO0] Retrieved detailed info for object 'Test_Col_Cube' (Type: MESH).",
+      "message": "[GIP2VP] Retrieved detailed info for object 'COL_Cube' (Type: MESH).",
       "status": "success"
     },
-    "Test_Col_Sphere": {
-      "name": "Test_Col_Sphere",
+    "COL_Sphere": {
+      "name": "COL_Sphere",
       "type": "MESH",
       "location": [
         5.0,
@@ -1587,11 +2124,11 @@
       "faces": 512,
       "modifiers": [],
       "success": true,
-      "message": "[L0Y9W1] Retrieved detailed info for object 'Test_Col_Sphere' (Type: MESH).",
+      "message": "[KVJ6WO] Retrieved detailed info for object 'COL_Sphere' (Type: MESH).",
       "status": "success"
     },
-    "Test_Col_Cube.001": {
-      "name": "Test_Col_Cube.001",
+    "COL_Cube.001": {
+      "name": "COL_Cube.001",
       "type": "MESH",
       "location": [
         0.0,
@@ -1617,11 +2154,11 @@
       "faces": 6,
       "modifiers": [],
       "success": true,
-      "message": "[PUXCW3] Retrieved detailed info for object 'Test_Col_Cube.001' (Type: MESH).",
+      "message": "[NAMWIJ] Retrieved detailed info for object 'COL_Cube.001' (Type: MESH).",
       "status": "success"
     },
-    "Test_Col_Sphere.001": {
-      "name": "Test_Col_Sphere.001",
+    "COL_Sphere.001": {
+      "name": "COL_Sphere.001",
       "type": "MESH",
       "location": [
         5.0,
@@ -1647,11 +2184,369 @@
       "faces": 512,
       "modifiers": [],
       "success": true,
-      "message": "[2MICOH] Retrieved detailed info for object 'Test_Col_Sphere.001' (Type: MESH).",
+      "message": "[EYE3G6] Retrieved detailed info for object 'COL_Sphere.001' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Circ_Base": {
-      "name": "Test_Op_Circ_Base",
+    "OP_Rand_Distribute": {
+      "name": "OP_Rand_Distribute",
+      "type": "MESH",
+      "location": [
+        15.0,
+        30.0,
+        2.473221905052725e-10
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[P8JPRS] Retrieved detailed info for object 'OP_Rand_Distribute' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Rand_Distribute.001": {
+      "name": "OP_Rand_Distribute.001",
+      "type": "MESH",
+      "location": [
+        14.336221694946289,
+        29.203487396240234,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[MC7FA5] Retrieved detailed info for object 'OP_Rand_Distribute.001' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Rand_Distribute.002": {
+      "name": "OP_Rand_Distribute.002",
+      "type": "MESH",
+      "location": [
+        14.797629356384277,
+        31.27619743347168,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[HX5D7O] Retrieved detailed info for object 'OP_Rand_Distribute.002' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Rand_Distribute.003": {
+      "name": "OP_Rand_Distribute.003",
+      "type": "MESH",
+      "location": [
+        14.85221004486084,
+        28.265567779541016,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[0G3M8R] Retrieved detailed info for object 'OP_Rand_Distribute.003' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Rand_Distribute.004": {
+      "name": "OP_Rand_Distribute.004",
+      "type": "MESH",
+      "location": [
+        15.874899864196777,
+        29.29617691040039,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[P5YX2V] Retrieved detailed info for object 'OP_Rand_Distribute.004' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Rand_Distribute.005": {
+      "name": "OP_Rand_Distribute.005",
+      "type": "MESH",
+      "location": [
+        14.07935905456543,
+        30.491744995117188,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[I1NSBU] Retrieved detailed info for object 'OP_Rand_Distribute.005' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Rand_Distribute.006": {
+      "name": "OP_Rand_Distribute.006",
+      "type": "MESH",
+      "location": [
+        15.31054973602295,
+        31.55551528930664,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[N6MHDL] Retrieved detailed info for object 'OP_Rand_Distribute.006' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Rand_Distribute.007": {
+      "name": "OP_Rand_Distribute.007",
+      "type": "MESH",
+      "location": [
+        16.246009826660156,
+        30.209693908691406,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[59PL1N] Retrieved detailed info for object 'OP_Rand_Distribute.007' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Rand_Distribute.008": {
+      "name": "OP_Rand_Distribute.008",
+      "type": "MESH",
+      "location": [
+        14.04494571685791,
+        28.687484741210938,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[3VUPA7] Retrieved detailed info for object 'OP_Rand_Distribute.008' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Rand_Distribute.009": {
+      "name": "OP_Rand_Distribute.009",
+      "type": "MESH",
+      "location": [
+        15.307214736938477,
+        31.63505744934082,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[XBZ9VF] Retrieved detailed info for object 'OP_Rand_Distribute.009' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Rand_Distribute.010": {
+      "name": "OP_Rand_Distribute.010",
+      "type": "MESH",
+      "location": [
+        15.36833381652832,
+        29.059879302978516,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.399999737739563,
+        0.39999985694885254,
+        0.4000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[ZM3L8K] Retrieved detailed info for object 'OP_Rand_Distribute.010' (Type: MESH).",
+      "status": "success"
+    },
+    "OP_Label": {
+      "name": "OP_Label",
+      "type": "FONT",
+      "location": [
+        -5.0,
+        30.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        4.206000328063965,
+        0.921000063419342,
+        0.10000000149011612
+      ],
+      "modifiers": [],
+      "success": true,
+      "message": "[XSXAPZ] Retrieved detailed info for object 'OP_Label' (Type: FONT).",
+      "status": "success"
+    },
+    "OP_CircularArray_Base": {
+      "name": "OP_CircularArray_Base",
       "type": "MESH",
       "location": [
         2.0,
@@ -1677,11 +2572,11 @@
       "faces": 34,
       "modifiers": [],
       "success": true,
-      "message": "[XLADKV] Retrieved detailed info for object 'Test_Op_Circ_Base' (Type: MESH).",
+      "message": "[P4XKZO] Retrieved detailed info for object 'OP_CircularArray_Base' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Circ_Base.001": {
-      "name": "Test_Op_Circ_Base.001",
+    "OP_CircularArray_Base.001": {
+      "name": "OP_CircularArray_Base.001",
       "type": "MESH",
       "location": [
         1.0,
@@ -1707,11 +2602,11 @@
       "faces": 34,
       "modifiers": [],
       "success": true,
-      "message": "[OJXQW5] Retrieved detailed info for object 'Test_Op_Circ_Base.001' (Type: MESH).",
+      "message": "[DSDJGW] Retrieved detailed info for object 'OP_CircularArray_Base.001' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Circ_Base.002": {
-      "name": "Test_Op_Circ_Base.002",
+    "OP_CircularArray_Base.002": {
+      "name": "OP_CircularArray_Base.002",
       "type": "MESH",
       "location": [
         -1.0,
@@ -1737,11 +2632,11 @@
       "faces": 34,
       "modifiers": [],
       "success": true,
-      "message": "[A34748] Retrieved detailed info for object 'Test_Op_Circ_Base.002' (Type: MESH).",
+      "message": "[REZ4MC] Retrieved detailed info for object 'OP_CircularArray_Base.002' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Circ_Base.003": {
-      "name": "Test_Op_Circ_Base.003",
+    "OP_CircularArray_Base.003": {
+      "name": "OP_CircularArray_Base.003",
       "type": "MESH",
       "location": [
         -2.0,
@@ -1767,11 +2662,11 @@
       "faces": 34,
       "modifiers": [],
       "success": true,
-      "message": "[Z3JSZX] Retrieved detailed info for object 'Test_Op_Circ_Base.003' (Type: MESH).",
+      "message": "[MZ24P6] Retrieved detailed info for object 'OP_CircularArray_Base.003' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Circ_Base.004": {
-      "name": "Test_Op_Circ_Base.004",
+    "OP_CircularArray_Base.004": {
+      "name": "OP_CircularArray_Base.004",
       "type": "MESH",
       "location": [
         -1.0,
@@ -1797,11 +2692,11 @@
       "faces": 34,
       "modifiers": [],
       "success": true,
-      "message": "[U6KBZC] Retrieved detailed info for object 'Test_Op_Circ_Base.004' (Type: MESH).",
+      "message": "[2D27DX] Retrieved detailed info for object 'OP_CircularArray_Base.004' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Circ_Base.005": {
-      "name": "Test_Op_Circ_Base.005",
+    "OP_CircularArray_Base.005": {
+      "name": "OP_CircularArray_Base.005",
       "type": "MESH",
       "location": [
         1.0,
@@ -1827,11 +2722,11 @@
       "faces": 34,
       "modifiers": [],
       "success": true,
-      "message": "[MQWVAN] Retrieved detailed info for object 'Test_Op_Circ_Base.005' (Type: MESH).",
+      "message": "[D7LBPQ] Retrieved detailed info for object 'OP_CircularArray_Base.005' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Joined_Result": {
-      "name": "Test_Op_Joined_Result",
+    "OP_Joined_Result": {
+      "name": "OP_Joined_Result",
       "type": "MESH",
       "location": [
         6.400000095367432,
@@ -1857,11 +2752,11 @@
       "faces": 18,
       "modifiers": [],
       "success": true,
-      "message": "[ZC4NUB] Retrieved detailed info for object 'Test_Op_Joined_Result' (Type: MESH).",
+      "message": "[ZQKJEC] Retrieved detailed info for object 'OP_Joined_Result' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_CreateArray": {
-      "name": "Test_Op_CreateArray",
+    "OP_CreateArray": {
+      "name": "OP_CreateArray",
       "type": "MESH",
       "location": [
         10.0,
@@ -1895,341 +2790,11 @@
         }
       ],
       "success": true,
-      "message": "[GOJGUI] Retrieved detailed info for object 'Test_Op_CreateArray' (Type: MESH).",
+      "message": "[Q1ZJ29] Retrieved detailed info for object 'OP_CreateArray' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Rand_Base": {
-      "name": "Test_Op_Rand_Base",
-      "type": "MESH",
-      "location": [
-        15.0,
-        30.0,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[CG74I3] Retrieved detailed info for object 'Test_Op_Rand_Base' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Rand_Base.001": {
-      "name": "Test_Op_Rand_Base.001",
-      "type": "MESH",
-      "location": [
-        15.557706832885742,
-        28.10004234313965,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[X6LXJA] Retrieved detailed info for object 'Test_Op_Rand_Base.001' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Rand_Base.002": {
-      "name": "Test_Op_Rand_Base.002",
-      "type": "MESH",
-      "location": [
-        14.100117683410645,
-        28.89284324645996,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[NF291H] Retrieved detailed info for object 'Test_Op_Rand_Base.002' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Rand_Base.003": {
-      "name": "Test_Op_Rand_Base.003",
-      "type": "MESH",
-      "location": [
-        15.945884704589844,
-        30.706798553466797,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[05OTGW] Retrieved detailed info for object 'Test_Op_Rand_Base.003' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Rand_Base.004": {
-      "name": "Test_Op_Rand_Base.004",
-      "type": "MESH",
-      "location": [
-        14.687686920166016,
-        28.11918830871582,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[4RHTNF] Retrieved detailed info for object 'Test_Op_Rand_Base.004' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Rand_Base.005": {
-      "name": "Test_Op_Rand_Base.005",
-      "type": "MESH",
-      "location": [
-        13.874551773071289,
-        30.021421432495117,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[0EGERV] Retrieved detailed info for object 'Test_Op_Rand_Base.005' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Rand_Base.006": {
-      "name": "Test_Op_Rand_Base.006",
-      "type": "MESH",
-      "location": [
-        13.881762504577637,
-        30.35706329345703,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[X9N9LF] Retrieved detailed info for object 'Test_Op_Rand_Base.006' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Rand_Base.007": {
-      "name": "Test_Op_Rand_Base.007",
-      "type": "MESH",
-      "location": [
-        16.223276138305664,
-        30.792556762695312,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[LA2QEJ] Retrieved detailed info for object 'Test_Op_Rand_Base.007' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Rand_Base.008": {
-      "name": "Test_Op_Rand_Base.008",
-      "type": "MESH",
-      "location": [
-        14.361001968383789,
-        28.621917724609375,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[3DN8L9] Retrieved detailed info for object 'Test_Op_Rand_Base.008' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Rand_Base.009": {
-      "name": "Test_Op_Rand_Base.009",
-      "type": "MESH",
-      "location": [
-        16.8288516998291,
-        29.346378326416016,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[WJRG0O] Retrieved detailed info for object 'Test_Op_Rand_Base.009' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Rand_Base.010": {
-      "name": "Test_Op_Rand_Base.010",
-      "type": "MESH",
-      "location": [
-        16.389978408813477,
-        30.41490364074707,
-        0.0
-      ],
-      "rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "dimensions": [
-        0.399999737739563,
-        0.39999985694885254,
-        0.4000000059604645
-      ],
-      "vertices": 482,
-      "faces": 512,
-      "modifiers": [],
-      "success": true,
-      "message": "[0SJAYN] Retrieved detailed info for object 'Test_Op_Rand_Base.010' (Type: MESH).",
-      "status": "success"
-    },
-    "Test_Op_Extrude": {
-      "name": "Test_Op_Extrude",
+    "OP_Extrude": {
+      "name": "OP_Extrude",
       "type": "MESH",
       "location": [
         20.0,
@@ -2255,11 +2820,11 @@
       "faces": 66,
       "modifiers": [],
       "success": true,
-      "message": "[GFX9Y5] Retrieved detailed info for object 'Test_Op_Extrude' (Type: MESH).",
+      "message": "[88A4UF] Retrieved detailed info for object 'OP_Extrude' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Inset": {
-      "name": "Test_Op_Inset",
+    "OP_Inset": {
+      "name": "OP_Inset",
       "type": "MESH",
       "location": [
         25.0,
@@ -2285,11 +2850,11 @@
       "faces": 10,
       "modifiers": [],
       "success": true,
-      "message": "[38POZ4] Retrieved detailed info for object 'Test_Op_Inset' (Type: MESH).",
+      "message": "[2H2E21] Retrieved detailed info for object 'OP_Inset' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Shear_Cylinder": {
-      "name": "Test_Op_Shear_Cylinder",
+    "OP_Shear_Cylinder": {
+      "name": "OP_Shear_Cylinder",
       "type": "MESH",
       "location": [
         30.0,
@@ -2315,11 +2880,11 @@
       "faces": 34,
       "modifiers": [],
       "success": true,
-      "message": "[PMFVFI] Retrieved detailed info for object 'Test_Op_Shear_Cylinder' (Type: MESH).",
+      "message": "[QGOE6J] Retrieved detailed info for object 'OP_Shear_Cylinder' (Type: MESH).",
       "status": "success"
     },
-    "Test_Op_Delete_Torus_Survivor": {
-      "name": "Test_Op_Delete_Torus_Survivor",
+    "OP_Delete_Torus_Survivor": {
+      "name": "OP_Delete_Torus_Survivor",
       "type": "MESH",
       "location": [
         35.0,
@@ -2345,7 +2910,2103 @@
       "faces": 576,
       "modifiers": [],
       "success": true,
-      "message": "[F0KRJW] Retrieved detailed info for object 'Test_Op_Delete_Torus_Survivor' (Type: MESH).",
+      "message": "[G1VL46] Retrieved detailed info for object 'OP_Delete_Torus_Survivor' (Type: MESH).",
+      "status": "success"
+    },
+    "TRSF_Label": {
+      "name": "TRSF_Label",
+      "type": "FONT",
+      "location": [
+        -5.0,
+        40.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        4.609000205993652,
+        0.7004074454307556,
+        0.10000000149011612
+      ],
+      "modifiers": [],
+      "success": true,
+      "message": "[ZVJDPZ] Retrieved detailed info for object 'TRSF_Label' (Type: FONT).",
+      "status": "success"
+    },
+    "SYS_Label": {
+      "name": "SYS_Label",
+      "type": "FONT",
+      "location": [
+        -5.0,
+        50.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        3.1690003871917725,
+        0.921000063419342,
+        0.10000000149011612
+      ],
+      "modifiers": [],
+      "success": true,
+      "message": "[2RJ184] Retrieved detailed info for object 'SYS_Label' (Type: FONT).",
+      "status": "success"
+    },
+    "SYS_Run_Fire_00": {
+      "name": "SYS_Run_Fire_00",
+      "type": "MESH",
+      "location": [
+        5.0,
+        50.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.1599999964237213,
+        0.1599999964237213,
+        10.0
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[BVB3VR] Retrieved detailed info for object 'SYS_Run_Fire_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Run_Gas_00": {
+      "name": "SYS_Run_Gas_00",
+      "type": "MESH",
+      "location": [
+        5.0,
+        51.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.07999999821186066,
+        0.07999999821186066,
+        10.0
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[NLEN3O] Retrieved detailed info for object 'SYS_Run_Gas_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Run_Chiller_00": {
+      "name": "SYS_Run_Chiller_00",
+      "type": "MESH",
+      "location": [
+        2.5,
+        52.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.11999999731779099,
+        0.11999999731779099,
+        5.0
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[K5B3UT] Retrieved detailed info for object 'SYS_Run_Chiller_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Run_Chiller_01": {
+      "name": "SYS_Run_Chiller_01",
+      "type": "MESH",
+      "location": [
+        5.0,
+        52.5,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.11999999731779099,
+        0.11999999731779099,
+        1.0
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[AHO1FC] Retrieved detailed info for object 'SYS_Run_Chiller_01' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Run_Chiller_Joint_01_JOINT": {
+      "name": "SYS_Run_Chiller_Joint_01_JOINT",
+      "type": "MESH",
+      "location": [
+        5.0,
+        52.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.1679999679327011,
+        0.16799995303153992,
+        0.1679999977350235
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[F73KW5] Retrieved detailed info for object 'SYS_Run_Chiller_Joint_01_JOINT' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Run_Drainage_Stack_00": {
+      "name": "SYS_Run_Drainage_Stack_00",
+      "type": "MESH",
+      "location": [
+        0.0,
+        53.0,
+        2.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.20000003278255463,
+        0.20000003278255463,
+        4.000000953674316
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[2NCLX1] Retrieved detailed info for object 'SYS_Run_Drainage_Stack_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_90_00": {
+      "name": "SYS_Routing_90_00",
+      "type": "MESH",
+      "location": [
+        14.0,
+        50.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.10000000149011612,
+        0.10000000149011612,
+        2.0
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[HBKKUB] Retrieved detailed info for object 'SYS_Routing_90_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_90_01": {
+      "name": "SYS_Routing_90_01",
+      "type": "MESH",
+      "location": [
+        15.0,
+        50.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.10000000149011612,
+        0.10000000149011612,
+        2.0
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[551Q85] Retrieved detailed info for object 'SYS_Routing_90_01' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_90_Joint_01_JOINT": {
+      "name": "SYS_Routing_90_Joint_01_JOINT",
+      "type": "MESH",
+      "location": [
+        15.0,
+        50.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.13999998569488525,
+        0.13999998569488525,
+        0.14000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[01RNDN] Retrieved detailed info for object 'SYS_Routing_90_Joint_01_JOINT' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Z_Skip_00": {
+      "name": "SYS_Routing_Z_Skip_00",
+      "type": "MESH",
+      "location": [
+        14.0,
+        52.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.10000000149011612,
+        0.10000000149011612,
+        2.0
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[M6V03H] Retrieved detailed info for object 'SYS_Routing_Z_Skip_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Z_Skip_01": {
+      "name": "SYS_Routing_Z_Skip_01",
+      "type": "MESH",
+      "location": [
+        16.0,
+        52.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.10000000149011612,
+        0.10000000149011612,
+        2.8284270763397217
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[GJRWSH] Retrieved detailed info for object 'SYS_Routing_Z_Skip_01' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Z_Skip_02": {
+      "name": "SYS_Routing_Z_Skip_02",
+      "type": "MESH",
+      "location": [
+        18.0,
+        52.0,
+        2.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.10000000149011612,
+        0.10000000149011612,
+        2.0
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[V9M0ZR] Retrieved detailed info for object 'SYS_Routing_Z_Skip_02' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Z_Skip_Joint_01_JOINT": {
+      "name": "SYS_Routing_Z_Skip_Joint_01_JOINT",
+      "type": "MESH",
+      "location": [
+        15.0,
+        52.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.13999998569488525,
+        0.13999998569488525,
+        0.14000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[7XN3T7] Retrieved detailed info for object 'SYS_Routing_Z_Skip_Joint_01_JOINT' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Z_Skip_Joint_02_JOINT": {
+      "name": "SYS_Routing_Z_Skip_Joint_02_JOINT",
+      "type": "MESH",
+      "location": [
+        17.0,
+        52.0,
+        2.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.13999998569488525,
+        0.13999998569488525,
+        0.14000000059604645
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[0B1MF9] Retrieved detailed info for object 'SYS_Routing_Z_Skip_Joint_02_JOINT' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Header_Tee_00": {
+      "name": "SYS_Routing_Header_Tee_00",
+      "type": "MESH",
+      "location": [
+        14.0,
+        54.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.1599999964237213,
+        0.1599999964237213,
+        2.0
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[ORNJ88] Retrieved detailed info for object 'SYS_Routing_Header_Tee_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Header_Tee_01": {
+      "name": "SYS_Routing_Header_Tee_01",
+      "type": "MESH",
+      "location": [
+        15.0,
+        54.0,
+        0.75
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.1599999964237213,
+        0.1599999964237213,
+        1.5
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[BPFNSG] Retrieved detailed info for object 'SYS_Routing_Header_Tee_01' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Header_Tee_02": {
+      "name": "SYS_Routing_Header_Tee_02",
+      "type": "MESH",
+      "location": [
+        15.0,
+        54.0,
+        0.75
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.1600000113248825,
+        0.1600000113248825,
+        1.5000003576278687
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[S05JT2] Retrieved detailed info for object 'SYS_Routing_Header_Tee_02' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Header_Tee_03": {
+      "name": "SYS_Routing_Header_Tee_03",
+      "type": "MESH",
+      "location": [
+        16.0,
+        54.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.1599999964237213,
+        0.1599999964237213,
+        2.0
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[7SHN3I] Retrieved detailed info for object 'SYS_Routing_Header_Tee_03' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Header_Tee_Joint_01_JOINT": {
+      "name": "SYS_Routing_Header_Tee_Joint_01_JOINT",
+      "type": "MESH",
+      "location": [
+        15.0,
+        54.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.22399991750717163,
+        0.22399994730949402,
+        0.2240000069141388
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[D49F8L] Retrieved detailed info for object 'SYS_Routing_Header_Tee_Joint_01_JOINT' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Routing_Header_Tee_Joint_03_JOINT": {
+      "name": "SYS_Routing_Header_Tee_Joint_03_JOINT",
+      "type": "MESH",
+      "location": [
+        15.0,
+        54.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.22399991750717163,
+        0.22399994730949402,
+        0.2240000069141388
+      ],
+      "vertices": 482,
+      "faces": 512,
+      "modifiers": [],
+      "success": true,
+      "message": "[OJZPUV] Retrieved detailed info for object 'SYS_Routing_Header_Tee_Joint_03_JOINT' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Tray_20x40_00": {
+      "name": "SYS_Tray_20x40_00",
+      "type": "MESH",
+      "location": [
+        21.0,
+        50.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        2.0,
+        0.03999999910593033,
+        0.019999999552965164
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[VA0UAQ] Retrieved detailed info for object 'SYS_Tray_20x40_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Tray_50x100_00": {
+      "name": "SYS_Tray_50x100_00",
+      "type": "MESH",
+      "location": [
+        21.0,
+        52.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        2.0,
+        0.10000000149011612,
+        0.05000000074505806
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[LMDXPL] Retrieved detailed info for object 'SYS_Tray_50x100_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Tray_100x200_00": {
+      "name": "SYS_Tray_100x200_00",
+      "type": "MESH",
+      "location": [
+        21.0,
+        54.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        2.0,
+        0.20000000298023224,
+        0.10000000149011612
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[INQXHJ] Retrieved detailed info for object 'SYS_Tray_100x200_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Mock_Ceiling": {
+      "name": "SYS_Mock_Ceiling",
+      "type": "MESH",
+      "location": [
+        25.0,
+        50.0,
+        4.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        2.0,
+        0.5,
+        0.05000000074505806
+      ],
+      "dimensions": [
+        2.0,
+        0.5,
+        0.05000000074505806
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[IOEDQL] Retrieved detailed info for object 'SYS_Mock_Ceiling' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Ceiling_Run_00": {
+      "name": "SYS_Ceiling_Run_00",
+      "type": "MESH",
+      "location": [
+        25.0,
+        50.0,
+        3.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        2.0,
+        0.30000001192092896,
+        0.05000000074505806
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[NTJC0H] Retrieved detailed info for object 'SYS_Ceiling_Run_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Standalone_Supp_TRAPEZE_HANGER": {
+      "name": "SYS_Standalone_Supp_TRAPEZE_HANGER",
+      "type": "MESH",
+      "location": [
+        24.5,
+        50.0,
+        3.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.4000000059604645
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[059R4X] Retrieved detailed info for object 'SYS_Standalone_Supp_TRAPEZE_HANGER' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Standalone_Supp_TRAPEZE_HANGER.001": {
+      "name": "SYS_Standalone_Supp_TRAPEZE_HANGER.001",
+      "type": "MESH",
+      "location": [
+        24.5,
+        50.150001525878906,
+        3.737499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[08COSZ] Retrieved detailed info for object 'SYS_Standalone_Supp_TRAPEZE_HANGER.001' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Standalone_Supp_TRAPEZE_HANGER.002": {
+      "name": "SYS_Standalone_Supp_TRAPEZE_HANGER.002",
+      "type": "MESH",
+      "location": [
+        24.5,
+        49.849998474121094,
+        3.737499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[HZSQLN] Retrieved detailed info for object 'SYS_Standalone_Supp_TRAPEZE_HANGER.002' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Mock_Wall": {
+      "name": "SYS_Mock_Wall",
+      "type": "MESH",
+      "location": [
+        24.0,
+        56.0,
+        2.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        6.0,
+        0.15000000596046448,
+        4.0
+      ],
+      "dimensions": [
+        6.0,
+        0.15000000596046448,
+        4.0
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[XE04Z2] Retrieved detailed info for object 'SYS_Mock_Wall' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Big_Cantilever_Run_00": {
+      "name": "SYS_Big_Cantilever_Run_00",
+      "type": "MESH",
+      "location": [
+        24.0,
+        55.650001525878906,
+        4.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        5.0,
+        0.44999998807907104,
+        0.05000000074505806
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[NC8Y3G] Retrieved detailed info for object 'SYS_Big_Cantilever_Run_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET": {
+      "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET",
+      "type": "MESH",
+      "location": [
+        22.0,
+        55.80000305175781,
+        3.9700000286102295
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.07999999821186066,
+        0.800000011920929,
+        0.07999999821186066
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[7C1LJH] Retrieved detailed info for object 'SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.001": {
+      "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.001",
+      "type": "MESH",
+      "location": [
+        22.0,
+        56.0,
+        4.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.20000000298023224,
+        0.029999999329447746,
+        0.800000011920929
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[80IFX5] Retrieved detailed info for object 'SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.001' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.002": {
+      "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.002",
+      "type": "MESH",
+      "location": [
+        23.5,
+        55.80000305175781,
+        3.9700000286102295
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.07999999821186066,
+        0.800000011920929,
+        0.07999999821186066
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[5TAEP2] Retrieved detailed info for object 'SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.002' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.003": {
+      "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.003",
+      "type": "MESH",
+      "location": [
+        23.5,
+        56.0,
+        4.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.20000000298023224,
+        0.029999999329447746,
+        0.800000011920929
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[RRQ9B4] Retrieved detailed info for object 'SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.003' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.004": {
+      "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.004",
+      "type": "MESH",
+      "location": [
+        25.0,
+        55.80000305175781,
+        3.9700000286102295
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.07999999821186066,
+        0.800000011920929,
+        0.07999999821186066
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[EX5BNZ] Retrieved detailed info for object 'SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.004' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.005": {
+      "name": "SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.005",
+      "type": "MESH",
+      "location": [
+        25.0,
+        56.0,
+        4.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.20000000298023224,
+        0.029999999329447746,
+        0.800000011920929
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[5PNC22] Retrieved detailed info for object 'SYS_Big_Cantilever_Run_AutoSupp_CANTILEVER_BRACKET.005' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bigger_Wall_Bracket_Run_00": {
+      "name": "SYS_Bigger_Wall_Bracket_Run_00",
+      "type": "MESH",
+      "location": [
+        24.0,
+        55.650001525878906,
+        3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        5.0,
+        0.6000000238418579,
+        0.05000000074505806
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[39VQGH] Retrieved detailed info for object 'SYS_Bigger_Wall_Bracket_Run_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET": {
+      "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET",
+      "type": "MESH",
+      "location": [
+        21.799999237060547,
+        55.900001525878906,
+        3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.20000000298023224,
+        0.029999999329447746,
+        0.800000011920929
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[JFOV9B] Retrieved detailed info for object 'SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.001": {
+      "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.001",
+      "type": "MESH",
+      "location": [
+        21.799999237060547,
+        55.775001525878906,
+        2.9600000381469727
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.4000000059604645,
+        0.30000001192092896,
+        0.03999999910593033
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[UB1RGK] Retrieved detailed info for object 'SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.001' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.002": {
+      "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.002",
+      "type": "MESH",
+      "location": [
+        23.0,
+        55.900001525878906,
+        3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.20000000298023224,
+        0.029999999329447746,
+        0.800000011920929
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[LCYZYT] Retrieved detailed info for object 'SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.002' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.003": {
+      "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.003",
+      "type": "MESH",
+      "location": [
+        23.0,
+        55.775001525878906,
+        2.9600000381469727
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.4000000059604645,
+        0.30000001192092896,
+        0.03999999910593033
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[YYT7K2] Retrieved detailed info for object 'SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.003' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.004": {
+      "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.004",
+      "type": "MESH",
+      "location": [
+        24.200000762939453,
+        55.900001525878906,
+        3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.20000000298023224,
+        0.029999999329447746,
+        0.800000011920929
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[7VIF4G] Retrieved detailed info for object 'SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.004' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.005": {
+      "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.005",
+      "type": "MESH",
+      "location": [
+        24.200000762939453,
+        55.775001525878906,
+        2.9600000381469727
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.4000000059604645,
+        0.30000001192092896,
+        0.03999999910593033
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[IFGWLG] Retrieved detailed info for object 'SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.005' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.006": {
+      "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.006",
+      "type": "MESH",
+      "location": [
+        25.399999618530273,
+        55.900001525878906,
+        3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.20000000298023224,
+        0.029999999329447746,
+        0.800000011920929
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[EDL26J] Retrieved detailed info for object 'SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.006' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.007": {
+      "name": "SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.007",
+      "type": "MESH",
+      "location": [
+        25.399999618530273,
+        55.775001525878906,
+        2.9600000381469727
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.4000000059604645,
+        0.30000001192092896,
+        0.03999999910593033
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[EF8HUO] Retrieved detailed info for object 'SYS_Bigger_Wall_Bracket_Run_AutoSupp_WALL_BRACKET.007' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bulkhead_High": {
+      "name": "SYS_Bulkhead_High",
+      "type": "MESH",
+      "location": [
+        30.5,
+        52.0,
+        4.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        3.0,
+        0.5,
+        0.05000000074505806
+      ],
+      "dimensions": [
+        3.0,
+        0.5,
+        0.05000000074505806
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[MRUZ52] Retrieved detailed info for object 'SYS_Bulkhead_High' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bulkhead_Low": {
+      "name": "SYS_Bulkhead_Low",
+      "type": "MESH",
+      "location": [
+        33.5,
+        52.0,
+        3.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        3.0,
+        0.5,
+        0.05000000074505806
+      ],
+      "dimensions": [
+        3.0,
+        0.5,
+        0.05000000074505806
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[PD1Z3S] Retrieved detailed info for object 'SYS_Bulkhead_Low' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Bulkhead_Face": {
+      "name": "SYS_Bulkhead_Face",
+      "type": "MESH",
+      "location": [
+        32.0,
+        52.0,
+        3.75
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        0.05000000074505806,
+        0.5,
+        0.5
+      ],
+      "dimensions": [
+        0.05000000074505806,
+        0.5,
+        0.5
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[1ZX96D] Retrieved detailed info for object 'SYS_Bulkhead_Face' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_00": {
+      "name": "SYS_Refined_Tray_Bulkhead_00",
+      "type": "MESH",
+      "location": [
+        30.399999618530273,
+        52.0,
+        3.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        2.799999237060547,
+        0.20000000298023224,
+        0.05000000074505806
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[46BG3G] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_00' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_01": {
+      "name": "SYS_Refined_Tray_Bulkhead_01",
+      "type": "MESH",
+      "location": [
+        32.04999923706055,
+        52.0,
+        3.25
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.7071067690849304,
+        0.20000000298023224,
+        0.05000000074505806
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[QR64W2] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_01' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_02": {
+      "name": "SYS_Refined_Tray_Bulkhead_02",
+      "type": "MESH",
+      "location": [
+        33.650001525878906,
+        52.0,
+        3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        2.700000762939453,
+        0.20000000298023224,
+        0.05000000074505806
+      ],
+      "vertices": 8,
+      "faces": 6,
+      "modifiers": [],
+      "success": true,
+      "message": "[8NP21X] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_02' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_Joint_01": {
+      "name": "SYS_Refined_Tray_Bulkhead_Joint_01",
+      "type": "MESH",
+      "location": [
+        31.799999237060547,
+        52.0,
+        3.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.05999999865889549,
+        0.05999999865889549,
+        0.20000000298023224
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[GUU9OO] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_Joint_01' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_Joint_02": {
+      "name": "SYS_Refined_Tray_Bulkhead_Joint_02",
+      "type": "MESH",
+      "location": [
+        32.29999923706055,
+        52.0,
+        3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.05999999865889549,
+        0.05999999865889549,
+        0.20000000298023224
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[NI0QI4] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_Joint_02' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER",
+      "type": "MESH",
+      "location": [
+        29.200000762939453,
+        52.0,
+        3.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.30000001192092896
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[BTRNJ9] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.001": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.001",
+      "type": "MESH",
+      "location": [
+        29.200000762939453,
+        52.099998474121094,
+        3.737499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[OJDXD2] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.001' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.002": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.002",
+      "type": "MESH",
+      "location": [
+        29.200000762939453,
+        51.900001525878906,
+        3.737499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[PM2ZO7] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.002' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.003": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.003",
+      "type": "MESH",
+      "location": [
+        30.200000762939453,
+        52.0,
+        3.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.30000001192092896
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[6JMJGX] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.003' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.004": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.004",
+      "type": "MESH",
+      "location": [
+        30.200000762939453,
+        52.099998474121094,
+        3.737499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[6MB4QF] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.004' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.005": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.005",
+      "type": "MESH",
+      "location": [
+        30.200000762939453,
+        51.900001525878906,
+        3.737499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[P24YBF] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.005' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.006": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.006",
+      "type": "MESH",
+      "location": [
+        31.200000762939453,
+        52.0,
+        3.5
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.30000001192092896
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[IQP52M] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.006' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.007": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.007",
+      "type": "MESH",
+      "location": [
+        31.200000762939453,
+        52.099998474121094,
+        3.737499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[8I7UPR] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.007' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.008": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.008",
+      "type": "MESH",
+      "location": [
+        31.200000762939453,
+        51.900001525878906,
+        3.737499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[IET8XE] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.008' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.009": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.009",
+      "type": "MESH",
+      "location": [
+        32.99289321899414,
+        52.0,
+        3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.30000001192092896
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[UVQC1M] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.009' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.010": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.010",
+      "type": "MESH",
+      "location": [
+        32.99289321899414,
+        52.099998474121094,
+        3.237499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[W7MN9L] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.010' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.011": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.011",
+      "type": "MESH",
+      "location": [
+        32.99289321899414,
+        51.900001525878906,
+        3.237499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[IFX32F] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.011' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.012": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.012",
+      "type": "MESH",
+      "location": [
+        33.99289321899414,
+        52.0,
+        3.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.30000001192092896
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[CNYYF9] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.012' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.013": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.013",
+      "type": "MESH",
+      "location": [
+        33.99289321899414,
+        52.099998474121094,
+        3.237499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[0CNYZO] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.013' (Type: MESH).",
+      "status": "success"
+    },
+    "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.014": {
+      "name": "SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.014",
+      "type": "MESH",
+      "location": [
+        33.99289321899414,
+        51.900001525878906,
+        3.237499952316284
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        0.01600000075995922,
+        0.01600000075995922,
+        0.4749999940395355
+      ],
+      "vertices": 64,
+      "faces": 34,
+      "modifiers": [],
+      "success": true,
+      "message": "[FL2CT9] Retrieved detailed info for object 'SYS_Refined_Tray_Bulkhead_AutoSupp_TRAPEZE_HANGER.014' (Type: MESH).",
       "status": "success"
     }
   }

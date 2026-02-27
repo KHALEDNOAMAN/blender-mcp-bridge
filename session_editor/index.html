@@ -13,7 +13,7 @@
         rel="stylesheet">
 </head>
 
-<body class="dark-theme">
+<body class="dark-theme" spellcheck="false">
     <div class="app-container">
         <header>
             <div class="logo-section">
@@ -27,77 +27,105 @@
                 <button id="themeToggle" class="btn btn-secondary">Theme</button>
                 <input type="file" id="fileInput" accept=".json" hidden>
                 <button id="loadBtn" class="btn btn-primary">Load Session</button>
+                <button id="addCommandBtn" class="btn btn-success">+ New Command</button>
                 <button id="saveBtn" class="btn btn-secondary" disabled>Export JSON</button>
             </div>
         </header>
 
         <main>
-            <section id="metadataSection" class="card glass">
-                <h2>Session Metadata</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="sessionName">Name</label>
-                        <input type="text" id="sessionName" placeholder="Session Name" spellcheck="false">
-                    </div>
-                    <div class="form-group">
-                        <label for="sessionModel">AI Model</label>
-                        <input type="text" id="sessionModel" placeholder="e.g. GPT-4o, Claude 3.5 Sonnet"
-                            spellcheck="false">
-                    </div>
-                    <div class="form-group">
-                        <label for="sessionCreatedAt">Created At</label>
-                        <input type="text" id="sessionCreatedAt" readonly>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="sessionDescription">Description</label>
-                        <textarea id="sessionDescription" rows="2" placeholder="Describe this recording..."
-                            spellcheck="false"></textarea>
+            <section id="metadataSection" class="card glass metadata-collapsible">
+                <div class="metadata-header" id="metadataToggle" title="Toggle session details">
+                    <h2>Session Metadata</h2>
+                    <span class="metadata-chevron">▼</span>
+                </div>
+                <div class="metadata-body" id="metadataBody">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="sessionName">Name</label>
+                            <input type="text" id="sessionName" placeholder="Session Name" spellcheck="false">
+                        </div>
+                        <div class="form-group">
+                            <label for="sessionModel">AI Model</label>
+                            <input type="text" id="sessionModel" placeholder="e.g. GPT-4o, Claude 3.5 Sonnet"
+                                spellcheck="false">
+                        </div>
+                        <div class="form-group">
+                            <label for="sessionCreatedAt">Created At</label>
+                            <input type="text" id="sessionCreatedAt" readonly>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="sessionDescription">Description</label>
+                            <textarea id="sessionDescription" rows="2" placeholder="Describe this recording..."
+                                spellcheck="false"></textarea>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section class="command-list-header card glass">
-                <div class="header-top">
-                    <div class="header-left">
+            <section id="commandsSection" class="card glass commands-collapsible">
+                <div class="commands-header" id="commandsToggle" title="Toggle commands list">
+                    <div class="commands-header-left">
                         <h2>Commands <span id="commandCount" class="badge">0</span></h2>
                     </div>
-                    <div class="playback-controls">
-                        <div class="control-group main-controls">
-                            <button id="undoBtn" class="btn btn-secondary" title="Undo Last Command (Ctrl+Z)">↶
-                                Undo</button>
-                            <button id="redoBtn" class="btn btn-secondary" title="Redo Last Command (Ctrl+Y)">↷
-                                Redo</button>
-                            <div class="vr"></div>
-                            <button id="playBtn" class="btn btn-success" disabled
-                                title="Play Session (Space or Ctrl+Enter)">▶ Play</button>
-                            <button id="stopBtn" class="btn btn-danger" disabled title="Stop Playback (Esc)">⏹
-                                Stop</button>
-                        </div>
-                        <div class="vr"></div>
-                        <div class="control-group secondary-controls">
-                            <button id="resetStateBtn" class="btn btn-secondary btn-sm"
-                                title="Re-enable all Run buttons (Alt+R)">↺ Reset</button>
-                            <button id="clearSceneBtn" class="btn btn-danger btn-sm"
-                                title="Delete all objects in Blender scene">🗑 Clear</button>
-                        </div>
-                    </div>
+                    <span class="commands-chevron">▼</span>
                 </div>
-                <div class="header-bottom">
-                    <div class="playback-delay-group">
-                        <label for="playbackDelay">Delay (ms)</label>
-                        <input type="number" id="playbackDelay" value="500" min="0" step="100">
-                    </div>
-                    <div class="search-bar">
-                        <input type="text" id="commandFilter" placeholder="Filter tools...">
+                <div class="commands-body" id="commandsBody">
+                    <!-- Collapsible Command List Header Panel -->
+                    <section id="commandListHeaderPanel" class="card glass command-list-header-collapsible">
+                        <div class="command-list-header-header" id="commandListHeaderToggle" title="Toggle playback controls">
+                            <span class="command-list-header-title">Playback Controls</span>
+                            <span class="command-list-header-chevron">▼</span>
+                        </div>
+                        <div class="command-list-header-body" id="commandListHeaderBody">
+                            <div class="sticky-header-container">
+                                <section class="command-list-header-content">
+                                    <div class="header-top">
+                                        <div class="header-left">
+                                            <div class="playback-controls">
+                                                <div class="control-group main-controls">
+                                                    <button id="undoBtn" class="btn btn-secondary" title="Undo Last Command (Ctrl+Z)">↶
+                                                        Undo</button>
+                                                    <button id="redoBtn" class="btn btn-secondary" title="Redo Last Command (Ctrl+Y)">↷
+                                                        Redo</button>
+                                                    <div class="vr"></div>
+                                                    <button id="playAllBtn" class="btn btn-success" disabled title="Play All (Space)">▶ Play
+                                                        All</button>
+                                                    <button id="playBtn" class="btn btn-success" disabled
+                                                        title="Play from Active (Ctrl+Enter)">▶ Play</button>
+                                                    <button id="stopBtn" class="btn btn-danger" disabled title="Stop Playback (Esc)">⏹
+                                                        Stop</button>
+                                                </div>
+                                                <div class="vr"></div>
+                                                <div class="control-group secondary-controls">
+                                                    <button id="resetStateBtn" class="btn btn-secondary btn-sm"
+                                                        title="Re-enable all Run buttons (Alt+R)">↺ Reset</button>
+                                                    <button id="clearSceneBtn" class="btn btn-danger btn-sm"
+                                                        title="Delete all objects in Blender scene">🗑 Clear</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="header-bottom">
+                                        <div class="playback-delay-group">
+                                            <label for="playbackDelay">Delay (ms)</label>
+                                            <input type="number" id="playbackDelay" value="500" min="0" step="100" spellcheck="false">
+                                        </div>
+                                        <div class="search-bar">
+                                            <input type="text" id="commandFilter" placeholder="Filter tools..." spellcheck="false">
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div id="commandList" class="command-list">
+                        <div class="empty-state">
+                            <p>No session loaded. Start by clicking "Load Session".</p>
+                        </div>
                     </div>
                 </div>
             </section>
-
-            <div id="commandList" class="command-list">
-                <div class="empty-state">
-                    <p>No session loaded. Start by clicking "Load Session".</p>
-                </div>
-            </div>
         </main>
 
         <footer>
@@ -107,29 +135,33 @@
 
     <!-- Template for Command Item -->
     <template id="commandTemplate">
-        <div class="command-card glass">
-            <div class="command-header">
+        <div class="command-card glass accordion-item">
+            <div class="command-header accordion-header">
                 <div class="command-info">
                     <span class="index">#1</span>
                     <span class="tool-name">create_cube</span>
                     <span class="timestamp">12:34:56</span>
                 </div>
                 <div class="command-actions">
-                    <button class="btn btn-sm btn-run run-cmd" title="Execute in Blender">▶ Run</button>
+                    <button class="btn btn-sm btn-run run-cmd" title="Execute in Blender (Alt+Enter)">▶ Run</button>
+                    <button class="btn-icon edit-cmd" title="Edit Parameters">⚙️</button>
                     <button class="btn-icon move-up" title="Move up">↑</button>
                     <button class="btn-icon move-down" title="Move down">↓</button>
                     <button class="btn-icon delete-cmd" title="Remove command">×</button>
+                    <span class="accordion-icon">▼</span>
                 </div>
             </div>
-            <div class="command-body">
+            <div class="command-body accordion-content">
                 <div class="command-description-section">
                     <label>Description / Reasoning</label>
-                    <textarea class="cmd-description" placeholder="Why was this tool called?"
+                    <textarea class="cmd-description auto-expand" placeholder="Why was this tool called?"
                         spellcheck="false"></textarea>
                 </div>
                 <div class="editor-container">
                     <label>Arguments (JSON)</label>
-                    <div id="argsEditor" class="args-editor"></div>
+                    <div class="args-editor-wrapper">
+                        <textarea class="args-editor auto-expand" spellcheck="false"></textarea>
+                    </div>
                 </div>
             </div>
         </div>
@@ -144,6 +176,15 @@
             </div>
             <div class="modal-body">
                 <p id="modalMessage"></p>
+                <div id="modalCustomContent"></div>
+            </div>
+            <div id="modalTestingBar" class="modal-testing-bar" hidden>
+                <div class="bar-label">Iterative Testing</div>
+                <div class="bar-buttons">
+                    <button id="modalUndo" class="btn btn-sm btn-secondary">Undo</button>
+                    <button id="modalRedo" class="btn btn-sm btn-secondary">Redo</button>
+                    <button id="modalRun" class="btn btn-sm btn-primary">▶ Run Current</button>
+                </div>
             </div>
             <div class="modal-footer">
                 <button id="modalCancel" class="btn btn-secondary">Cancel</button>
@@ -152,6 +193,35 @@
         </div>
     </div>
 
+    <!-- New Command Modal Template Content -->
+    <template id="newCommandTemplate">
+        <div class="new-command-form">
+            <div class="selection-grid">
+                <div class="form-group">
+                    <label for="categorySelect">Step 1: Category</label>
+                    <select id="categorySelect" class="form-select">
+                        <option value="" disabled selected>Select category...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="toolSelect">Step 2: Tool</label>
+                    <select id="toolSelect" class="form-select" disabled>
+                        <option value="" disabled selected>Select category first...</option>
+                    </select>
+                </div>
+            </div>
+            <div id="toolArgsForm" class="tool-args-form">
+                <!-- Dynamic arguments will be injected here -->
+            </div>
+        </div>
+    </template>
+
+    <script src="globals.js"></script>
+    <script src="modal.js"></script>
+    <script src="api.js"></script>
+    <script src="ui.js"></script>
+    <script src="playback.js"></script>
+    <script src="commands.js"></script>
     <script src="app.js"></script>
 </body>
 

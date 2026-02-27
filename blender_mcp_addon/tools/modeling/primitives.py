@@ -166,6 +166,59 @@ class ModelingPrimitives:
             "message": f"Text object '{obj.name}' {status} successfully.",
         }
 
+    def create_empty(
+        self,
+        location,
+        name=None,
+        empty_display_type="PLAIN_AXES",
+        empty_display_size=1.0,
+        instance_collection=None,
+        collection=None,
+        **kwargs,
+    ):
+        """Create an Empty object, optionally instancing a collection"""
+        is_update = bool(name and name in bpy.data.objects)
+        if is_update:
+            obj = bpy.data.objects[name]
+            if obj.type != "EMPTY":
+                raise ValueError(f"Object '{name}' is not an Empty object")
+            obj.location = location
+        else:
+            bpy.ops.object.empty_add(
+                type=empty_display_type, radius=empty_display_size, location=location
+            )
+            obj = bpy.context.active_object
+            if name:
+                obj.name = name
+
+        obj.empty_display_type = empty_display_type
+        obj.empty_display_size = empty_display_size
+
+        if instance_collection:
+            inst_coll = get_collection(instance_collection)
+            obj.instance_type = "COLLECTION"
+            obj.instance_collection = inst_coll
+
+        if collection:
+            self._move_to_collection_helper(obj, collection)
+
+        if "hide_viewport" in kwargs:
+            obj.hide_viewport = kwargs["hide_viewport"]
+        if "hide_render" in kwargs:
+            obj.hide_render = kwargs["hide_render"]
+
+        status = "updated" if is_update else "created"
+        msg = f"Empty object '{obj.name}' {status} successfully."
+        if instance_collection:
+            msg += f" Instancing collection '{instance_collection}'."
+
+        return {
+            "success": True,
+            "name": obj.name,
+            "status": status,
+            "message": msg,
+        }
+
     def create_plane(
         self,
         location,
@@ -174,6 +227,7 @@ class ModelingPrimitives:
         rotation=None,
         name=None,
         collection=None,
+        **kwargs,
     ):
         """Create a plane"""
         return self.create_primitive(
@@ -184,6 +238,7 @@ class ModelingPrimitives:
             name=name,
             collection=collection,
             size=size,
+            **kwargs,
         )
 
     def create_primitive(
@@ -214,6 +269,8 @@ class ModelingPrimitives:
         params = {"location": location}
         if type == "cube":
             params["size"] = kwargs.get("size", 1.0)
+        elif type == "plane":
+            params["size"] = kwargs.get("size", 2.0)
         elif type == "cylinder":
             if "vertices" in kwargs:
                 params["vertices"] = kwargs["vertices"]
@@ -240,10 +297,6 @@ class ModelingPrimitives:
         if is_update:
             obj = bpy.data.objects[name]
             obj.location = location
-            # Update specific mesh parameters if it's a mesh object
-            if obj.type == "MESH":
-                # Note: This is an approximation for existing objects without rebuilding mesh
-                pass
         else:
             existing_objects = {obj.name for obj in bpy.data.objects}
             op(**params)
@@ -251,30 +304,55 @@ class ModelingPrimitives:
                 obj for obj in bpy.data.objects if obj.name not in existing_objects
             ]
             obj = new_objects[0] if new_objects else bpy.context.object
+            if not obj:
+                raise RuntimeError("Failed to identify or create object")
+            if name:
+                obj.name = name
 
-        if not obj:
-            raise RuntimeError("Failed to identify or update object")
+        # Ensure visibility
+        obj.hide_viewport = False
+        obj.hide_render = False
 
-        # Handle scale and rotation with defaults for NEW objects only
-        final_scale = (
-            scale if scale is not None else ((1, 1, 1) if not is_update else None)
-        )
-        final_rotation = (
-            rotation if rotation is not None else ((0, 0, 0) if not is_update else None)
-        )
+        # ── SIZE / SCALE / DIMENSIONS  (applied BEFORE rotation) ──
+        # Order matters: dimensions depend on the mesh being in its default
+        # orientation.  A rotated plane has a zero-extent world axis that
+        # Blender cannot resize, so we must resize first, then rotate.
 
-        if final_scale is not None:
-            obj.scale = final_scale
+        # Size update for existing cubes/planes
+        if is_update and "size" in kwargs and type in ["cube", "plane"]:
+            s = kwargs["size"]
+            obj.dimensions = (s, s, s) if type == "cube" else (s, s, 0.0)
 
-        if final_rotation is not None:
-            obj.rotation_euler = [math.radians(r) for r in final_rotation]
+        if scale is not None:
+            obj.scale = scale
+        elif not is_update:
+            obj.scale = (1, 1, 1)
 
+        # Dimensions (Highest Priority) – applied in default orientation
         if "dimensions" in kwargs and kwargs["dimensions"]:
-            obj.dimensions = kwargs["dimensions"]
+            dims = kwargs["dimensions"]
+            if len(dims) == 2:
+                dims = (dims[0], dims[1], obj.dimensions.z)
+            elif len(dims) >= 3:
+                dims = dims[:3]
+
+            obj.dimensions = dims
+            # Only bake scale if ALL scale components are non-zero.
+            # A zero scale component (e.g. flat axis of a plane) would
+            # collapse all vertices to a point, destroying the mesh.
+            if all(abs(s) > 1e-6 for s in obj.scale):
+                bpy.context.view_layer.objects.active = obj
+                obj.select_set(True)
+                bpy.ops.object.transform_apply(scale=True)
+
+        # ── ROTATION  (applied AFTER dimensions) ──
+        if rotation is not None:
+            obj.rotation_euler = [math.radians(r) for r in rotation]
+        elif not is_update:
+            obj.rotation_euler = (0, 0, 0)
+
         if collection:
             self._move_to_collection_helper(obj, collection)
-        if name:
-            obj.name = name
 
         status = "updated" if is_update else "created"
         return {
@@ -282,8 +360,10 @@ class ModelingPrimitives:
             "name": obj.name,
             "type": type,
             "status": status,
+            "dimensions": list(obj.dimensions),
+            "location": list(obj.location),
             "verified": True,
-            "message": f"Object '{obj.name}' ({type}) {status} successfully. Geometry verified. Proceed immediately to next modeling step.",
+            "message": f"Object '{obj.name}' ({type}) {status} successfully. Dimensions: {list(obj.dimensions)}.",
         }
 
     def _move_to_collection_helper(self, obj, collection_name):

@@ -1,20 +1,26 @@
 import click
 import json
 import sys
-import os
 from pathlib import Path
 
 # Add project root to sys.path to allow running as a script
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = str(Path(__file__).resolve().parent.parent)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-from tests.utils.mcp_client import MCPClient
-from tests.utils.stateful_mcp_client import StatefulMCPClient
-from tests.scenarios.grid_layout import GridLayoutScenario
-from tests.scenarios.arch_layout import ArchLayoutScenario
+# We use direct imports now that sys.path is handled
+from src.config import settings  # noqa: E402
+from tests.utils.mcp_client import MCPClient  # noqa: E402
+from tests.utils.stateful_mcp_client import StatefulMCPClient  # noqa: E402
+from tests.scenarios.grid_layout import GridLayoutScenario  # noqa: E402
+from tests.scenarios.arch_layout import ArchLayoutScenario  # noqa: E402
 
 # Configure paths
 TESTS_DIR = Path(__file__).parent
 BENCHMARKS_DIR = TESTS_DIR / "benchmarks"
+
+# Connection Defaults from Central Config
+DEFAULT_URL = settings.bridge_url
 
 SCENARIOS = {
     "grid": GridLayoutScenario,
@@ -29,7 +35,9 @@ def cli():
 
 
 @cli.command()
-@click.option("--host", default="http://localhost:8000", help="MCP Server URL")
+@click.option(
+    "--host", default=DEFAULT_URL, help=f"MCP Server URL (default: {DEFAULT_URL})"
+)
 @click.option("--verify", is_flag=True, help="Verify against benchmark after running")
 @click.option(
     "--scenario",
@@ -41,7 +49,7 @@ def cli():
 @click.option(
     "--module",
     type=click.Choice(
-        ["primitives", "modifiers", "collections", "operators", "transforms"]
+        ["primitives", "modifiers", "collections", "operators", "transforms", "systems"]
     ),
     help="Run specific row/module (Grid only)",
 )
@@ -53,15 +61,28 @@ def cli():
 )
 def run(host, verify, scenario, module, transport):
     """Run the integration test scenario(s)"""
+    # Auto-select grid scenario if module is specified
+    if module:
+        if scenario == "arch":
+            raise click.UsageError(
+                "--module can only be used with the 'grid' scenario."
+            )
+        if scenario == "all":
+            scenario = "grid"
+
     scenarios_to_run = [scenario] if scenario != "all" else list(SCENARIOS.keys())
 
     if transport == "stateless":
         print(f"Connecting to {host} in STATELESS mode...")
         client = MCPClient(base_url=host)
     else:
-        print(f"Connecting to {host} in STATEFUL mode...")
+        effective_scope = f"scenario={scenario}" + (
+            f", module={module}" if module else ""
+        )
+        print(f"Connecting to {host} in STATEFUL mode ({effective_scope})...")
         client = StatefulMCPClient(base_url=host)
 
+    all_passed = True
     for s_name in scenarios_to_run:
         print(f"\n--- Running Scenario: {s_name} ---")
         benchmark_file = BENCHMARKS_DIR / f"{s_name}_expected.json"
@@ -96,13 +117,13 @@ def run(host, verify, scenario, module, transport):
 
                 # Identify test objects
                 is_test_obj = (
-                    name.startswith("Test_")
-                    or name.startswith("HDB_")
-                    or name.startswith("Wall_")
-                    or name.startswith("Col_")
-                    or name.startswith("Lbl_")
-                    or name.startswith("Unit_")
-                    or name == "Test_Integration_Collection"
+                    name.startswith("HDB_")
+                    or name.startswith("PRIM_")
+                    or name.startswith("COL_")
+                    or name.startswith("MOD_")
+                    or name.startswith("OP_")
+                    or name.startswith("TRSF_")
+                    or name.startswith("SYS_")
                 )
 
                 if is_test_obj:
@@ -117,7 +138,15 @@ def run(host, verify, scenario, module, transport):
         print(f"Snapshot saved to {last_run_file}")
 
         if verify:
-            verify_results(benchmark_file, last_run_file)
+            if not verify_results(benchmark_file, last_run_file):
+                all_passed = False
+
+    # Cleanup
+    if hasattr(client, "close"):
+        client.close()
+
+    if verify and not all_passed:
+        sys.exit(1)
 
 
 @cli.command()
@@ -131,10 +160,15 @@ def run(host, verify, scenario, module, transport):
 def verify(scenario):
     """Verify the last run(s) against the benchmark(s)"""
     scenarios_to_verify = [scenario] if scenario != "all" else list(SCENARIOS.keys())
+    all_passed = True
     for s_name in scenarios_to_verify:
         benchmark_file = BENCHMARKS_DIR / f"{s_name}_expected.json"
         last_run_file = BENCHMARKS_DIR / f"{s_name}_last_run.json"
-        verify_results(benchmark_file, last_run_file)
+        if not verify_results(benchmark_file, last_run_file):
+            all_passed = False
+
+    if not all_passed:
+        sys.exit(1)
 
 
 def verify_results(benchmark_file, last_run_file):
@@ -206,8 +240,9 @@ def verify_results(benchmark_file, last_run_file):
                     exit_code = 1
 
     if exit_code != 0:
-        sys.exit(exit_code)
+        return False
     print("✅ Verification Passed!")
+    return True
 
 
 @cli.command()
@@ -231,33 +266,6 @@ def approve(scenario):
             print(f"Benchmark updated at {benchmark_file}")
         else:
             print(f"No last run found for {s_name}")
-
-
-if __name__ == "__main__":
-    cli()
-
-
-@cli.command()
-@click.option(
-    "--scenario",
-    "-s",
-    type=click.Choice(["grid", "hdb"]),
-    default="grid",
-    help="Scenario to approve",
-)
-def approve(scenario):
-    """Approve the last run as the new benchmark"""
-    benchmark_file = BENCHMARKS_DIR / f"{scenario}_expected.json"
-    last_run_file = BENCHMARKS_DIR / f"{scenario}_last_run.json"
-
-    if not last_run_file.exists():
-        print(f"No last run found at {last_run_file} to approve.")
-        return
-
-    import shutil
-
-    shutil.copy(last_run_file, benchmark_file)
-    print(f"Benchmark updated at {benchmark_file}")
 
 
 if __name__ == "__main__":
