@@ -19,6 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+          enable-cache: true
+
       - name: "Lint — ruff check"
         # uvx runs a tool without installing into project venv
         run: uvx ruff check src/ tests/ blender_mcp_addon/
@@ -32,6 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+          enable-cache: true
 
       - name: "McCabe complexity — ruff C90"
         # Flags any function/method with cyclomatic complexity > 12
