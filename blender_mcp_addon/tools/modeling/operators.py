@@ -1,7 +1,9 @@
-import bpy
 import math
 import random
-from ...utils import get_object, get_collection
+
+import bpy
+
+from ...utils import get_collection, get_object
 
 
 class ModelingOperators:
@@ -108,9 +110,7 @@ class ModelingOperators:
                     coll = get_collection(collection)
                 else:
                     coll = (
-                        obj.users_collection[0]
-                        if obj.users_collection
-                        else bpy.context.collection
+                        obj.users_collection[0] if obj.users_collection else bpy.context.collection
                     )
                 coll.objects.link(new_obj)
                 new_obj.location = (x, y, z)
@@ -238,7 +238,7 @@ class ModelingOperators:
             use_fixed_z = False
 
         created = []
-        for i in range(count):
+        for _ in range(count):
             angle = rng.uniform(0, 2 * math.pi)
             r = math.sqrt(rng.uniform(min_distance**2, max_distance**2))
 
@@ -254,11 +254,7 @@ class ModelingOperators:
             new_obj.delta_location = (0, 0, 0)
 
             # Link to the same collection as source
-            coll = (
-                obj.users_collection[0]
-                if obj.users_collection
-                else bpy.context.collection
-            )
+            coll = obj.users_collection[0] if obj.users_collection else bpy.context.collection
             coll.objects.link(new_obj)
 
             # Set location directly (safer than matrix_world for new objects)
@@ -463,10 +459,37 @@ class ModelingOperators:
             "message": f"Sheared '{object_name}' on {axis} axis by {value}.",
         }
 
+    def _find_modifier_dependents(self, obj, **kwargs):
+        """Find other objects whose UN-APPLIED modifiers still point at `obj`.
+
+        Deleting a modifier's target object (e.g. a Boolean cutter) before
+        the modifier is applied silently breaks the modifier: the reference
+        goes empty and the modifier stops doing anything, so a subsequent
+        apply bakes in the *unmodified* mesh with no error. This lets us
+        catch that before it happens instead of after.
+        """
+        import bpy
+
+        dependents = []
+        for other in bpy.data.objects:
+            if other == obj:
+                continue
+            for mod in other.modifiers:
+                for prop in mod.bl_rna.properties:
+                    if (
+                        prop.type == "POINTER"
+                        and getattr(prop.fixed_type, "identifier", None) == "Object"
+                    ):
+                        if getattr(mod, prop.identifier, None) == obj:
+                            dependents.append(f"'{other.name}' (modifier '{mod.name}')")
+                            break
+        return dependents
+
     def delete_object(self, object_name=None, pattern=None, **kwargs):
         """Delete object(s) by name or pattern. Handles hidden objects."""
-        import bpy
         import fnmatch
+
+        import bpy
 
         # Ensure we're in Object mode
         if bpy.context.mode != "OBJECT":
@@ -484,6 +507,19 @@ class ModelingOperators:
             for coll in bpy.data.collections:
                 if fnmatch.fnmatch(coll.name, pattern):
                     collections_to_remove.append(coll)
+
+            # Guard: refuse if any match is still an un-applied modifier target
+            blocked = []
+            for obj in objects_to_delete:
+                deps = self._find_modifier_dependents(obj)
+                if deps:
+                    blocked.append(f"'{obj.name}' is still used by {', '.join(deps)}")
+            if blocked:
+                raise ValueError(
+                    "CRITICAL ERROR: Refusing to delete objects still referenced by un-applied modifiers: "
+                    + "; ".join(blocked)
+                    + ". Apply (bake) those modifiers first, or remove the modifier, before deleting the target."
+                )
 
             # Delete objects
             count = len(objects_to_delete)
@@ -508,12 +544,18 @@ class ModelingOperators:
 
         # Single object deletion
         obj = get_object(object_name)
+        deps = self._find_modifier_dependents(obj)
+        if deps:
+            raise ValueError(
+                f"CRITICAL ERROR: '{object_name}' is still referenced by an un-applied modifier on "
+                + ", ".join(deps)
+                + ". Apply (bake) that modifier first with apply_all_modifiers, or remove the modifier, "
+                "before deleting this object."
+            )
         bpy.data.objects.remove(obj, do_unlink=True)
         return {"success": True, "message": f"Deleted object '{object_name}'"}
 
-    def set_object_visibility(
-        self, object_name, hide_viewport=None, hide_render=None, **kwargs
-    ):
+    def set_object_visibility(self, object_name, hide_viewport=None, hide_render=None, **kwargs):
         """Toggle or set visibility of an object."""
         obj = get_object(object_name)
 
@@ -540,4 +582,19 @@ class ModelingOperators:
             "verified": True,
             "object": object_name,
             "message": f"'{object_name}' visibility updated ({settings}).",
+        }
+
+    def convert_to_mesh(self, object_name):
+        """Convert a non-mesh object (like Text or Curve) to a Mesh object."""
+        if bpy.context.mode != "OBJECT":
+            bpy.ops.object.mode_set(mode="OBJECT")
+
+        obj = get_object(object_name)
+        bpy.ops.object.select_all(action="DESELECT")
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.convert(target="MESH")
+        return {
+            "success": True,
+            "message": f"Successfully converted '{object_name}' to MESH.",
         }

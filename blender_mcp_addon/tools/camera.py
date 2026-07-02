@@ -1,6 +1,8 @@
-import bpy
 import math
+
+import bpy
 from mathutils import Vector
+
 from ..utils import get_object
 
 

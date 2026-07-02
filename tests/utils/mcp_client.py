@@ -1,8 +1,10 @@
-import httpx
 import json
 import random
 import string
 import traceback
+
+import httpx
+
 from src.config import settings
 
 
@@ -10,9 +12,7 @@ class MCPClient:
     def __init__(self, base_url=settings.bridge_url):
         self.base_url = base_url
         self.mcp_url = f"{base_url}/mcp/"
-        self.session_id = "".join(
-            random.choices(string.ascii_letters + string.digits, k=8)
-        )
+        self.session_id = "".join(random.choices(string.ascii_letters + string.digits, k=8))
 
     def call_tool(self, name, arguments=None):
         if arguments is None:

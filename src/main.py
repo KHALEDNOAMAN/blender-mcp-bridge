@@ -1,16 +1,16 @@
 import asyncio
-import uvicorn
 import logging
-import click
 import socket
 import threading
+
+import click
+import uvicorn
+
 from .config import settings
-from .sessions import SessionRecorder, SessionMetadata, BridgeSession, SessionPlayer
+from .sessions import BridgeSession, SessionMetadata, SessionPlayer, SessionRecorder
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("mcp_server")
 
 
@@ -29,9 +29,7 @@ def _blender_health_check(host: str, port: int, interval: int = 5):
             if connected:
                 logger.info(f"[Blender] 🟢 Connected to addon at {host}:{port}")
             else:
-                logger.warning(
-                    f"[Blender] 🔴 Disconnected — addon not reachable at {host}:{port}"
-                )
+                logger.warning(f"[Blender] 🔴 Disconnected — addon not reachable at {host}:{port}")
             was_connected = connected
 
         threading.Event().wait(interval)
@@ -80,9 +78,7 @@ def serve(host, port, record_path, name, model, description, doc_url):
     )
     t.start()
 
-    uvicorn.run(
-        server_mod.app, host=host, port=port, log_level="warning", access_log=False
-    )
+    uvicorn.run(server_mod.app, host=host, port=port, log_level="warning", access_log=False)
 
 
 @cli.command()

@@ -1,5 +1,7 @@
-import bpy
 import fnmatch
+
+import bpy
+
 from ...utils import get_object
 
 
@@ -48,9 +50,7 @@ class ModelingSelection:
 
             final_selected = bpy.context.selected_objects
             if len(final_selected) > 1:
-                greedy_note = (
-                    f" (Included {len(final_selected) - 1} siblings automatically)"
-                )
+                greedy_note = f" (Included {len(final_selected) - 1} siblings automatically)"
 
         selected = [o.name for o in bpy.context.selected_objects]
         active = bpy.context.view_layer.objects.active

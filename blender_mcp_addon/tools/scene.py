@@ -1,5 +1,7 @@
-import bpy
 import math
+
+import bpy
+
 from ..utils import get_object
 
 
@@ -61,9 +63,7 @@ class SceneTools:
             info["modifiers"].append(mod_info)
 
         info["success"] = True
-        info["message"] = (
-            f"Retrieved detailed info for object '{name}' (Type: {obj.type})."
-        )
+        info["message"] = f"Retrieved detailed info for object '{name}' (Type: {obj.type})."
         return info
 
     def get_distance(self, object_a, object_b, mode="CENTER"):

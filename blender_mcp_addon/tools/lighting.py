@@ -1,6 +1,8 @@
-import bpy
 import math
-from ..utils import hex_to_rgb, get_object
+
+import bpy
+
+from ..utils import get_object, hex_to_rgb
 
 
 class LightTools:

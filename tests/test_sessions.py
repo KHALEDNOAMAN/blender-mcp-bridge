@@ -1,6 +1,7 @@
-import os
 import json
-from src.sessions import SessionMetadata, SessionRecorder, BridgeSession
+import os
+
+from src.sessions import BridgeSession, SessionMetadata, SessionRecorder
 
 
 def test_session_lifecycle():
@@ -17,7 +18,7 @@ def test_session_lifecycle():
     assert os.path.exists(path)
 
     print("4. Validating JSON structure and data integrity...")
-    with open(path, "r") as f:
+    with open(path) as f:
         data = json.load(f)
 
     assert data["metadata"]["name"] == "Test Session"

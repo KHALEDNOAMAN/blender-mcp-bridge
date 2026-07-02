@@ -36,3 +36,6 @@ tmp/
 !tests/benchmarks/arch_expected.json
 !tests/benchmarks/grid_expected.json
 !community/**/*.json
+
+# Ignorte all log files
+*.log

@@ -1,10 +1,10 @@
-from .primitives import ModelingPrimitives
-from .modifiers import ModelingModifiers
-from .transforms import ModelingTransforms
-from .selection import ModelingSelection
-from .operators import ModelingOperators
 from .architectural import ModelingArchitectural
+from .modifiers import ModelingModifiers
+from .operators import ModelingOperators
+from .primitives import ModelingPrimitives
+from .selection import ModelingSelection
 from .systems import ModelingSystems
+from .transforms import ModelingTransforms
 
 
 class ModelingTools(

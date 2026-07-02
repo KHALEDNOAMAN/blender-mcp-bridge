@@ -1,8 +1,10 @@
-import bpy
-import bmesh
 import math
+
+import bmesh
+import bpy
 import mathutils
-from ...utils import get_object, get_collection
+
+from ...utils import get_collection, get_object
 
 
 class ModelingArchitectural:
@@ -27,9 +29,7 @@ class ModelingArchitectural:
             else [start_point[0], start_point[1], 0.0]
         )
         p2 = mathutils.Vector(
-            end_point[:2] + [0.0]
-            if len(end_point) == 2
-            else [end_point[0], end_point[1], 0.0]
+            end_point[:2] + [0.0] if len(end_point) == 2 else [end_point[0], end_point[1], 0.0]
         )
 
         if (p2 - p1).length < 1e-6:
@@ -140,9 +140,7 @@ class ModelingArchitectural:
             bm_floor.verts.ensure_lookup_table()
             max_z = max(v.co.z for v in bm_floor.verts)
             if max_z > 1e-6:
-                bmesh.ops.translate(
-                    bm_floor, vec=(0, 0, -max_z), verts=list(bm_floor.verts)
-                )
+                bmesh.ops.translate(bm_floor, vec=(0, 0, -max_z), verts=list(bm_floor.verts))
 
             bm_floor.to_mesh(floor_mesh)
             bm_floor.free()
@@ -164,9 +162,7 @@ class ModelingArchitectural:
                         dh = d.get("door_height", d.get("height", 2.1))
                         do = d.get("door_offset", d.get("offset", 0.0))
                         dw = d.get("door_width", d.get("width", 0.9))
-                        edge_openings.setdefault(idx, []).append(
-                            ("door", do, dw, dh, 0.0)
-                        )
+                        edge_openings.setdefault(idx, []).append(("door", do, dw, dh, 0.0))
                         global_z_cuts.add(max(0.0, min(dh, height)))
             if windows:
                 for w in windows:
@@ -176,9 +172,7 @@ class ModelingArchitectural:
                         wh = w.get("window_height", w.get("height", 1.5))
                         wo = w.get("window_offset", w.get("offset", 0.0))
                         ww = w.get("window_width", w.get("width", 1.2))
-                        edge_openings.setdefault(idx, []).append(
-                            ("window", wo, ww, sh + wh, sh)
-                        )
+                        edge_openings.setdefault(idx, []).append(("window", wo, ww, sh + wh, sh))
                         global_z_cuts.add(max(0.0, min(sh, height)))
                         global_z_cuts.add(max(0.0, min(sh + wh, height)))
 
@@ -210,7 +204,7 @@ class ModelingArchitectural:
 
                 # 2. Collect X-cuts for this specific wall and merge duplicates
                 x_raw = {0.0, length}
-                for ot, oo, ow, otop, osill in openings:
+                for _, oo, ow, _, _ in openings:
                     x_raw.add(max(0.0, min(oo, length)))
                     x_raw.add(max(0.0, min(oo + ow, length)))
 
@@ -246,9 +240,7 @@ class ModelingArchitectural:
                 for xi in range(len(x_sorted) - 1):
                     x_mid = (x_sorted[xi] + x_sorted[xi + 1]) / 2.0
                     active_openings = [
-                        o
-                        for o in openings
-                        if o[1] - 1e-4 <= x_mid <= o[1] + o[2] + 1e-4
+                        o for o in openings if o[1] - 1e-4 <= x_mid <= o[1] + o[2] + 1e-4
                     ]
 
                     for zi in range(len(z_sorted) - 1):
@@ -257,7 +249,7 @@ class ModelingArchitectural:
                         is_hole = False
                         # Only cut holes ABOVE floor level (Z=0)
                         if z_mid > 1e-4:
-                            for ot, oo, ow, otop, osill in active_openings:
+                            for _, _, _, otop, osill in active_openings:
                                 if osill - 1e-4 <= z_mid <= otop + 1e-4:
                                     is_hole = True
                                     break
@@ -277,9 +269,7 @@ class ModelingArchitectural:
             bmesh.ops.remove_doubles(bm_walls, verts=list(bm_walls.verts), dist=0.0001)
             # Apply solidification to the wall ring
             if len(bm_walls.faces):
-                bmesh.ops.solidify(
-                    bm_walls, geom=list(bm_walls.faces), thickness=-wall_thickness
-                )
+                bmesh.ops.solidify(bm_walls, geom=list(bm_walls.faces), thickness=-wall_thickness)
             bm_walls.to_mesh(wall_mesh)
             bm_walls.free()
 
@@ -287,9 +277,7 @@ class ModelingArchitectural:
             ceil_name = f"{name}_Ceiling"
             ceil_obj, ceil_mesh = _make_obj(ceil_name)
             bm_ceil = bmesh.new()
-            ceil_verts = [
-                bm_ceil.verts.new(mathutils.Vector((p.x, p.y, height))) for p in pts2d
-            ]
+            ceil_verts = [bm_ceil.verts.new(mathutils.Vector((p.x, p.y, height))) for p in pts2d]
             bm_ceil.faces.new(ceil_verts)
             bm_ceil.normal_update()
             bm_ceil.to_mesh(ceil_mesh)
@@ -338,9 +326,7 @@ class ModelingArchitectural:
         bmesh.ops.solidify gives all three faces physical thickness;
         the door hole stays open since there is no face there.
         """
-        p1 = mathutils.Vector(
-            start_point[:3] if len(start_point) >= 3 else (*start_point, 0)
-        )
+        p1 = mathutils.Vector(start_point[:3] if len(start_point) >= 3 else (*start_point, 0))
         p2 = mathutils.Vector(end_point[:3] if len(end_point) >= 3 else (*end_point, 0))
 
         # Force Z=0 for base of wall
@@ -620,9 +606,7 @@ class ModelingArchitectural:
         bm.to_mesh(mesh)
         bm.free()
 
-        res_msg = (
-            f"Column '{name}' created at {location} ({width}m x {depth}m x {height}m)."
-        )
+        res_msg = f"Column '{name}' created at {location} ({width}m x {depth}m x {height}m)."
 
         # --- OPTIONAL UNION ---
         if union_with:

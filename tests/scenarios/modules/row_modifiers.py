@@ -206,9 +206,7 @@ def test_apply_modifiers(client: MCPClient, y_offset: float, collection: str):
     )
 
 
-def test_copy_remove_modifiers(
-    client: MCPClient, y_offset: float, collection_name: str
-):
+def test_copy_remove_modifiers(client: MCPClient, y_offset: float, collection_name: str):
     print(f"Running Modifier Removal tests in {collection_name}...")
 
     # 1. Create a Collection for the targets
@@ -282,21 +280,15 @@ def test_boolean_ops(client: MCPClient, y_offset: float, collection: str):
 
     # Intersect (x=45)
     b, c = create_pair(45, "Test_BoolOp_Intersect")
-    client.call_tool(
-        "boolean_operation", {"object_a": b, "object_b": c, "operation": "INTERSECT"}
-    )
+    client.call_tool("boolean_operation", {"object_a": b, "object_b": c, "operation": "INTERSECT"})
 
     # Union (x=50)
     b, c = create_pair(50, "Test_BoolOp_Union")
-    client.call_tool(
-        "boolean_operation", {"object_a": b, "object_b": c, "operation": "UNION"}
-    )
+    client.call_tool("boolean_operation", {"object_a": b, "object_b": c, "operation": "UNION"})
 
     # Difference (x=55)
     b, c = create_pair(55, "Test_BoolOp_Diff")
-    client.call_tool(
-        "boolean_operation", {"object_a": b, "object_b": c, "operation": "DIFFERENCE"}
-    )
+    client.call_tool("boolean_operation", {"object_a": b, "object_b": c, "operation": "DIFFERENCE"})
 
     # Slice (x=60)
     # We'll slice a Sphere with an elongated Cube for a clear result

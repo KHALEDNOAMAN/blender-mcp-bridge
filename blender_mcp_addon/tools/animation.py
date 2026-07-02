@@ -1,5 +1,7 @@
-import bpy
 import math
+
+import bpy
+
 from ..utils import get_object
 
 

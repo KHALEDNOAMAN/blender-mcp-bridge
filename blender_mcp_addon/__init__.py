@@ -1,4 +1,5 @@
 import bpy
+
 from .server import BlenderMCPServer
 
 bl_info = {

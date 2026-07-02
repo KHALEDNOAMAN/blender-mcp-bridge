@@ -94,9 +94,7 @@ def create_collections_row(client: MCPClient, y_offset: float = 20.0):
     coll_info_before = client.call_tool("get_collections", {})
     print_collection_tree(coll_info_before)
 
-    client.call_tool(
-        "remove_collection", {"name": to_remove_coll, "delete_objects": True}
-    )
+    client.call_tool("remove_collection", {"name": to_remove_coll, "delete_objects": True})
 
     print(f"\nAfter removal ({to_remove_coll} and its objects should be gone):")
     coll_info_after = client.call_tool("get_collections", {})

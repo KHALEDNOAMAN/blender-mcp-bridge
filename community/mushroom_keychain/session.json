@@ -1,0 +1,285 @@
+{
+  "metadata": {
+    "name": "Sculpted Mushroom Keychain",
+    "model": "z-ai/glm-5v-turbo",
+    "description": "Organic keychain combining sculpting and 3D-print prep tools",
+    "documentation_url": "",
+    "created_at": "2026-07-02T18:35:17.342500"
+  },
+  "commands": [
+    {
+      "tool": "set_scene_units",
+      "arguments": {
+        "system": "METRIC",
+        "length_unit": "MILLIMETERS",
+        "scale": 0.001
+      },
+      "description": null,
+      "timestamp": 1782988552.131074,
+      "execution_status": null
+    },
+    {
+      "tool": "set_active_collection",
+      "arguments": {
+        "collection_name": "MushroomKeychain"
+      },
+      "description": null,
+      "timestamp": 1782988552.4538703,
+      "execution_status": null
+    },
+    {
+      "tool": "create_collection",
+      "arguments": {
+        "name": "MushroomKeychain"
+      },
+      "description": null,
+      "timestamp": 1782988552.7453387,
+      "execution_status": null
+    },
+    {
+      "tool": "create_cone",
+      "arguments": {
+        "location": [
+          0,
+          0,
+          10
+        ],
+        "radius1": 5,
+        "radius2": 4,
+        "depth": 20,
+        "name": "Stem",
+        "collection": "MushroomKeychain"
+      },
+      "description": null,
+      "timestamp": 1782988618.9577649,
+      "execution_status": null
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "location": [
+          0,
+          0,
+          20
+        ],
+        "radius": 14,
+        "subdivisions": 3,
+        "name": "Cap",
+        "collection": "MushroomKeychain"
+      },
+      "description": null,
+      "timestamp": 1782988681.7174425,
+      "execution_status": null
+    },
+    {
+      "tool": "create_cylinder",
+      "arguments": {
+        "location": [
+          0,
+          0,
+          4
+        ],
+        "radius": 1,
+        "depth": 20,
+        "name": "RingHole",
+        "rotation": [
+          0,
+          90,
+          0
+        ],
+        "collection": "MushroomKeychain"
+      },
+      "description": null,
+      "timestamp": 1782988712.8464365,
+      "execution_status": null
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Stem",
+        "object_b": "RingHole",
+        "operation": "DIFFERENCE",
+        "solver": "EXACT",
+        "hide_cutter": true
+      },
+      "description": null,
+      "timestamp": 1782988792.1714885,
+      "execution_status": null
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "Stem"
+      },
+      "description": null,
+      "timestamp": 1782989219.805799,
+      "execution_status": null
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "object_name": "RingHole"
+      },
+      "description": null,
+      "timestamp": 1782989268.7158477,
+      "execution_status": null
+    },
+    {
+      "tool": "transform_object",
+      "arguments": {
+        "object_name": "Cap",
+        "scale": [
+          1,
+          1,
+          0.55
+        ]
+      },
+      "description": null,
+      "timestamp": 1782989286.295162,
+      "execution_status": null
+    },
+    {
+      "tool": "apply_transforms",
+      "arguments": {
+        "object_names": [
+          "Cap"
+        ],
+        "location": false,
+        "rotation": true,
+        "scale": true
+      },
+      "description": null,
+      "timestamp": 1782989290.6456754,
+      "execution_status": null
+    },
+    {
+      "tool": "enter_sculpt_mode",
+      "arguments": {
+        "object_name": "Cap"
+      },
+      "description": null,
+      "timestamp": 1782989818.383467,
+      "execution_status": null
+    },
+    {
+      "tool": "sculpt_inflate",
+      "arguments": {
+        "object_name": "Cap",
+        "distance": 1.5,
+        "mask_below_z": 12.5
+      },
+      "description": null,
+      "timestamp": 1782989824.2385066,
+      "execution_status": null
+    },
+    {
+      "tool": "exit_sculpt_mode",
+      "arguments": {},
+      "description": null,
+      "timestamp": 1782989827.9818978,
+      "execution_status": null
+    },
+    {
+      "tool": "enter_sculpt_mode",
+      "arguments": {
+        "object_name": "Cap"
+      },
+      "description": null,
+      "timestamp": 1782989846.9263191,
+      "execution_status": null
+    },
+    {
+      "tool": "sculpt_grab",
+      "arguments": {
+        "object_name": "Cap",
+        "location": [
+          12,
+          6,
+          17
+        ],
+        "offset": [
+          0.9,
+          0.4,
+          0.8
+        ],
+        "radius": 3
+      },
+      "description": null,
+      "timestamp": 1782989852.70184,
+      "execution_status": null
+    },
+    {
+      "tool": "exit_sculpt_mode",
+      "arguments": {},
+      "description": null,
+      "timestamp": 1782989857.7582545,
+      "execution_status": null
+    },
+    {
+      "tool": "symmetrize_mesh",
+      "arguments": {
+        "object_name": "Cap",
+        "direction": "POSITIVE_X"
+      },
+      "description": null,
+      "timestamp": 1782989891.2734427,
+      "execution_status": null
+    },
+    {
+      "tool": "join_objects",
+      "arguments": {
+        "object_names": [
+          "Stem",
+          "Cap"
+        ],
+        "new_name": "MushroomKeychain"
+      },
+      "description": null,
+      "timestamp": 1782989980.318351,
+      "execution_status": null
+    },
+    {
+      "tool": "apply_voxel_remesh",
+      "arguments": {
+        "object_name": "MushroomKeychain",
+        "voxel_size": 0.5,
+        "adaptivity": 0,
+        "clean_geometry": true
+      },
+      "description": null,
+      "timestamp": 1782990038.9308264,
+      "execution_status": null
+    },
+    {
+      "tool": "apply_sculpt_smooth",
+      "arguments": {
+        "object_name": "MushroomKeychain",
+        "iterations": 3,
+        "factor": 0.5
+      },
+      "description": null,
+      "timestamp": 1782990063.9984586,
+      "execution_status": null
+    },
+    {
+      "tool": "check_mesh_for_printing",
+      "arguments": {
+        "object_name": "MushroomKeychain"
+      },
+      "description": null,
+      "timestamp": 1782990092.415147,
+      "execution_status": null
+    },
+    {
+      "tool": "export_model",
+      "arguments": {
+        "object_name": "MushroomKeychain",
+        "filepath": "f:/github-proj/blender-mcp-n8n/assets/mushroom_keychain.stl",
+        "format": "STL"
+      },
+      "description": null,
+      "timestamp": 1782990159.568517,
+      "execution_status": null
+    }
+  ]
+}

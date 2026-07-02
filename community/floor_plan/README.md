@@ -28,7 +28,7 @@ python -m src.main play community/floor_plan/session.json
 ## User Prompts to Recreate in Blender
 
 ### 1. Project Initialization
-> **User:**
+**User:**
 > Create a new top-level collection named 'Floor_Plan_Unit'
 
 **Assistant:**
@@ -44,7 +44,7 @@ python -m src.main play community/floor_plan/session.json
 ---
 
 ### 2. Outer Shell Perimeter
-> **User:**
+**User:**
 > Create the main building shell named 'Unit_Shell' in collection 'Floor_Plan_Unit', wall thickness 0.2, height 3.2. Use these perimeter vertices (in meters) to trace the 12m x 12.75m footprint: (0,0), (3.1,0), (3.1,1.22), (8.9,1.22), (8.9,0), (12,0), (12,12.75), (7.3,12.75), (7.3,9.5), (4.7,9.5), (4.7,12.75), (0,12.75), (0,0). Door opening at edge index 3 for the main unit entry (offset 0.25, width 1.0)
 
 **Assistant:**
@@ -75,7 +75,7 @@ python -m src.main play community/floor_plan/session.json
 ---
 
 ### 3. Primary Interior Partitions (Solid)
-> **User:**
+**User:**
 > Build these structural partition walls (solid, no doors) using thickness 0.15 and height 3.2:
 > - 'Wall_Bed2-3_Center': from (6.1, 5.35) to (6.1, 9.5)
 > - 'Wall_Study_Top_Right': from (1.9, 5.2) to (1.9, 4.0)
@@ -108,7 +108,7 @@ python -m src.main play community/floor_plan/session.json
 ---
 
 ### 4. Architectural Openings (Doors)
-> **User:**
+**User:**
 > Add walls with door openings using thickness 0.15 and height 3.2:
 > - 'Wall_MainBed_WC_Door': from (3.1, 12.75) to (3.1, 5.35), width 0.9, offset 2.1
 > - 'Wall_MainBed_Door': from (0, 5.2) to (3.25, 5.2), width 0.9, offset 2.2
@@ -139,7 +139,7 @@ python -m src.main play community/floor_plan/session.json
 ---
 
 ### 5. ColumnsDetails
-> **User:**
+**User:**
 > Add structural columns of height 3.2, merged with 'Unit_Shell_Walls':
 > - At (-0.4,12.55) and (11.8,12.55) with width 0.6 and depth 0.6
 > - At (-0.4,-0.4) and (11.8,-0.4) with width 0.6 and depth 1.0
@@ -169,7 +169,7 @@ python -m src.main play community/floor_plan/session.json
 ---
 
 ### 6. Room Labels
-> **User:**
+**User:**
 > Label the rooms to match the plan using `create_text` (size 0.35, Z-offset 0.2 for visibility):
 > - 'Lbl_MainBed' at (1.5, 9.0) "MAIN BEDROOM"
 > - 'Lbl_Bed2' at (4.5, 7.5) "BEDROOM 2"

@@ -1,13 +1,16 @@
 from mcp import types
-from .modeling import get_modeling_tools
-from .scene import get_scene_tools
-from .collections import get_collection_tools
-from .materials import get_material_tools
-from .lighting import get_lighting_tools
-from .camera import get_camera_tools
+
 from .animation import get_animation_tools
-from .rendering import get_rendering_tools
+from .camera import get_camera_tools
+from .collections import get_collection_tools
 from .history import get_history_tools
+from .lighting import get_lighting_tools
+from .materials import get_material_tools
+from .modeling import get_modeling_tools
+from .printing import get_printing_tools
+from .rendering import get_rendering_tools
+from .scene import get_scene_tools
+from .sculpting import get_sculpting_tools
 
 
 def get_mcp_tools() -> list[types.Tool]:
@@ -22,4 +25,6 @@ def get_mcp_tools() -> list[types.Tool]:
     tools.extend(get_animation_tools())
     tools.extend(get_rendering_tools())
     tools.extend(get_history_tools())
+    tools.extend(get_printing_tools())
+    tools.extend(get_sculpting_tools())
     return tools

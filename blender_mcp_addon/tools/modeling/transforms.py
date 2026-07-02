@@ -1,6 +1,9 @@
-import bpy
 import math
-from ...utils import get_object, get_collection
+
+import bpy
+import mathutils
+
+from ...utils import get_collection, get_object
 
 
 class ModelingTransforms:
@@ -235,9 +238,109 @@ class ModelingTransforms:
         }
 
     def set_object_dimensions(self, object_name, x, y, z):
+        """Set world-space bounding box dimensions.
+
+        obj.dimensions scales along the object's LOCAL axes, not world
+        axes, so on a rotated object a naive assignment inflates the
+        wrong axis. Invert the rotation to find the local-space target
+        that reproduces the requested world-space size.
+        """
         obj = get_object(object_name)
-        obj.dimensions = (x, y, z)
+        target = mathutils.Vector((x, y, z))
+        rot = obj.rotation_euler.to_matrix()
+        abs_rot = mathutils.Matrix([[abs(v) for v in row] for row in rot])
+        try:
+            local_target = abs_rot.inverted() @ target
+        except ValueError:
+            local_target = target
+        obj.dimensions = (abs(local_target.x), abs(local_target.y), abs(local_target.z))
         return {
             "success": True,
-            "message": f"Set dimensions of '{object_name}' to {x}x{y}x{z}",
+            "message": f"Set {object_name} dimensions to [{x}, {y}, {z}] meters",
+        }
+
+    def apply_all_modifiers(self, object_name):
+        """Permanently apply all modifiers on an object."""
+        obj = get_object(object_name)
+        bpy.context.view_layer.objects.active = obj
+        # Copy names first to avoid list mutation issues during iteration
+        mod_names = [mod.name for mod in obj.modifiers]
+        for name in mod_names:
+            try:
+                bpy.ops.object.modifier_apply(modifier=name)
+            except Exception as e:
+                print(f"[MCP] Failed to apply modifier {name} on {object_name}: {e}")
+        return {
+            "success": True,
+            "message": f"Applied all modifiers permanently on {object_name}",
+        }
+
+    def apply_transforms(
+        self,
+        object_names=None,
+        pattern=None,
+        location=False,
+        rotation=True,
+        scale=True,
+    ):
+        """Apply (bake) scale, rotation, and/or location transforms into mesh vertex data.
+
+        This is essential before joining objects that have different non-unit scales
+        (e.g. a cube scaled [3,1.4,0.9]) to ensure the voxel remesher sees all
+        sub-meshes in a consistent coordinate space. Call this on each part
+        BEFORE calling join_objects.
+        """
+        import fnmatch
+
+        targets = []
+        if object_names:
+            if isinstance(object_names, str):
+                targets.append(object_names)
+            elif isinstance(object_names, list):
+                targets.extend(object_names)
+
+        if pattern:
+            matches = fnmatch.filter(bpy.data.objects.keys(), pattern)
+            targets.extend(matches)
+
+        if not targets:
+            return {
+                "success": False,
+                "message": "No objects provided via 'object_names' or 'pattern'.",
+            }
+
+        original_active = bpy.context.view_layer.objects.active
+        original_selected = [o for o in bpy.context.selected_objects]
+
+        bpy.ops.object.select_all(action="DESELECT")
+        applied = []
+        for name in targets:
+            try:
+                obj = bpy.data.objects.get(name)
+                if obj is None:
+                    continue
+                obj.select_set(True)
+                bpy.context.view_layer.objects.active = obj
+                bpy.ops.object.transform_apply(location=location, rotation=rotation, scale=scale)
+                obj.select_set(False)
+                applied.append(name)
+            except Exception as e:
+                print(f"[MCP] apply_transforms failed for {name}: {e}")
+
+        # Restore previous selection
+        bpy.ops.object.select_all(action="DESELECT")
+        for o in original_selected:
+            try:
+                o.select_set(True)
+            except Exception:
+                pass
+        try:
+            bpy.context.view_layer.objects.active = original_active
+        except Exception:
+            pass
+
+        return {
+            "success": True,
+            "applied": applied,
+            "message": f"Applied transforms (scale={scale}, rotation={rotation}, location={location}) to {len(applied)} object(s).",
         }

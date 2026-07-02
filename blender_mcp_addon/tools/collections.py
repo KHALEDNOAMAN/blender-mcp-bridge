@@ -1,4 +1,5 @@
 import bpy
+
 from ..utils import get_collection, get_object
 
 
@@ -131,13 +132,8 @@ class CollectionTools:
                             for parent in bpy.data.collections:
                                 if source_coll.name in parent.children:
                                     parent.children.unlink(source_coll)
-                            if (
-                                source_coll.name
-                                in bpy.context.scene.collection.children
-                            ):
-                                bpy.context.scene.collection.children.unlink(
-                                    source_coll
-                                )
+                            if source_coll.name in bpy.context.scene.collection.children:
+                                bpy.context.scene.collection.children.unlink(source_coll)
                             bpy.data.collections.remove(source_coll)
 
         if objects_moved == 0 and collections_moved == 0:
@@ -170,9 +166,7 @@ class CollectionTools:
                 "name": collection.name,
                 "level": level,
                 "objects": [obj.name for obj in collection.objects],
-                "children": [
-                    build_hierarchy(child, level + 1) for child in collection.children
-                ],
+                "children": [build_hierarchy(child, level + 1) for child in collection.children],
             }
 
         return build_hierarchy(bpy.context.scene.collection)
@@ -306,9 +300,7 @@ class CollectionTools:
             "message": f"{msg} Copied {objects_copied} objects and {collections_copied} collections.",
         }
 
-    def set_collection_visibility(
-        self, name, hide_viewport=None, hide_render=None, **kwargs
-    ):
+    def set_collection_visibility(self, name, hide_viewport=None, hide_render=None, **kwargs):
         """Toggle collection visibility"""
         coll = bpy.data.collections.get(name)
         if not coll:

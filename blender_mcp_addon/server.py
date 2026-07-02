@@ -1,19 +1,22 @@
-import socket
 import json
+import queue
+import socket
 import threading
 import traceback
-import queue
+
 import bpy
 
-from .tools.scene import SceneTools
-from .tools.collections import CollectionTools
-from .tools.modeling import ModelingTools
-from .tools.materials import MaterialTools
 from .tools.animation import AnimationTools
-from .tools.rendering import RenderingTools
 from .tools.camera import CameraTools
-from .tools.lighting import LightTools
+from .tools.collections import CollectionTools
 from .tools.history import HistoryTools
+from .tools.lighting import LightTools
+from .tools.materials import MaterialTools
+from .tools.modeling import ModelingTools
+from .tools.printing import PrintingTools
+from .tools.rendering import RenderingTools
+from .tools.scene import SceneTools
+from .tools.sculpting import SculptingTools
 
 
 class BlenderMCPServer(
@@ -26,6 +29,8 @@ class BlenderMCPServer(
     CameraTools,
     LightTools,
     HistoryTools,
+    PrintingTools,
+    SculptingTools,
 ):
     """Blender MCP Server for n8n with componentized tools"""
 
@@ -36,6 +41,49 @@ class BlenderMCPServer(
         self.command_queue = queue.Queue()
         self.last_error = None
         self.timer_handle = None
+
+    def import_and_analyze_reference(self, filepath=None):
+        """Import reference STL and return bounding box and dimensions"""
+        import os
+
+        if not filepath:
+            filepath = "f:/github-proj/blender-mcp-n8n/assets/3DBenchy.stl"
+        if not os.path.exists(filepath):
+            return {"success": False, "error": f"File not found: {filepath}"}
+
+        old_active = bpy.context.view_layer.objects.active
+        old_selected = list(bpy.context.selected_objects)
+
+        bpy.ops.object.select_all(action="DESELECT")
+
+        if hasattr(bpy.ops.wm, "stl_import"):
+            bpy.ops.wm.stl_import(filepath=filepath)
+        else:
+            bpy.ops.import_mesh.stl(filepath=filepath)
+
+        obj = bpy.context.active_object
+        if not obj:
+            return {"success": False, "error": "Failed to import reference model"}
+
+        dimensions = list(obj.dimensions)
+        bound_box = [list(v) for v in obj.bound_box]
+
+        # Keep it or delete it? Let's delete it so we don't pollute the scene.
+        bpy.ops.object.delete()
+
+        for o in old_selected:
+            try:
+                o.select_set(True)
+            except Exception:
+                pass
+        if old_active:
+            bpy.context.view_layer.objects.active = old_active
+
+        return {
+            "success": True,
+            "dimensions": dimensions,
+            "bound_box": bound_box,
+        }
 
     def start_server(self, host="0.0.0.0", port=8888):
         if self.running:
@@ -87,7 +135,7 @@ class BlenderMCPServer(
                     threading.Thread(
                         target=self._handle_client, args=(client,), daemon=True
                     ).start()
-                except socket.timeout:
+                except TimeoutError:
                     continue
             except Exception as e:
                 if self.running:
@@ -105,9 +153,7 @@ class BlenderMCPServer(
         except Exception as e:
             print(f"[MCP] Client error: {e}")
             try:
-                client.sendall(
-                    json.dumps({"status": "error", "message": str(e)}).encode("utf-8")
-                )
+                client.sendall(json.dumps({"status": "error", "message": str(e)}).encode("utf-8"))
             except Exception:
                 pass
         finally:
@@ -127,45 +173,56 @@ class BlenderMCPServer(
             return {"status": "error", "message": "Command timed out"}
         return res_container["result"]
 
+    def addon_log(self, msg):
+        try:
+            with open("F:\\github-proj\\blender-mcp-n8n\\blender_addon.log", "a") as f:
+                f.write(msg + "\n")
+        except Exception:
+            pass
+
     def _process_queue(self):
         if not self.running:
             return None
         try:
+            # self.addon_log("Timer tick check queue...")
             while not self.command_queue.empty():
                 try:
                     item = self.command_queue.get_nowait()
                     if not item:
                         continue
                     cmd, event, res = item["command"], item["event"], item["container"]
+                    cmd_type = cmd.get("type", "")
+                    self.addon_log(f"Processing command: {cmd_type}")
                     try:
                         res["result"] = self.execute_command(cmd)
+                        self.addon_log(f"Command {cmd_type} executed successfully")
 
                         # Push to Undo Stack if it's a state-changing command
-                        cmd_type = cmd.get("type", "")
                         if (
                             cmd_type
                             and not cmd_type.startswith("get_")
-                            and cmd_type
-                            not in ["undo", "redo", "render_frame", "render_animation"]
+                            and cmd_type not in ["undo", "redo", "render_frame", "render_animation"]
                         ):
                             try:
                                 bpy.ops.ed.undo_push(message=f"MCP: {cmd_type}")
                             except Exception as e:
-                                print(f"[MCP] Warning: Failed to push undo step: {e}")
+                                self.addon_log(f"Failed to push undo: {e}")
 
                     except Exception as e:
                         traceback.print_exc()
+                        self.addon_log(f"Execution error on {cmd_type}: {e}")
                         res["result"] = {
                             "status": "error",
                             "message": f"Execution error: {e}",
                         }
                     finally:
                         event.set()
+                        self.addon_log(f"Signaled event for {cmd_type}")
                 except Exception as e:
-                    print(f"[MCP] Queue processing error: {e}")
+                    self.addon_log(f"Queue item processing error: {e}")
                     traceback.print_exc()
         except Exception as e:
-            print(f"[MCP] Critical Timer Error: {e}")
+            self.addon_log(f"Critical Timer Error: {e}")
             traceback.print_exc()
 
         return 0.005
@@ -200,6 +257,7 @@ class BlenderMCPServer(
             "create_cube": self.create_cube,
             "create_cylinder": self.create_cylinder,
             "create_sphere": self.create_sphere,
+            "create_cone": self.create_cone,
             "create_icosphere": self.create_icosphere,
             "create_torus": self.create_torus,
             "create_text": self.create_text,
@@ -213,6 +271,7 @@ class BlenderMCPServer(
             "copy_modifier": self.copy_modifier,
             "remove_modifier": self.remove_modifier,
             "boolean_operation": self.boolean_operation,
+            "apply_all_modifiers": self.apply_all_modifiers,
             "transform_object": self.transform_object,
             "circular_array": self.circular_array,
             "select_objects": self.select_objects,
@@ -222,11 +281,13 @@ class BlenderMCPServer(
             "set_object_dimensions": self.set_object_dimensions,
             "join_objects": self.join_objects,
             "random_distribute": self.random_distribute,
+            "apply_transforms": self.apply_transforms,
             "extrude_mesh": self.extrude_mesh,
             "inset_faces": self.inset_faces,
             "shear_mesh": self.shear_mesh,
             "invert_mesh_selection": self.invert_mesh_selection,
             "set_object_visibility": self.set_object_visibility,
+            "convert_to_mesh": self.convert_to_mesh,
             # Architectural (ArchBuilder)
             "build_room_shell": self.build_room_shell,
             "build_wall_segment": self.build_wall_segment,
@@ -262,6 +323,22 @@ class BlenderMCPServer(
             "create_light": self.create_light,
             "configure_light": self.configure_light,
             "set_world_background": self.set_world_background,
+            # Printing
+            "set_scene_units": self.set_scene_units,
+            "check_mesh_for_printing": self.check_mesh_for_printing,
+            "repair_mesh": self.repair_mesh,
+            "apply_voxel_remesh": self.apply_voxel_remesh,
+            "export_model": self.export_model,
+            # Sculpting
+            "enter_sculpt_mode": self.enter_sculpt_mode,
+            "exit_sculpt_mode": self.exit_sculpt_mode,
+            "set_dyntopo": self.set_dyntopo,
+            "apply_sculpt_smooth": self.apply_sculpt_smooth,
+            "sculpt_inflate": self.sculpt_inflate,
+            "sculpt_grab": self.sculpt_grab,
+            "symmetrize_mesh": self.symmetrize_mesh,
+            # Reference Analysis
+            "import_and_analyze_reference": self.import_and_analyze_reference,
             # History
             "undo": self.undo_action,
             "redo": self.redo_action,
@@ -277,9 +354,7 @@ class BlenderMCPServer(
                 msg = result["message"]
                 if not msg.startswith(f"[{rid}]"):
                     result["message"] = (
-                        f"✓ [{rid}] {msg[2:]}"
-                        if msg.startswith("✓ ")
-                        else f"[{rid}] {msg}"
+                        f"✓ [{rid}] {msg[2:]}" if msg.startswith("✓ ") else f"[{rid}] {msg}"
                     )
             return {"status": "success", "result": result}
         except Exception as e:

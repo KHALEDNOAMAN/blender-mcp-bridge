@@ -62,9 +62,7 @@ def test_create_and_array(client: MCPClient, x_start: float, y: float, collectio
     )
 
 
-def test_random_distribute(
-    client: MCPClient, x_start: float, y: float, collection: str
-):
+def test_random_distribute(client: MCPClient, x_start: float, y: float, collection: str):
     print("Testing random_distribute...")
     client.call_tool(
         "create_sphere",

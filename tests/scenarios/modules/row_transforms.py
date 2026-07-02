@@ -120,9 +120,7 @@ def create_transforms_row(client: MCPClient, y_offset: float = 40.0):
     # 5. Duplicate Selection (x=20)
     # Select Batch_1 and Batch_2 then duplicate with offset
     # Fixed tool name: select_objects
-    client.call_tool(
-        "select_objects", {"object_names": ["Transform_Batch_1", "Transform_Batch_2"]}
-    )
+    client.call_tool("select_objects", {"object_names": ["Transform_Batch_1", "Transform_Batch_2"]})
 
     client.call_tool(
         "duplicate_selection",

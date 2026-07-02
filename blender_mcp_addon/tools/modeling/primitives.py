@@ -1,5 +1,7 @@
-import bpy
 import math
+
+import bpy
+
 from ...utils import get_collection
 
 
@@ -94,6 +96,34 @@ class ModelingPrimitives:
             collection=collection,
             radius=radius,
         )
+
+    def create_cone(
+        self,
+        location,
+        radius1=1.0,
+        radius2=0.0,
+        depth=2.0,
+        scale=None,
+        rotation=None,
+        name=None,
+        collection=None,
+        **kwargs,
+    ):
+        """Create a cone primitive"""
+        params = {
+            "scale": scale,
+            "rotation": rotation,
+            "name": name,
+            "collection": collection,
+        }
+        if radius1 is not None:
+            params["radius1"] = radius1
+        if radius2 is not None:
+            params["radius2"] = radius2
+        if depth is not None:
+            params["depth"] = depth
+        params.update(kwargs)
+        return self.create_primitive("cone", location, **params)
 
     def create_torus(
         self,
@@ -283,6 +313,13 @@ class ModelingPrimitives:
                 params["radius"] = kwargs["radius"]
             if "subdivisions" in kwargs:
                 params["subdivisions"] = kwargs["subdivisions"]
+        elif type == "cone":
+            if "radius1" in kwargs:
+                params["radius1"] = kwargs["radius1"]
+            if "radius2" in kwargs:
+                params["radius2"] = kwargs["radius2"]
+            if "depth" in kwargs:
+                params["depth"] = kwargs["depth"]
         elif type == "torus":
             if "major_radius" in kwargs:
                 params["major_radius"] = kwargs["major_radius"]
@@ -300,9 +337,7 @@ class ModelingPrimitives:
         else:
             existing_objects = {obj.name for obj in bpy.data.objects}
             op(**params)
-            new_objects = [
-                obj for obj in bpy.data.objects if obj.name not in existing_objects
-            ]
+            new_objects = [obj for obj in bpy.data.objects if obj.name not in existing_objects]
             obj = new_objects[0] if new_objects else bpy.context.object
             if not obj:
                 raise RuntimeError("Failed to identify or create object")

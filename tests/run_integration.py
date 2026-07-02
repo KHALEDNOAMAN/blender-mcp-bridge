@@ -1,7 +1,8 @@
-import click
 import json
 import sys
 from pathlib import Path
+
+import click
 
 # Add project root to sys.path to allow running as a script
 project_root = str(Path(__file__).resolve().parent.parent)
@@ -10,10 +11,12 @@ if project_root not in sys.path:
 
 # We use direct imports now that sys.path is handled
 from src.config import settings  # noqa: E402
+from tests.scenarios.arch_layout import ArchLayoutScenario  # noqa: E402
+from tests.scenarios.filament_tag_layout import FilamentTagLayout  # noqa: E402
+from tests.scenarios.grid_layout import GridLayoutScenario  # noqa: E402
+from tests.scenarios.print_layout import PrintScenario  # noqa: E402
 from tests.utils.mcp_client import MCPClient  # noqa: E402
 from tests.utils.stateful_mcp_client import StatefulMCPClient  # noqa: E402
-from tests.scenarios.grid_layout import GridLayoutScenario  # noqa: E402
-from tests.scenarios.arch_layout import ArchLayoutScenario  # noqa: E402
 
 # Configure paths
 TESTS_DIR = Path(__file__).parent
@@ -25,6 +28,8 @@ DEFAULT_URL = settings.bridge_url
 SCENARIOS = {
     "grid": GridLayoutScenario,
     "arch": ArchLayoutScenario,
+    "print": PrintScenario,
+    "filament_tag": FilamentTagLayout,
 }
 
 
@@ -35,14 +40,12 @@ def cli():
 
 
 @cli.command()
-@click.option(
-    "--host", default=DEFAULT_URL, help=f"MCP Server URL (default: {DEFAULT_URL})"
-)
+@click.option("--host", default=DEFAULT_URL, help=f"MCP Server URL (default: {DEFAULT_URL})")
 @click.option("--verify", is_flag=True, help="Verify against benchmark after running")
 @click.option(
     "--scenario",
     "-s",
-    type=click.Choice(["grid", "arch", "all"]),
+    type=click.Choice(["grid", "arch", "print", "filament_tag", "all"]),
     default="all",
     help="Scenario to run (default: all)",
 )
@@ -64,9 +67,7 @@ def run(host, verify, scenario, module, transport):
     # Auto-select grid scenario if module is specified
     if module:
         if scenario == "arch":
-            raise click.UsageError(
-                "--module can only be used with the 'grid' scenario."
-            )
+            raise click.UsageError("--module can only be used with the 'grid' scenario.")
         if scenario == "all":
             scenario = "grid"
 
@@ -76,9 +77,7 @@ def run(host, verify, scenario, module, transport):
         print(f"Connecting to {host} in STATELESS mode...")
         client = MCPClient(base_url=host)
     else:
-        effective_scope = f"scenario={scenario}" + (
-            f", module={module}" if module else ""
-        )
+        effective_scope = f"scenario={scenario}" + (f", module={module}" if module else "")
         print(f"Connecting to {host} in STATEFUL mode ({effective_scope})...")
         client = StatefulMCPClient(base_url=host)
 
@@ -153,7 +152,7 @@ def run(host, verify, scenario, module, transport):
 @click.option(
     "--scenario",
     "-s",
-    type=click.Choice(["grid", "arch", "all"]),
+    type=click.Choice(["grid", "arch", "print", "filament_tag", "all"]),
     default="all",
     help="Scenario to verify",
 )
@@ -180,9 +179,9 @@ def verify_results(benchmark_file, last_run_file):
         print(f"No last run found at {last_run_file}.")
         return
 
-    with open(benchmark_file, "r") as f:
+    with open(benchmark_file) as f:
         expected = json.load(f)
-    with open(last_run_file, "r") as f:
+    with open(last_run_file) as f:
         actual = json.load(f)
 
     print(f"Verifying {last_run_file.name} against {benchmark_file.name}...")
@@ -192,7 +191,7 @@ def verify_results(benchmark_file, last_run_file):
         if isinstance(a, (list, tuple)):
             if len(a) != len(b):
                 return False
-            return all(fuzzy_match(x, y, tol) for x, y in zip(a, b))
+            return all(fuzzy_match(x, y, tol) for x, y in zip(a, b, strict=False))
         try:
             return abs(float(a) - float(b)) < tol
         except (ValueError, TypeError):
@@ -249,7 +248,7 @@ def verify_results(benchmark_file, last_run_file):
 @click.option(
     "--scenario",
     "-s",
-    type=click.Choice(["grid", "arch", "all"]),
+    type=click.Choice(["grid", "arch", "print", "filament_tag", "all"]),
     default="all",
     help="Scenario to approve",
 )

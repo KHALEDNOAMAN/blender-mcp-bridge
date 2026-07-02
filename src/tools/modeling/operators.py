@@ -338,4 +338,18 @@ def get_operator_tools() -> list[types.Tool]:
                 "required": ["object_name"],
             },
         ),
+        types.Tool(
+            name="convert_to_mesh",
+            description="Convert a non-mesh object (like Text or Curve) to a Mesh object so it can be joined or modified.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "object_name": {
+                        "type": "string",
+                        "description": "Name of the object to convert",
+                    },
+                },
+                "required": ["object_name"],
+            },
+        ),
     ]

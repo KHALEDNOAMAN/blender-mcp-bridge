@@ -131,6 +131,11 @@ def get_primitive_tools() -> list[types.Tool]:
                         "description": "XYZ position",
                     },
                     "radius": {"type": "number", "description": "Radius of the sphere"},
+                    "scale": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: XYZ scale",
+                    },
                     "name": {"type": "string", "description": "Object name"},
                     "rotation": {
                         "type": "array",
@@ -143,6 +148,39 @@ def get_primitive_tools() -> list[types.Tool]:
                     },
                 },
                 "required": ["location", "radius"],
+            },
+        ),
+        types.Tool(
+            name="create_cone",
+            description="Create a cone mesh object or update an existing one if 'name' matches.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "XYZ position",
+                    },
+                    "radius1": {"type": "number", "description": "Base radius"},
+                    "radius2": {"type": "number", "description": "Tip radius"},
+                    "depth": {"type": "number", "description": "Depth (height)"},
+                    "scale": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: XYZ scale",
+                    },
+                    "name": {"type": "string", "description": "Object name"},
+                    "rotation": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: Euler rotation in degrees [X, Y, Z]",
+                    },
+                    "collection": {
+                        "type": "string",
+                        "description": "Optional: Name of the collection to move the object to.",
+                    },
+                },
+                "required": ["location"],
             },
         ),
         types.Tool(

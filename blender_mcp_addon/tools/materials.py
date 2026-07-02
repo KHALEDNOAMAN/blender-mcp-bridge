@@ -1,6 +1,8 @@
-import bpy
 import fnmatch
-from ..utils import hex_to_rgb, get_object
+
+import bpy
+
+from ..utils import get_object, hex_to_rgb
 
 
 class MaterialTools:
@@ -209,10 +211,7 @@ class MaterialTools:
         **kwargs,
     ):
         """Assign material to objects. Supports both names and patterns."""
-        mat = (
-            bpy.data.materials.get(material_name)
-            or self.create_material(material_name)["name"]
-        )
+        mat = bpy.data.materials.get(material_name) or self.create_material(material_name)["name"]
         if isinstance(mat, str):
             mat = bpy.data.materials.get(mat)
 
@@ -285,9 +284,7 @@ class MaterialTools:
             "message": f"Added node '{node.name}' to '{material_name}'",
         }
 
-    def connect_shader_nodes(
-        self, material_name, from_node, from_socket, to_node, to_socket
-    ):
+    def connect_shader_nodes(self, material_name, from_node, from_socket, to_node, to_socket):
         mat = bpy.data.materials.get(material_name)
         nodes = mat.node_tree.nodes
         from_n, to_n = nodes.get(from_node), nodes.get(to_node)

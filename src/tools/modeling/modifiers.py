@@ -148,7 +148,7 @@ def get_modifier_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="boolean_operation",
-            description="""Perform a boolean operation between objects or collections. 
+            description="""Perform a boolean operation between objects or collections.
 GUIDANCE:
 - Use 'SLICE' to cut a hole AND keep the resulting piece as a new object.
 - Use operand_type='COLLECTION' to use all objects in a collection as cutters at once.

@@ -1,8 +1,11 @@
 import asyncio
 import json
 import threading
+from typing import Any
+
 from mcp.client.session import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
+
 from src.config import settings
 
 
@@ -12,11 +15,11 @@ class StatefulMCPClient:
         self.mcp_url = f"{base_url}/mcp/?transport=stateful"
 
         # Background worker state
-        self._loop = None
-        self._thread = None
-        self._command_queue = None
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._thread: threading.Thread | None = None
+        self._command_queue: asyncio.Queue[Any] | None = None
         self._ready = threading.Event()
-        self._worker_task = None
+        self._worker_task: Any = None
 
     def _ensure_worker(self):
         """Starts the background worker if not already running"""
@@ -41,18 +44,14 @@ class StatefulMCPClient:
             print(f"  [CLIENT] Connecting to {self.mcp_url}...")
 
             # Connect (this task enters the context)
-            streams = await stack.enter_async_context(
-                streamablehttp_client(self.mcp_url)
-            )
+            streams = await stack.enter_async_context(streamablehttp_client(self.mcp_url))
 
             if isinstance(streams, tuple):
                 read_stream, write_stream = streams[:2]
             else:
                 raise ValueError(f"Unexpected stream return type: {type(streams)}")
 
-            session = await stack.enter_async_context(
-                ClientSession(read_stream, write_stream)
-            )
+            session = await stack.enter_async_context(ClientSession(read_stream, write_stream))
             await session.initialize()
 
             # Request loop
@@ -84,9 +83,7 @@ class StatefulMCPClient:
                                         }
                                     )
                         else:
-                            future.set_result(
-                                {"status": "success", "raw": str(result.content)}
-                            )
+                            future.set_result({"status": "success", "raw": str(result.content)})
                     except Exception as e:
                         future.set_exception(e)
 
@@ -102,6 +99,7 @@ class StatefulMCPClient:
         self._ensure_worker()
 
         # Dispatch to worker thread and wait for it
+        assert self._loop is not None
         item_future = asyncio.run_coroutine_threadsafe(
             self._dispatch_to_worker("call", name, arguments), self._loop
         )
@@ -115,17 +113,23 @@ class StatefulMCPClient:
         # Create a future that works across threads
         # We need to be careful here: self._loop is for the worker thread
         # We use a threadsafe future
+        assert self._loop is not None
         item_future = asyncio.run_coroutine_threadsafe(
             self._dispatch_to_worker("call", name, arguments), self._loop
         )
         result = item_future.result()
         status = result.get("status", "ok")
-        emoji = "❌ " if status == "error" else ""
+        emoji = "OK " if status == "success" else "X "
         print(f"  [CLIENT] {name}: {emoji}{status}")
+        if status == "error":
+            print(f"    Error: {result.get('error')}")
+            print(f"    Message: {result.get('message')}")
         return result
 
     async def _dispatch_to_worker(self, cmd, name=None, args=None):
         """Helper to push to the worker queue from within the same loop"""
+        assert self._loop is not None
+        assert self._command_queue is not None
         future = self._loop.create_future()
         await self._command_queue.put((cmd, name, args, future))
         return await future
@@ -133,6 +137,7 @@ class StatefulMCPClient:
     async def aclose(self):
         """Explicitly close by signaling the worker to exit (Thread-safe)"""
         if self._command_queue:
+            assert self._loop is not None
             item_future = asyncio.run_coroutine_threadsafe(
                 self._dispatch_to_worker("close"), self._loop
             )
@@ -144,7 +149,8 @@ class StatefulMCPClient:
             future = asyncio.run_coroutine_threadsafe(self.aclose(), self._loop)
             future.result()
             # The worker thread will exit naturally when the coroutine finishes
-            self._thread.join(timeout=2.0)
+            if self._thread is not None:
+                self._thread.join(timeout=2.0)
             self._thread = None
             self._loop = None
 

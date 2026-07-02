@@ -6,7 +6,6 @@ Replicates the exact layout fine-tuned in the session editor.
 
 from tests.utils.mcp_client import MCPClient
 
-
 # ── Constants ────────────────────────────────────────────────────────────────
 H = 2.8  # Ceiling height
 COLLECTION = "HDB_3Room_Flat"

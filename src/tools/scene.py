@@ -13,9 +13,7 @@ def get_scene_tools() -> list[types.Tool]:
             description="Get detailed information about a specific object",
             inputSchema={
                 "type": "object",
-                "properties": {
-                    "name": {"type": "string", "description": "Object name"}
-                },
+                "properties": {"name": {"type": "string", "description": "Object name"}},
                 "required": ["name"],
             },
         ),

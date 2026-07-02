@@ -20,8 +20,17 @@ graph LR
 
 ### 1. Install Dependencies
 
+We recommend using [`uv`](https://docs.astral.sh/uv/) for fast virtual environment management and package installation:
+
 ```bash
-pip install -r requirements.txt
+# 1. Sync dependencies (automatically creates .venv if missing)
+uv sync
+
+# 2. Activate it
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
 ```
 
 ## Configuration
@@ -41,9 +50,9 @@ Create a `.env` file in the root directory to customize your setup:
 ### Method 1: Zip & Install (Recommended)
 1. Zip the `blender_mcp_addon` folder (into `blender_mcp_addon.zip`).
 2. Open Blender.
-3. Go to **Edit** > **Preferences** > **Add-ons**.
-4. Click **Install...** and select the `.zip` file.
-5. Search for "Blender MCP" and enable the checkbox.
+3. **For Blender 4.2+**: Go to **Edit** > **Preferences** > **Get Extensions** > Click the dropdown arrow in the top right > **Install from Disk...** and select the `.zip`.
+   **For Blender 4.0 / 4.1**: Go to **Edit** > **Preferences** > **Add-ons** > **Install...** and select the `.zip`.
+4. Search for "Blender MCP" and enable the checkbox.
 
 ### Method 2: Manual Copy (Developer)
 1. Copy the `blender_mcp_addon` folder to your Blender addons directory:
@@ -67,10 +76,10 @@ As the addon grows, a single 1800+ line file becomes unmaintainable. We've split
 
 ```bash
 # Standard mode
-python -m src.main serve
+uv run python -m src.main serve
 
 # Recording mode (Save all commands to a file)
-python -m src.main serve --record my_session.json --name "Building My House"
+uv run python -m src.main serve --record my_session.json --name "Building My House"
 ```
 
 The server will start on `http://localhost:8008` with HTTP Streamable endpoint at `/mcp`. It uses detailed logging to show exactly which tools are being called and their results.
@@ -82,7 +91,7 @@ The **Bridge Sessions** feature allows you to record yours or an AI's tool calls
 ### Recording a Session
 To record all tool calls made to the bridge while the server is running:
 ```bash
-python -m src.main serve --record path/to/session.json --name "My Project" --description "Optional description"
+uv run python -m src.main serve --record path/to/session.json --name "My Project" --description "Optional description"
 ```
 Any tool calls made by n8n or other clients will be automatically saved to the JSON file.
 
@@ -91,10 +100,10 @@ Any tool calls made by n8n or other clients will be automatically saved to the J
 To playback a previously recorded session:
 ```bash
 # Default (Stateful - HTTP Streamable) - Recommended for speed
-python -m src.main play path/to/session.json
+uv run python -m src.main play path/to/session.json
 
 # Stateless mode (Standard HTTP) - Slower due to handshake overhead
-python -m src.main play path/to/session.json --transport stateless
+uv run python -m src.main play path/to/session.json --transport stateless
 ```
 
 > [!TIP]
@@ -132,7 +141,7 @@ If you modify the addon code or the MCP server logic, follow these steps to ensu
 
 1. **Reload Scripts**: In Blender, press `F3` and type **"Reload Scripts"** (or use the shortcut `Alt + R` if configured).
 2. **Restart Blender Server**: In the N-Panel, click **Stop MCP Server** and then **Start MCP Server** again.
-3. **Restart Python Server**: Stop and restart the server with `python -m src.main serve`.
+3. **Restart Python Server**: Stop and restart the server with `uv run python -m src.main serve`.
 
 > [!IMPORTANT]
 > All Blender operations now run on the main thread via a command queue, ensuring stability and preventing dependency graph errors.
@@ -211,6 +220,28 @@ The server exposes **70+ Blender tools** across several categories:
 | `build_cable_tray` | Create electrical containment runs (LADDER, TROUGH) with automated supports. |
 | `add_tray_support` | Move existing supports or add new ones (TRAPEZE, CANTILEVER, WALL) to tray runs. |
 | `add_auto_cable_drops` | Automatically generate smooth Bezier cable drops from trays to racks/equipment beneath. |
+
+### 3D Printing (Validation & Repair)
+| Tool | Explanation |
+|---|---|
+| `set_scene_units` | Set scene units and scale (e.g., metric millimeters) crucial for 3D slicers. |
+| `check_mesh_for_printing` | Analyze mesh topology for non-manifold edges, holes, and degenerate geometry. |
+| `repair_mesh` | Automated, non-destructive mesh repair (merge vertices, fill holes, recalculate normals). |
+| `apply_voxel_remesh` | Fuse overlapping parts into a single manifold volume using voxel remeshing. |
+| `apply_sculpt_smooth` | Smooth mesh geometry with sculpt-mode brush for organic cleanup. |
+| `apply_transforms` | Bake location/rotation/scale transforms into mesh data (required before boolean ops). |
+| `apply_all_modifiers` | Apply all pending modifiers on an object and convert to clean mesh. |
+| `convert_to_mesh` | Convert FONT/Curve objects (e.g. text) to editable mesh geometry. |
+| `export_model` | Export objects or selections to standard 3D print formats (STL or 3MF). |
+
+### Sculpting
+| Tool | Explanation |
+|---|---|
+| `enter_sculpt_mode` / `exit_sculpt_mode` | Switch an object into/out of Sculpt Mode. |
+| `set_dyntopo` | Enable/configure Dynamic Topology for adaptive detail while sculpting. |
+| `sculpt_inflate` | Inflate/deflate a mesh along vertex normals; optional world-space Z mask to protect a flat base. |
+| `sculpt_grab` | Simulate the Grab brush — pull vertices near a world-space point by an offset, with cosine falloff. |
+| `symmetrize_mesh` | Mirror one half of a mesh onto the other across an axis, in Sculpt Mode. |
 
 ### Materials
 | Tool | Explanation |
@@ -390,17 +421,52 @@ We use an integrated test suite to verify Blender tools and layout scenarios.
 
 ```bash
 # Run the Arch layout test
-python tests/run_integration.py run --scenario arch
+uv run python tests/run_integration.py run --scenario arch
 
 # Run the standard functional grid test
-python tests/run_integration.py run --scenario grid
+uv run python tests/run_integration.py run --scenario grid
+
+# Run the 3D Printing tool verification test
+uv run python tests/run_integration.py run --scenario print
+
+# Run the Filament Name Tag & Stand generation test
+uv run python tests/run_integration.py run --scenario filament_tag
 ```
+
+### Scenarios
+
+| Scenario | Key | Description |
+|---|---|---|
+| Grid Layout | `grid` | Functional grid test covering all tool categories |
+| Arch Layout | `arch` | Architectural scene generation test |
+| Print Validation | `print` | 3D printing workflow: units, mesh repair, export |
+| Filament Tag | `filament_tag` | Generates a 4-piece modular filament name tag & clip system (NameTagCard, AMSClip, StickonHolder, DeskStand) |
 
 See the [Integration Testing Guide](docs/integration_tests.md) for full details on verification and benchmarking.
 
+## Code Quality & Standards
+
+We enforce code quality standards using [Ruff](https://docs.astral.sh/ruff/) and [Mypy](https://mypy.readthedocs.io/). These are run automatically on GitHub Actions CI.
+
+To run these checks locally:
+
+```bash
+# 1. Format code (strict black-compatible formatting)
+uv run ruff format src/ tests/ blender_mcp_addon/
+
+# 2. Run linter and check code complexity (McCabe <= 12)
+uv run ruff check src/ tests/ blender_mcp_addon/
+
+# 3. Auto-fix standard lint issues
+uv run ruff check src/ tests/ blender_mcp_addon/ --fix
+
+# 4. Run static type checking
+uv run mypy src/
+```
+
 ## Troubleshooting
 
-**Server won't start**: Install dependencies with `pip install -r requirements.txt`
+**Server won't start**: Install dependencies with `uv sync`
 
 **Connection failed**: Ensure Blender MCP addon is running on port 8888.
 

@@ -1,4 +1,5 @@
 import bpy
+
 from ...utils import hex_to_rgb
 
 
@@ -52,9 +53,7 @@ class ModelingSystems:
 
             center = (p1 + p2) / 2
             obj_name = f"{name}_{i:02d}"
-            bpy.ops.mesh.primitive_cylinder_add(
-                radius=radius, depth=dist, location=center
-            )
+            bpy.ops.mesh.primitive_cylinder_add(radius=radius, depth=dist, location=center)
             obj = bpy.context.active_object
             obj.name = obj_name
 
@@ -70,9 +69,7 @@ class ModelingSystems:
                 obj.data.materials[0] = mat
 
             col_target = collection or "MEP_Systems"
-            coll = bpy.data.collections.get(col_target) or bpy.data.collections.new(
-                col_target
-            )
+            coll = bpy.data.collections.get(col_target) or bpy.data.collections.new(col_target)
             if col_target not in bpy.context.scene.collection.children:
                 bpy.context.scene.collection.children.link(coll)
             for c in list(obj.users_collection):
@@ -126,9 +123,7 @@ class ModelingSystems:
         # Consistent with user request: joints do not have materials to stand out as visual nodes
 
         col_target = collection or "MEP_Fittings"
-        coll = bpy.data.collections.get(col_target) or bpy.data.collections.new(
-            col_target
-        )
+        coll = bpy.data.collections.get(col_target) or bpy.data.collections.new(col_target)
         if col_target not in bpy.context.scene.collection.children:
             bpy.context.scene.collection.children.link(coll)
         for c in list(obj.users_collection):
@@ -208,9 +203,7 @@ class ModelingSystems:
                 tray.data.materials.append(mat)
 
             col_target = collection or "MEP_Trays"
-            coll = bpy.data.collections.get(col_target) or bpy.data.collections.new(
-                col_target
-            )
+            coll = bpy.data.collections.get(col_target) or bpy.data.collections.new(col_target)
             if col_target not in bpy.context.scene.collection.children:
                 bpy.context.scene.collection.children.link(coll)
             for c in list(tray.users_collection):
@@ -332,9 +325,7 @@ class ModelingSystems:
         # Radius is slightly larger than tray depth half (e.g. depth=0.05 -> radius=0.03)
         radius = depth * 0.6
 
-        bpy.ops.mesh.primitive_cylinder_add(
-            radius=radius, depth=width, location=location
-        )
+        bpy.ops.mesh.primitive_cylinder_add(radius=radius, depth=width, location=location)
         obj = bpy.context.active_object
         obj.name = name
 
@@ -350,9 +341,7 @@ class ModelingSystems:
             obj.data.materials.append(mat)
 
         col_target = collection or "MEP_Fittings"
-        coll = bpy.data.collections.get(col_target) or bpy.data.collections.new(
-            col_target
-        )
+        coll = bpy.data.collections.get(col_target) or bpy.data.collections.new(col_target)
         if col_target not in bpy.context.scene.collection.children:
             bpy.context.scene.collection.children.link(coll)
         for c in list(obj.users_collection):
@@ -522,9 +511,7 @@ class ModelingSystems:
                     obj.data.materials[0] = mat
 
         col_target = collection or "MEP_Supports"
-        coll = bpy.data.collections.get(col_target) or bpy.data.collections.new(
-            col_target
-        )
+        coll = bpy.data.collections.get(col_target) or bpy.data.collections.new(col_target)
         if col_target not in bpy.context.scene.collection.children:
             bpy.context.scene.collection.children.link(coll)
 

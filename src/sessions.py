@@ -1,8 +1,8 @@
 import json
 import time
-from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Any, Optional
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from typing import Any
 
 
 @dataclass
@@ -17,16 +17,16 @@ class SessionMetadata:
 @dataclass
 class SessionCommand:
     tool: str
-    arguments: Dict[str, Any]
-    description: Optional[str] = None
+    arguments: dict[str, Any]
+    description: str | None = None
     timestamp: float = field(default_factory=time.time)
-    execution_status: Optional[str] = None
+    execution_status: str | None = None
 
 
 @dataclass
 class BridgeSession:
     metadata: SessionMetadata
-    commands: List[SessionCommand] = field(default_factory=list)
+    commands: list[SessionCommand] = field(default_factory=list)
 
     def to_dict(self):
         return {
@@ -35,7 +35,7 @@ class BridgeSession:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]):
+    def from_dict(cls, data: dict[str, Any]):
         metadata_data = data.get("metadata", {})
         # Filter metadata keys to match class
         metadata_keys = {f.name for f in SessionMetadata.__dataclass_fields__.values()}
@@ -57,7 +57,7 @@ class BridgeSession:
 
     @classmethod
     def load(cls, path: str):
-        with open(path, "r") as f:
+        with open(path) as f:
             data = json.load(f)
         return cls.from_dict(data)
 
@@ -67,24 +67,18 @@ class SessionRecorder:
         self.path = path
         self.session = BridgeSession(metadata=metadata)
 
-    def record_command(
-        self, tool: str, arguments: Dict[str, Any], description: str = None
-    ):
-        command = SessionCommand(
-            tool=tool, arguments=arguments, description=description
-        )
+    def record_command(self, tool: str, arguments: dict[str, Any], description: str | None = None):
+        command = SessionCommand(tool=tool, arguments=arguments, description=description)
         self.session.commands.append(command)
         # Auto-save after each command to prevent data loss
         self.session.save(self.path)
 
 
 class SessionPlayer:
-    def __init__(
-        self, transport: str = "stateful", host: str = "http://localhost:8008"
-    ):
+    def __init__(self, transport: str = "stateful", host: str = "http://localhost:8008"):
         self.transport = transport
         self.host = host
-        self._client = None
+        self._client: Any = None
 
     async def _get_client(self):
         if self._client:
@@ -158,9 +152,7 @@ class SessionPlayer:
             fail_color = red if fail_count > 0 else green
             print(f"  {fail_color}{'Failures:':<{label_width}} {fail_count}{reset}")
 
-            print(
-                f"\n{bold}{green if fail_count == 0 else red}Playback finished.{reset}"
-            )
+            print(f"\n{bold}{green if fail_count == 0 else red}Playback finished.{reset}")
         finally:
             if hasattr(client, "aclose"):
                 await client.aclose()

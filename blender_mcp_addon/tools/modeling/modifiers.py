@@ -1,4 +1,5 @@
 import bpy
+
 from ...utils import get_object
 
 
@@ -113,9 +114,7 @@ class ModelingModifiers:
         source = get_object(source_object)
         source_mod = source.modifiers.get(modifier_name)
         if not source_mod:
-            raise ValueError(
-                f"Modifier '{modifier_name}' not found on '{source_object}'"
-            )
+            raise ValueError(f"Modifier '{modifier_name}' not found on '{source_object}'")
 
         if target_collection:
             from ...utils import get_collection
@@ -142,16 +141,11 @@ class ModelingModifiers:
             new_mod = target.modifiers.get(source_mod.name)
             if not new_mod:
                 for m in target.modifiers:
-                    if (
-                        m.name.lower() == source_mod.name.lower()
-                        and m.type == source_mod.type
-                    ):
+                    if m.name.lower() == source_mod.name.lower() and m.type == source_mod.type:
                         new_mod = m
                         break
             if not new_mod:
-                new_mod = target.modifiers.new(
-                    name=source_mod.name, type=source_mod.type
-                )
+                new_mod = target.modifiers.new(name=source_mod.name, type=source_mod.type)
 
             exclude = {
                 "bl_rna",
@@ -235,9 +229,7 @@ class ModelingModifiers:
             slice_obj.modifiers.clear()
 
             # Apply Intersect to slice
-            self.boolean_operation(
-                slice_name, object_b, "INTERSECT", solver, False, operand_type
-            )
+            self.boolean_operation(slice_name, object_b, "INTERSECT", solver, False, operand_type)
 
             # Ensure cutter and slice piece are hidden if requested
             if hide_cutter:
@@ -280,11 +272,7 @@ class ModelingModifiers:
                 ):
                     mod = m
                     break
-                elif (
-                    operand_type == "OBJECT"
-                    and m.operand_type == "OBJECT"
-                    and m.object == cutter
-                ):
+                elif operand_type == "OBJECT" and m.operand_type == "OBJECT" and m.object == cutter:
                     mod = m
                     break
 

@@ -1,30 +1,27 @@
+import contextvars
 import json
+import logging
+import os
 import random
 import string
-import os
-import logging
-import contextvars
-from typing import Optional
 from contextlib import asynccontextmanager
 
+import mcp.types as types
 from mcp.server import Server
 from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
-import mcp.types as types
+from starlette.applications import Starlette
+from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import Response
+from starlette.routing import Mount, Route
+from starlette.staticfiles import StaticFiles
 
 from .config import settings
 from .connection import blender, logger
-from .tools import get_mcp_tools
 from .sessions import SessionRecorder
-
-from starlette.applications import Starlette
-from starlette.middleware.cors import CORSMiddleware
-from starlette.staticfiles import StaticFiles
-from starlette.responses import Response
-from starlette.routing import Route, Mount
-
+from .tools import get_mcp_tools
 
 # Lifecycle / Recording State
-recorder: Optional[SessionRecorder] = None
+recorder: SessionRecorder | None = None
 
 # Transport tracking
 transport_var = contextvars.ContextVar("transport", default="MCP")
@@ -34,7 +31,7 @@ logging.getLogger("mcp").setLevel(logging.WARNING)
 logging.getLogger("starlette").setLevel(logging.WARNING)
 
 # Initialize MCP Server
-app = Server("blender-mcp-n8n")
+mcp_server = Server("blender-mcp-n8n")
 
 ASSETS_DIR = settings.assets_dir
 
@@ -79,13 +76,13 @@ def resolve_path(args):
     return args
 
 
-@app.list_tools()
+@mcp_server.list_tools()
 async def list_tools() -> list[types.Tool]:
     """Expose available Blender tools to the AI Agent"""
     return get_mcp_tools()
 
 
-@app.call_tool()
+@mcp_server.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
     """Handle tool calls from the AI Agent"""
     rid = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
@@ -106,11 +103,7 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
     blender_res = blender.send_command(name, clean_args, rid)
 
     # Flatten nested results from bridge
-    if (
-        isinstance(blender_res, dict)
-        and "result" in blender_res
-        and "status" in blender_res
-    ):
+    if isinstance(blender_res, dict) and "result" in blender_res and "status" in blender_res:
         status_val = blender_res["status"]
         blender_res = blender_res["result"]
         if isinstance(blender_res, dict) and "status" not in blender_res:
@@ -148,9 +141,7 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
 
 # MCP Application Logic (Streamable Transport)
 # Lines below set up the Starlette/MCP integration
-session_manager = StreamableHTTPSessionManager(
-    app=app, json_response=True, stateless=True
-)
+session_manager = StreamableHTTPSessionManager(app=mcp_server, json_response=True, stateless=True)
 
 
 @asynccontextmanager
@@ -183,9 +174,7 @@ async def mcp_asgi(scope, receive, send):
         query = scope.get("query_string", b"").decode("utf-8")
 
         # 1. Check for Explicit Marking
-        explicit_stateless = any(
-            h[0] == b"x-mcp-model" and h[1] == b"stateless" for h in headers
-        )
+        explicit_stateless = any(h[0] == b"x-mcp-model" and h[1] == b"stateless" for h in headers)
         explicit_stateful = "transport=stateful" in query
 
         # 2. Heuristic fallback
@@ -221,9 +210,7 @@ starlette_app = Starlette(
     routes=[
         Route("/", root_redirect),
         Mount("/mcp", app=mcp_asgi),
-        Mount(
-            "/editor", StaticFiles(directory="session_editor", html=True), name="editor"
-        ),
+        Mount("/editor", StaticFiles(directory="session_editor", html=True), name="editor"),
     ],
     lifespan=lifespan,
 )

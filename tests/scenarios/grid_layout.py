@@ -1,10 +1,10 @@
-from tests.utils.mcp_client import MCPClient
-from tests.scenarios.modules.row_primitives import create_primitives_row
-from tests.scenarios.modules.row_modifiers import create_modifiers_row
 from tests.scenarios.modules.row_collections import create_collections_row
+from tests.scenarios.modules.row_modifiers import create_modifiers_row
 from tests.scenarios.modules.row_operators import create_operators_row
-from tests.scenarios.modules.row_transforms import create_transforms_row
+from tests.scenarios.modules.row_primitives import create_primitives_row
 from tests.scenarios.modules.row_systems import create_systems_row
+from tests.scenarios.modules.row_transforms import create_transforms_row
+from tests.utils.mcp_client import MCPClient
 
 
 class GridLayoutScenario:

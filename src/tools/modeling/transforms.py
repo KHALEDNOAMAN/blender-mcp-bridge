@@ -146,7 +146,7 @@ def get_transform_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="set_object_dimensions",
-            description="Set exact dimensions for an object in meters.",
+            description="Set exact world-space bounding box dimensions for an object, in meters. Rotation-safe: works correctly regardless of the object's current rotation.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -156,6 +156,20 @@ def get_transform_tools() -> list[types.Tool]:
                     "z": {"type": "number"},
                 },
                 "required": ["object_name", "x", "y", "z"],
+            },
+        ),
+        types.Tool(
+            name="apply_all_modifiers",
+            description="Permanently apply all modifiers (like Booleans) on an object, baking their effects into the mesh data.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "object_name": {
+                        "type": "string",
+                        "description": "Name of the object to apply modifiers on",
+                    },
+                },
+                "required": ["object_name"],
             },
         ),
         types.Tool(
@@ -185,6 +199,39 @@ def get_transform_tools() -> list[types.Tool]:
                     },
                 },
                 "required": ["transforms"],
+            },
+        ),
+        types.Tool(
+            name="apply_transforms",
+            description="Bake scale, rotation, and/or location transforms into mesh vertex data. Crucial before boolean operations or joining objects with non-unit scale.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "object_names": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "List of object names to apply transforms on",
+                    },
+                    "pattern": {
+                        "type": "string",
+                        "description": "Glob pattern to select objects (e.g. 'Frame*')",
+                    },
+                    "location": {
+                        "type": "boolean",
+                        "default": False,
+                        "description": "Bake location transform",
+                    },
+                    "rotation": {
+                        "type": "boolean",
+                        "default": True,
+                        "description": "Bake rotation transform",
+                    },
+                    "scale": {
+                        "type": "boolean",
+                        "default": True,
+                        "description": "Bake scale transform",
+                    },
+                },
             },
         ),
     ]

@@ -1,6 +1,7 @@
-import socket
 import json
 import logging
+import socket
+
 from .config import settings
 
 logger = logging.getLogger("mcp_server")
@@ -18,7 +19,7 @@ class BlenderConnection:
                 if not chunk:  # Connection closed by server
                     break
                 data += chunk
-            except socket.timeout:
+            except TimeoutError:
                 if data:
                     break
                 continue
