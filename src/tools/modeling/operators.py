@@ -1,3 +1,5 @@
+# src/tools/modeling/operators.py
+
 from mcp import types
 
 

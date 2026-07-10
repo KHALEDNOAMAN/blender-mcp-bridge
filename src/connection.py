@@ -1,3 +1,5 @@
+# src/connection.py
+
 import json
 import logging
 import socket

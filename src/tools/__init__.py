@@ -1,3 +1,5 @@
+# src/tools/__init__.py
+
 from mcp import types
 
 from .animation import get_animation_tools

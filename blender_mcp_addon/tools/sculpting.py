@@ -1,6 +1,8 @@
-import bmesh
-import bpy
-from mathutils import Vector
+# blender_mcp_addon/tools/sculpting.py
+
+import bmesh  # type: ignore
+import bpy  # type: ignore
+from mathutils import Vector  # type: ignore
 
 from ..utils import get_object
 
@@ -172,6 +174,16 @@ class SculptingTools:
         if obj.type != "MESH":
             return {"success": False, "error": f"'{object_name}' is not a mesh."}
 
+        # Same /1000 mistake as create_primitive: a sub-0.1 radius on a
+        # MILLIMETERS scene is never intentional (guaranteed 0 vertices hit).
+        if bpy.context.scene.unit_settings.length_unit == "MILLIMETERS" and 0 < abs(radius) < 0.1:
+            raise ValueError(
+                f"CRITICAL ERROR: radius={radius} is under 0.1 while the scene is configured in "
+                f"MILLIMETERS. This scene's raw values ARE millimeters directly — do NOT divide by "
+                f"1000 to 'convert to meters'. If you meant {radius * 1000:g}mm, pass {radius * 1000:g}, "
+                f"not {radius}."
+            )
+
         original_active = bpy.context.view_layer.objects.active
         bpy.context.view_layer.objects.active = obj
         if bpy.context.mode != "OBJECT":
@@ -185,8 +197,11 @@ class SculptingTools:
         bm.from_mesh(obj.data)
 
         affected = 0
+        nearest_dist = None
         for vert in bm.verts:
             dist = (vert.co - center).length
+            if nearest_dist is None or dist < nearest_dist:
+                nearest_dist = dist
             if dist < radius:
                 # Smooth cosine-based falloff: 1 at center, 0 at edge
                 falloff = max(0.0, 1.0 - (dist / radius) ** 2)
@@ -199,10 +214,21 @@ class SculptingTools:
 
         bpy.context.view_layer.objects.active = original_active
 
+        if affected == 0:
+            message = (
+                f"Grab found 0 vertices within {radius} of {location} on '{object_name}'. "
+                f"The nearest actual mesh vertex is {nearest_dist:.2f} units away — the location "
+                f"or radius is likely wrong (check for an accidental /1000 unit conversion), not "
+                f"a missing-detail issue."
+            )
+        else:
+            message = f"Grab sculpted {affected} vertices near {location} on '{object_name}'."
+
         return {
             "success": True,
             "affected_vertices": affected,
-            "message": f"Grab sculpted {affected} vertices near {location} on '{object_name}'.",
+            "nearest_vertex_distance": nearest_dist,
+            "message": message,
         }
 
     def symmetrize_mesh(self, object_name, direction="POSITIVE_X"):

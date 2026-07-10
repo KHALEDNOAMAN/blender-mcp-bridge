@@ -1,3 +1,5 @@
+# src/tools/animation.py
+
 from mcp import types
 
 

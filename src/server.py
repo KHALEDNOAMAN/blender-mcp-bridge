@@ -1,3 +1,5 @@
+# src/server.py
+
 import contextvars
 import json
 import logging
@@ -130,9 +132,12 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
             log_status = "ERROR"
 
     # Mirror success indicator in local console log
-    log_msg = blender_res.get("message", blender_res.get("status", "Done"))
-    if "error" in blender_res:
-        log_msg = f"ERROR: {blender_res['error']}"
+    if isinstance(blender_res, dict):
+        log_msg = blender_res.get("message", blender_res.get("status", "Done"))
+        if "error" in blender_res:
+            log_msg = f"ERROR: {blender_res['error']}"
+    else:
+        log_msg = str(blender_res)
 
     logger.info(f"[{transport}] [{rid}] [{log_status}] {log_msg}")
 

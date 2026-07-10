@@ -1,3 +1,5 @@
+# src/tools/scene.py
+
 from mcp import types
 
 

@@ -1,6 +1,8 @@
+# blender_mcp_addon/tools/modeling/primitives.py
+
 import math
 
-import bpy
+import bpy  # type: ignore
 
 from ...utils import get_collection
 
@@ -271,6 +273,170 @@ class ModelingPrimitives:
             **kwargs,
         )
 
+    def create_polygon(
+        self,
+        vertices,
+        location=(0, 0, 0),
+        extrude=0.0,
+        name=None,
+        rotation=None,
+        collection=None,
+        **kwargs,
+    ):
+        """Create a flat polygon mesh from a list of 2D or 3D vertex coordinates.
+
+        Args:
+            vertices: List of [x, y] or [x, y, z] coordinates defining the polygon outline.
+                      Vertices should be ordered (clockwise or counter-clockwise).
+            location: World-space origin for the object.
+            extrude: If > 0, extrude the polygon along +Z by this amount to create a solid.
+            name: Object name.
+            rotation: Euler rotation in degrees [X, Y, Z].
+            collection: Collection to place the object in.
+        """
+        import bmesh  # type: ignore
+
+        if len(vertices) < 3:
+            raise ValueError("A polygon requires at least 3 vertices.")
+
+        # Normalise to 3D (default Z=0)
+        verts_3d = []
+        for v in vertices:
+            if len(v) == 2:
+                verts_3d.append((v[0], v[1], 0.0))
+            elif len(v) >= 3:
+                verts_3d.append((v[0], v[1], v[2]))
+            else:
+                raise ValueError(f"Vertex must have 2 or 3 components, got {len(v)}")
+
+        # ── Build mesh with bmesh ──
+        top_vertices = kwargs.get("top_vertices")
+        if top_vertices:
+            # Detect if top_vertices is a list of layers
+            if isinstance(top_vertices[0], (list, tuple)) and isinstance(
+                top_vertices[0][0], (list, tuple)
+            ):
+                layers_data = top_vertices
+            else:
+                layers_data = [top_vertices]
+
+            all_layers_3d = [verts_3d]
+            for layer_idx, layer in enumerate(layers_data):
+                if len(layer) != len(vertices):
+                    raise ValueError(
+                        f"Layer {layer_idx} in top_vertices must have {len(vertices)} vertices, got {len(layer)}"
+                    )
+
+                layer_verts_3d = []
+                for v in layer:
+                    if len(v) == 2:
+                        z = (layer_idx + 1) * 5.0
+                        layer_verts_3d.append((v[0], v[1], z))
+                    elif len(v) >= 3:
+                        layer_verts_3d.append((v[0], v[1], v[2]))
+                    else:
+                        raise ValueError(
+                            f"Vertex in layer {layer_idx} must have 2 or 3 components, got {len(v)}"
+                        )
+                all_layers_3d.append(layer_verts_3d)
+
+            mesh = bpy.data.meshes.new(name or "Polygon")
+            obj = bpy.data.objects.new(mesh.name, mesh)
+            bpy.context.collection.objects.link(obj)
+
+            bm = bmesh.new()
+
+            # Create vertices for all layers
+            bm_layers_verts = []
+            for layer_verts in all_layers_3d:
+                bm_layer = [bm.verts.new(v) for v in layer_verts]
+                bm_layers_verts.append(bm_layer)
+
+            # Cap bottom and top, then triangulate the caps deterministically:
+            # a long or height-varying cap n-gon is otherwise triangulated ad hoc
+            # by the viewport, which can bridge distant vertices and tent the
+            # surface above/below the ring outline.
+            cap_faces = [
+                bm.faces.new(bm_layers_verts[0]),
+                bm.faces.new(reversed(bm_layers_verts[-1])),
+            ]
+            bmesh.ops.triangulate(bm, faces=cap_faces, ngon_method="BEAUTY")
+
+            # Connect side faces between each layer
+            n_verts = len(vertices)
+            n_layers = len(bm_layers_verts)
+            for layer_idx in range(n_layers - 1):
+                bot_layer = bm_layers_verts[layer_idx]
+                top_layer = bm_layers_verts[layer_idx + 1]
+                for i in range(n_verts):
+                    bm.faces.new(
+                        [
+                            bot_layer[i],
+                            bot_layer[(i + 1) % n_verts],
+                            top_layer[(i + 1) % n_verts],
+                            top_layer[i],
+                        ]
+                    )
+
+            bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+            bm.to_mesh(mesh)
+            bm.free()
+            mesh.update()
+        else:
+            mesh = bpy.data.meshes.new(name or "Polygon")
+            obj = bpy.data.objects.new(mesh.name, mesh)
+            bpy.context.collection.objects.link(obj)
+
+            bm = bmesh.new()
+            bm_verts = [bm.verts.new(v) for v in verts_3d]
+            bm.faces.new(bm_verts)
+
+            if extrude > 0:
+                result = bmesh.ops.extrude_face_region(bm, geom=bm.faces[:])
+                extruded_verts = [e for e in result["geom"] if isinstance(e, bmesh.types.BMVert)]
+                bmesh.ops.translate(bm, vec=(0, 0, extrude), verts=extruded_verts)
+
+                taper = kwargs.get("taper", 1.0)
+                if taper != 1.0:
+                    cx = sum(v[0] for v in verts_3d) / len(verts_3d)
+                    cy = sum(v[1] for v in verts_3d) / len(verts_3d)
+                    for ev in extruded_verts:
+                        ev.co.x = cx + (ev.co.x - cx) * taper
+                        ev.co.y = cy + (ev.co.y - cy) * taper
+
+            bm.to_mesh(mesh)
+            bm.free()
+            mesh.update()
+
+        # ── Position / Rotation ──
+        obj.location = location
+
+        if rotation is not None:
+            obj.rotation_euler = [math.radians(r) for r in rotation]
+
+        if name:
+            obj.name = name
+
+        if collection:
+            self._move_to_collection_helper(obj, collection)
+
+        obj.hide_viewport = False
+        obj.hide_render = False
+
+        return {
+            "success": True,
+            "name": obj.name,
+            "type": "polygon",
+            "status": "created",
+            "dimensions": list(obj.dimensions),
+            "location": list(obj.location),
+            "vertex_count": len(vertices),
+            "extruded": extrude > 0,
+            "message": f"Polygon '{obj.name}' created with {len(vertices)} vertices"
+            + (f", extruded {extrude}mm" if extrude > 0 else "")
+            + ".",
+        }
+
     def create_primitive(
         self,
         type,
@@ -330,8 +496,46 @@ class ModelingPrimitives:
             if "minor_segments" in kwargs:
                 params["minor_segments"] = kwargs["minor_segments"]
 
+        # Sanity check: scene is configured so raw values ARE millimeters
+        # directly (no /1000 conversion needed). Catch the common mistake of
+        # treating these as meters and dividing mm by 1000 before calling in.
+        # This is a hard error, not just a warning: a sub-0.1 feature is never
+        # printable on any real nozzle, so it is never an intentional value.
+        skip_keys = {
+            "location",
+            "rotation",
+            "scale",
+            "name",
+            "collection",
+            "vertices",
+            "subdivisions",
+        }
+        shape_values = [
+            v for k, v in params.items() if k not in skip_keys and isinstance(v, (int, float))
+        ]
+        if (
+            bpy.context.scene.unit_settings.length_unit == "MILLIMETERS"
+            and shape_values
+            and all(0 < abs(v) < 0.1 for v in shape_values)
+        ):
+            example = shape_values[0]
+            raise ValueError(
+                f"CRITICAL ERROR: all shape dimensions are under 0.1 (e.g. {example}) while the scene is "
+                f"configured in MILLIMETERS. This scene's raw values ARE millimeters directly — do NOT "
+                f"divide by 1000 to 'convert to meters'. If you meant {example * 1000:g}mm, pass "
+                f"{example * 1000:g}, not {example}."
+            )
+
         is_update = bool(name and name in bpy.data.objects)
         if is_update:
+            shape_params = {k: v for k, v in params.items() if k != "location"}
+            if shape_params:
+                raise ValueError(
+                    f"CRITICAL ERROR: '{name}' already exists, so this call would only move it — "
+                    f"Blender cannot resize an existing primitive's shape ({', '.join(shape_params)}) "
+                    f"in place via this operator. Delete '{name}' first, then recreate it with the "
+                    f"new dimensions."
+                )
             obj = bpy.data.objects[name]
             obj.location = location
         else:
@@ -367,7 +571,7 @@ class ModelingPrimitives:
         if "dimensions" in kwargs and kwargs["dimensions"]:
             dims = kwargs["dimensions"]
             if len(dims) == 2:
-                dims = (dims[0], dims[1], obj.dimensions.z)
+                dims = (dims[0], dims[1], obj.dimensions[2])
             elif len(dims) >= 3:
                 dims = dims[:3]
 
@@ -390,6 +594,7 @@ class ModelingPrimitives:
             self._move_to_collection_helper(obj, collection)
 
         status = "updated" if is_update else "created"
+        message = f"Object '{obj.name}' ({type}) {status} successfully. Dimensions: {list(obj.dimensions)}."
         return {
             "success": True,
             "name": obj.name,
@@ -398,7 +603,7 @@ class ModelingPrimitives:
             "dimensions": list(obj.dimensions),
             "location": list(obj.location),
             "verified": True,
-            "message": f"Object '{obj.name}' ({type}) {status} successfully. Dimensions: {list(obj.dimensions)}.",
+            "message": message,
         }
 
     def _move_to_collection_helper(self, obj, collection_name):

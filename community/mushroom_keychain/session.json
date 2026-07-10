@@ -1,10 +1,9 @@
 {
   "metadata": {
-    "name": "Sculpted Mushroom Keychain",
-    "model": "z-ai/glm-5v-turbo",
-    "description": "Organic keychain combining sculpting and 3D-print prep tools",
-    "documentation_url": "",
-    "created_at": "2026-07-02T18:35:17.342500"
+    "name": "Mushroom Keychain - Black & White Three-Phase",
+    "model": "claude-fable-5",
+    "created_at": "2026-07-10T00:00:00.000Z",
+    "description": "Three-phase build per design review. PHASE 1: sculpt the cap. PHASE 2: undercut - flat slice at Z=19 (removes the ellipsoid's curled-under wall, the proven root cause of the shattering cap), then a bell hollowed into the flat face (ceiling Z=21.4, opening r~12.2, flat rim ring ~3.2mm), then remesh 0.25mm + smooth. PHASE 3: the 13 white warts are added AFTER all smoothing so they cannot be erased (the previous version smoothed them flat) - kept as separate white shells over the finished red head. Colors: red cap, white spots + stem. Exports one aligned STL per color."
   },
   "commands": [
     {
@@ -14,152 +13,94 @@
         "length_unit": "MILLIMETERS",
         "scale": 0.001
       },
-      "description": null,
-      "timestamp": 1782988552.131074,
-      "execution_status": null
+      "timestamp": 1783843200,
+      "description": "Set scene to millimeters."
     },
     {
-      "tool": "set_active_collection",
+      "tool": "delete_object",
       "arguments": {
-        "collection_name": "MushroomKeychain"
+        "pattern": "*"
       },
-      "description": null,
-      "timestamp": 1782988552.4538703,
-      "execution_status": null
-    },
-    {
-      "tool": "create_collection",
-      "arguments": {
-        "name": "MushroomKeychain"
-      },
-      "description": null,
-      "timestamp": 1782988552.7453387,
-      "execution_status": null
+      "timestamp": 1783843200,
+      "description": "Wipe the scene for an idempotent replay."
     },
     {
       "tool": "create_cone",
       "arguments": {
-        "location": [
-          0,
-          0,
-          10
-        ],
+        "name": "Stem",
+        "location": [0, 0, 12],
         "radius1": 5,
         "radius2": 4,
-        "depth": 20,
-        "name": "Stem",
-        "collection": "MushroomKeychain"
+        "depth": 24
       },
-      "description": null,
-      "timestamp": 1782988618.9577649,
-      "execution_status": null
-    },
-    {
-      "tool": "create_icosphere",
-      "arguments": {
-        "location": [
-          0,
-          0,
-          20
-        ],
-        "radius": 14,
-        "subdivisions": 3,
-        "name": "Cap",
-        "collection": "MushroomKeychain"
-      },
-      "description": null,
-      "timestamp": 1782988681.7174425,
-      "execution_status": null
+      "timestamp": 1783843201,
+      "description": "Stem: tapered cone, base on the ground plane, top at Z=24 reaching past the bell ceiling."
     },
     {
       "tool": "create_cylinder",
       "arguments": {
-        "location": [
-          0,
-          0,
-          4
-        ],
-        "radius": 1,
+        "name": "RingHoleCutter",
+        "location": [0, 0, 4],
+        "rotation": [0, 90, 0],
+        "radius": 1.0,
         "depth": 20,
-        "name": "RingHole",
-        "rotation": [
-          0,
-          90,
-          0
-        ],
-        "collection": "MushroomKeychain"
+        "vertices": 24
       },
-      "description": null,
-      "timestamp": 1782988712.8464365,
-      "execution_status": null
+      "timestamp": 1783843201,
+      "description": "Keyring hole cutter through the lower stem."
     },
     {
       "tool": "boolean_operation",
       "arguments": {
         "object_a": "Stem",
-        "object_b": "RingHole",
-        "operation": "DIFFERENCE",
-        "solver": "EXACT",
-        "hide_cutter": true
+        "object_b": "RingHoleCutter",
+        "operation": "DIFFERENCE"
       },
-      "description": null,
-      "timestamp": 1782988792.1714885,
-      "execution_status": null
+      "timestamp": 1783843201,
+      "description": "Cut the keyring hole."
     },
     {
       "tool": "apply_all_modifiers",
-      "arguments": {
-        "object_name": "Stem"
-      },
-      "description": null,
-      "timestamp": 1782989219.805799,
-      "execution_status": null
+      "arguments": { "object_name": "Stem" },
+      "timestamp": 1783843201,
+      "description": "Bake the hole."
     },
     {
-      "tool": "delete_object",
+      "tool": "create_icosphere",
       "arguments": {
-        "object_name": "RingHole"
+        "name": "Cap",
+        "location": [0, 0, 20],
+        "radius": 14,
+        "subdivisions": 3
       },
-      "description": null,
-      "timestamp": 1782989268.7158477,
-      "execution_status": null
+      "timestamp": 1783843202,
+      "description": "PHASE 1: cap sphere centered at Z=20."
     },
     {
       "tool": "transform_object",
       "arguments": {
         "object_name": "Cap",
-        "scale": [
-          1,
-          1,
-          0.55
-        ]
+        "scale": [1, 1, 0.55]
       },
-      "description": null,
-      "timestamp": 1782989286.295162,
-      "execution_status": null
+      "timestamp": 1783843202,
+      "description": "Squash the cap into a dome."
     },
     {
       "tool": "apply_transforms",
       "arguments": {
-        "object_names": [
-          "Cap"
-        ],
+        "object_names": ["Cap"],
         "location": false,
         "rotation": true,
         "scale": true
       },
-      "description": null,
-      "timestamp": 1782989290.6456754,
-      "execution_status": null
+      "timestamp": 1783843202,
+      "description": "Bake the squash into the mesh."
     },
     {
       "tool": "enter_sculpt_mode",
-      "arguments": {
-        "object_name": "Cap"
-      },
-      "description": null,
-      "timestamp": 1782989818.383467,
-      "execution_status": null
+      "arguments": { "object_name": "Cap" },
+      "timestamp": 1783843202,
+      "description": "Sculpt the cap."
     },
     {
       "tool": "sculpt_inflate",
@@ -168,118 +109,398 @@
         "distance": 1.5,
         "mask_below_z": 12.5
       },
-      "description": null,
-      "timestamp": 1782989824.2385066,
-      "execution_status": null
+      "timestamp": 1783843202,
+      "description": "Round out the dome."
     },
     {
       "tool": "exit_sculpt_mode",
       "arguments": {},
-      "description": null,
-      "timestamp": 1782989827.9818978,
-      "execution_status": null
+      "timestamp": 1783843202,
+      "description": "Back to object mode."
     },
     {
       "tool": "enter_sculpt_mode",
-      "arguments": {
-        "object_name": "Cap"
-      },
-      "description": null,
-      "timestamp": 1782989846.9263191,
-      "execution_status": null
+      "arguments": { "object_name": "Cap" },
+      "timestamp": 1783843202,
+      "description": "One more sculpt pass."
     },
     {
       "tool": "sculpt_grab",
       "arguments": {
         "object_name": "Cap",
-        "location": [
-          12,
-          6,
-          17
-        ],
-        "offset": [
-          0.9,
-          0.4,
-          0.8
-        ],
+        "location": [12, 6, 17],
+        "offset": [0.9, 0.4, 0.8],
         "radius": 3
       },
-      "description": null,
-      "timestamp": 1782989852.70184,
-      "execution_status": null
+      "timestamp": 1783843202,
+      "description": "Pull one organic bump on the dome edge."
     },
     {
       "tool": "exit_sculpt_mode",
       "arguments": {},
-      "description": null,
-      "timestamp": 1782989857.7582545,
-      "execution_status": null
+      "timestamp": 1783843202,
+      "description": "Back to object mode. *** END OF PHASE 1 *** Stop here to view: sculpted organic dome with bumps."
     },
     {
-      "tool": "symmetrize_mesh",
+      "tool": "create_cube",
       "arguments": {
-        "object_name": "Cap",
-        "direction": "POSITIVE_X"
+        "name": "FlatCutter",
+        "location": [0, 0, 12.0],
+        "dimensions": [40, 40, 14]
       },
-      "description": null,
-      "timestamp": 1782989891.2734427,
-      "execution_status": null
+      "timestamp": 1783843203,
+      "description": "PHASE 2a: flat slice cutter - its top face sits at Z=19, the green-line height."
     },
     {
-      "tool": "join_objects",
+      "tool": "boolean_operation",
       "arguments": {
-        "object_names": [
-          "Stem",
-          "Cap"
-        ],
-        "new_name": "MushroomKeychain"
+        "object_a": "Cap",
+        "object_b": "FlatCutter",
+        "operation": "DIFFERENCE"
       },
-      "description": null,
-      "timestamp": 1782989980.318351,
-      "execution_status": null
+      "timestamp": 1783843203,
+      "description": "Slice the cap flat at Z=19: removes the ellipsoid's curled-under lower wall so no later cutter can punch through a side wall."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "BellCutter",
+        "location": [0, 0, 18.2],
+        "radius": 14,
+        "subdivisions": 3,
+        "dimensions": [25.2, 25.2, 6.4]
+      },
+      "timestamp": 1783843203,
+      "description": "PHASE 2b: bell cutter (12.6 x 12.6 x 3.2 semi-axes) - fat equator below the Z=19 face, so no side punch-through is possible."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Cap",
+        "object_b": "BellCutter",
+        "operation": "DIFFERENCE"
+      },
+      "timestamp": 1783843203,
+      "description": "Hollow the bell into the flat face: ceiling Z=21.4 at the center (the green-line 50 percent height), opening radius ~12.2, leaving a ~3.2mm flat rim border ring - sized so every white spot socket keeps at least 1mm of black wall above the bell."
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": { "object_name": "Cap" },
+      "timestamp": 1783843203,
+      "description": "Bake the flat slice and the bell before remeshing."
     },
     {
       "tool": "apply_voxel_remesh",
       "arguments": {
-        "object_name": "MushroomKeychain",
-        "voxel_size": 0.5,
-        "adaptivity": 0,
+        "object_name": "Cap",
+        "voxel_size": 0.25,
+        "adaptivity": 0.0,
         "clean_geometry": true
       },
-      "description": null,
-      "timestamp": 1782990038.9308264,
-      "execution_status": null
+      "timestamp": 1783843204,
+      "description": "Remesh the cap at 0.25mm."
     },
     {
       "tool": "apply_sculpt_smooth",
       "arguments": {
-        "object_name": "MushroomKeychain",
+        "object_name": "Cap",
         "iterations": 3,
         "factor": 0.5
       },
-      "description": null,
-      "timestamp": 1782990063.9984586,
-      "execution_status": null
+      "timestamp": 1783843204,
+      "description": "Smooth the cap - done BEFORE the spots exist, so they cannot be smoothed away. *** END OF PHASE 2 *** Stop here to view: smooth black cap with bell undercut."
+    },
+    {
+      "tool": "apply_voxel_remesh",
+      "arguments": {
+        "object_name": "Stem",
+        "voxel_size": 0.25,
+        "adaptivity": 0.0,
+        "clean_geometry": true
+      },
+      "timestamp": 1783843204,
+      "description": "Remesh the stem at 0.25mm."
+    },
+    {
+      "tool": "apply_sculpt_smooth",
+      "arguments": {
+        "object_name": "Stem",
+        "iterations": 2,
+        "factor": 0.5
+      },
+      "timestamp": 1783843204,
+      "description": "Smooth the stem."
+    },
+    {
+      "tool": "create_cylinder",
+      "arguments": {
+        "name": "RingBoreCutter",
+        "location": [0, 0, 4],
+        "rotation": [0, 90, 0],
+        "radius": 1.0,
+        "depth": 22,
+        "vertices": 24
+      },
+      "timestamp": 1783843205,
+      "description": "Re-drill the keyring hole AFTER remesh and smoothing so the bore is crisp."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Stem",
+        "object_b": "RingBoreCutter",
+        "operation": "DIFFERENCE"
+      },
+      "timestamp": 1783843205,
+      "description": "Re-cut the hole through the smoothed stem."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot1",
+        "location": [1.4, 0.5, 27.5],
+        "radius": 2.6,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "PHASE 3: white wart near the crown (~80% buried, ~1mm bump)."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot2",
+        "location": [-6.7, -2.4, 25.9],
+        "radius": 3.4,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Big wart, upper back-left."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot3",
+        "location": [6.6, 10.5, 23.6],
+        "radius": 2.2,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Small wart, right shoulder."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot4",
+        "location": [-8.9, 8.6, 22.9],
+        "radius": 2.9,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Medium wart, back-right slope (radius trimmed to keep 1mm wall above the bell)."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot5",
+        "location": [8.1, -9.5, 22.9],
+        "radius": 2.8,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Medium wart, front-left slope."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot6",
+        "location": [-4.0, -11.2, 23.9],
+        "radius": 2.4,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Wart low on the left flank."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot7",
+        "location": [9.2, 7.2, 23.3],
+        "radius": 2.9,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Wart on the front-right flank (radius trimmed for bell clearance)."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot8",
+        "location": [-11.9, 2.7, 24.0],
+        "radius": 2.0,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Small wart at the back rim."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot9",
+        "location": [2.2, -3.9, 27.4],
+        "radius": 2.1,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Small wart near the crown."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot10",
+        "location": [-0.9, 8.0, 25.7],
+        "radius": 3.6,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Biggest wart (~6mm patch), upper right shoulder."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot11",
+        "location": [-7.7, -7.7, 24.3],
+        "radius": 3.4,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Big wart, back-left slope."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot12",
+        "location": [10.6, -1.9, 23.9],
+        "radius": 3.0,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Wart on the front slope (radius trimmed for bell clearance)."
+    },
+    {
+      "tool": "create_icosphere",
+      "arguments": {
+        "name": "Spot13",
+        "location": [-4.9, 5.8, 26.3],
+        "radius": 2.5,
+        "subdivisions": 4
+      },
+      "timestamp": 1783843206,
+      "description": "Medium wart between crown and back-right slope."
+    },
+    {
+      "tool": "join_objects",
+      "arguments": {
+        "object_names": ["Spot1", "Spot2", "Spot3", "Spot4", "Spot5", "Spot6", "Spot7", "Spot8", "Spot9", "Spot10", "Spot11", "Spot12", "Spot13"],
+        "new_name": "CapSpots"
+      },
+      "timestamp": 1783843206,
+      "description": "Join the thirteen warts into the white spots body."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Stem",
+        "object_b": "Cap",
+        "operation": "DIFFERENCE",
+        "hide_cutter": false
+      },
+      "timestamp": 1783843207,
+      "description": "Trim the stem against the finished cap: it ends exactly at the bell ceiling."
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": { "object_name": "Stem" },
+      "timestamp": 1783843207,
+      "description": "Bake the re-drilled hole and the trim."
+    },
+    {
+      "tool": "join_objects",
+      "arguments": {
+        "object_names": ["Stem", "CapSpots"],
+        "new_name": "MushroomWhite"
+      },
+      "timestamp": 1783843208,
+      "description": "Combine stem and spots into the single white color body. Spots remain separate shells, not socketed into the cap."
+    },
+    {
+      "tool": "create_material",
+      "arguments": {
+        "name": "CapRed",
+        "color": [0.8, 0.05, 0.05, 1.0],
+        "roughness": 0.5
+      },
+      "timestamp": 1783843208,
+      "description": "Red material for the cap - classic amanita look."
+    },
+    {
+      "tool": "create_material",
+      "arguments": {
+        "name": "PureWhite",
+        "color": [0.92, 0.92, 0.9, 1.0],
+        "roughness": 0.6
+      },
+      "timestamp": 1783843208,
+      "description": "White material for stem and spots."
+    },
+    {
+      "tool": "assign_material",
+      "arguments": {
+        "object_names": ["Cap"],
+        "material_name": "CapRed"
+      },
+      "timestamp": 1783843208,
+      "description": "Cap goes red."
+    },
+    {
+      "tool": "assign_material",
+      "arguments": {
+        "object_names": ["MushroomWhite"],
+        "material_name": "PureWhite"
+      },
+      "timestamp": 1783843208,
+      "description": "Stem and spots go white."
     },
     {
       "tool": "check_mesh_for_printing",
-      "arguments": {
-        "object_name": "MushroomKeychain"
-      },
-      "description": null,
-      "timestamp": 1782990092.415147,
-      "execution_status": null
+      "arguments": { "object_name": "Cap" },
+      "timestamp": 1783843209,
+      "description": "Waterproofing check on the red cap body."
+    },
+    {
+      "tool": "check_mesh_for_printing",
+      "arguments": { "object_name": "MushroomWhite" },
+      "timestamp": 1783843209,
+      "description": "Waterproofing check on the white body (stem shell + thirteen spot shells)."
     },
     {
       "tool": "export_model",
       "arguments": {
-        "object_name": "MushroomKeychain",
-        "filepath": "f:/github-proj/blender-mcp-n8n/assets/mushroom_keychain.stl",
+        "object_name": "Cap",
+        "filepath": "mushroom_cap_red.stl",
         "format": "STL"
       },
-      "description": null,
-      "timestamp": 1782990159.568517,
-      "execution_status": null
+      "timestamp": 1783843211,
+      "description": "Export the red cap as STL (same world origin as the white body - do NOT move or rotate either object before export, alignment depends on shared coordinates)."
+    },
+    {
+      "tool": "export_model",
+      "arguments": {
+        "object_name": "MushroomWhite",
+        "filepath": "mushroom_stem_white.stl",
+        "format": "STL"
+      },
+      "timestamp": 1783843211.1,
+      "description": "Export the white body (stem + spots) as STL. In Bambu Studio: import BOTH STLs in one action and answer YES to 'Load these files as a single object with multiple parts?' - then assign a filament per part in the objects panel."
     }
   ]
 }

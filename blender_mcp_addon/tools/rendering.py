@@ -1,4 +1,6 @@
-import bpy
+# blender_mcp_addon/tools/rendering.py
+
+import bpy  # type: ignore
 
 
 class RenderingTools:

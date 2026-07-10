@@ -1,3 +1,5 @@
+# tests/test_sessions.py
+
 import json
 import os
 
@@ -33,7 +35,7 @@ def test_session_lifecycle():
 
     print("6. Cleaning up temporary test file...")
     os.remove(path)
-    print("✅ Session Lifecycle Unit Test Passed!")
+    print("[PASS] Session Lifecycle Unit Test Passed!")
 
 
 if __name__ == "__main__":

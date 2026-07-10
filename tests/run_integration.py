@@ -1,3 +1,5 @@
+# tests/run_integration.py
+
 import json
 import sys
 from pathlib import Path
@@ -110,6 +112,8 @@ def run(host, verify, scenario, module, transport):
         detailed_objects = {}
         if "objects" in scene_info and isinstance(scene_info["objects"], list):
             for obj in scene_info["objects"]:
+                if not isinstance(obj, dict):
+                    continue
                 name = obj.get("name")
                 if not name:
                     continue
@@ -141,8 +145,8 @@ def run(host, verify, scenario, module, transport):
                 all_passed = False
 
     # Cleanup
-    if hasattr(client, "close"):
-        client.close()
+    if callable(getattr(client, "close", None)):
+        client.close()  # type: ignore
 
     if verify and not all_passed:
         sys.exit(1)

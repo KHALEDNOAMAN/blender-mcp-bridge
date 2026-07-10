@@ -1,6 +1,9 @@
-import bpy
+# blender_mcp_addon/__init__.py
+
+import bpy  # type: ignore
 
 from .server import BlenderMCPServer
+from .utils import DEFAULT_PORT
 
 bl_info = {
     "name": "Blender MCP for n8n",
@@ -69,7 +72,7 @@ class BLENDERMCP_PT_Panel(bpy.types.Panel):
         layout.operator("blendermcp.start_server")
         layout.operator("blendermcp.stop_server")
         layout.separator()
-        layout.label(text="Port: 8888")
+        layout.label(text=f"Port: {DEFAULT_PORT}")
         layout.label(text="45+ Structured Tools")
 
 

@@ -1,8 +1,10 @@
+# blender_mcp_addon/tools/printing.py
+
 import os
 
-import addon_utils
-import bmesh
-import bpy
+import addon_utils  # type: ignore
+import bmesh  # type: ignore
+import bpy  # type: ignore
 
 from ..utils import get_object
 
@@ -173,13 +175,20 @@ class PrintingTools:
         }
 
     def export_model(self, object_name=None, filepath=None, format="STL", selection_only=True):
-        """Export object(s) to STL or 3MF format."""
+        """Export object(s) to STL or 3MF format. Relative paths are resolved against BLENDER_ASSETS_DIR."""
         if not filepath:
             name_to_use = object_name if object_name else "scene_export"
             ext = ".stl" if format.upper() == "STL" else ".3mf"
             filepath = f"{name_to_use}{ext}"
 
-        # Standardize filepath (bridge server will resolve it if it's relative)
+        # Resolve relative path using BLENDER_ASSETS_DIR
+        if not os.path.isabs(filepath):
+            assets_dir = os.environ.get("BLENDER_ASSETS_DIR")
+            if assets_dir:
+                filepath = os.path.join(assets_dir, filepath)
+            else:
+                filepath = os.path.abspath(filepath)
+
         # Ensure directory path exists
         dirpath = os.path.dirname(filepath)
         if dirpath and not os.path.exists(dirpath):
@@ -214,18 +223,26 @@ class PrintingTools:
                 else:
                     bpy.ops.export_mesh.stl(filepath=filepath, use_selection=selection_only)
             elif format_upper == "3MF":
-                if hasattr(bpy.ops.wm, "three_mf_export"):
-                    bpy.ops.wm.three_mf_export(
-                        filepath=filepath, export_selected_objects=selection_only
+                # 3MF export - preserves materials and colors for multi-color printing
+                # Requires the io_scene_3mf addon: https://extensions.blender.org/add-ons/threemf-io/
+                try:
+                    # Standard operator from io_scene_3mf addon with multi-object support
+                    bpy.ops.export_scene.threemf(
+                        filepath=filepath,
+                        use_selection=selection_only,
+                        export_materials=True,
+                        use_mesh_modifiers=True,
                     )
-                elif hasattr(bpy.ops.export_mesh, "threemf"):
-                    bpy.ops.export_mesh.threemf(filepath=filepath, use_selection=selection_only)
-                elif hasattr(bpy.ops.export_mesh, "three_mf"):
-                    bpy.ops.export_mesh.three_mf(filepath=filepath, use_selection=selection_only)
-                else:
-                    raise AttributeError(
-                        "3MF export operator not found. Ensure a 3MF addon is enabled in Blender."
-                    )
+                except Exception as op_error:
+                    # Try alternative operator name
+                    try:
+                        bpy.ops.export_mesh.threemf(
+                            filepath=filepath, use_selection=selection_only, export_materials=True
+                        )
+                    except Exception as e:
+                        raise AttributeError(
+                            f"3MF export operator not found. Install the threemf_io addon from https://extensions.blender.org/add-ons/threemf-io/ (Error: {op_error})"
+                        ) from e
             else:
                 raise ValueError(f"Unsupported export format: {format}")
         except Exception as e:
@@ -246,4 +263,64 @@ class PrintingTools:
             "filepath": filepath,
             "format": format_upper,
             "message": f"Successfully exported to '{filepath}'.",
+        }
+
+    def import_model(self, filepath):
+        """Import a 3D model file (STL, OBJ, or FBX) into the scene and keep it."""
+        import os
+
+        if not filepath:
+            return {"success": False, "error": "No filepath provided."}
+
+        # Resolve path if relative
+        if not os.path.isabs(filepath):
+            # Check environment variable BLENDER_ASSETS_DIR if it exists
+            assets_dir = os.environ.get("BLENDER_ASSETS_DIR")
+            if assets_dir:
+                filepath = os.path.join(assets_dir, filepath)
+            else:
+                # Try relative to workspace/current dir
+                filepath = os.path.abspath(filepath)
+
+        if not os.path.exists(filepath):
+            return {"success": False, "error": f"File not found: {filepath}"}
+
+        # Deselect all objects first to track what gets imported
+        try:
+            if bpy.context.mode != "OBJECT":
+                bpy.ops.object.mode_set(mode="OBJECT")
+        except Exception:
+            pass
+        bpy.ops.object.select_all(action="DESELECT")
+
+        ext = os.path.splitext(filepath)[1].lower()
+        try:
+            if ext == ".stl":
+                if hasattr(bpy.ops.wm, "stl_import"):
+                    bpy.ops.wm.stl_import(filepath=filepath)
+                else:
+                    bpy.ops.import_mesh.stl(filepath=filepath)
+            elif ext == ".obj":
+                if hasattr(bpy.ops.wm, "obj_import"):
+                    bpy.ops.wm.obj_import(filepath=filepath)
+                else:
+                    bpy.ops.import_scene.obj(filepath=filepath)
+            elif ext == ".fbx":
+                bpy.ops.import_scene.fbx(filepath=filepath)
+            else:
+                return {"success": False, "error": f"Unsupported file format: {ext}"}
+        except Exception as e:
+            return {"success": False, "error": f"Failed to import model: {str(e)}"}
+
+        imported_objects = [o.name for o in bpy.context.selected_objects]
+        if not imported_objects:
+            return {"success": False, "error": "No objects were imported."}
+
+        # Set the active object to the first imported object
+        bpy.context.view_layer.objects.active = bpy.context.selected_objects[0]
+
+        return {
+            "success": True,
+            "message": f"Successfully imported {len(imported_objects)} object(s) from '{filepath}'.",
+            "imported_objects": imported_objects,
         }

@@ -1,3 +1,5 @@
+//session_editor/app.js
+
 addCommandBtn.addEventListener('click', async () => {
     if (availableTools.length === 0) { await fetchTools(); }
     const content = document.getElementById('newCommandTemplate').content.cloneNode(true);
@@ -86,15 +88,107 @@ commandsToggle.addEventListener('click', () => {
     localStorage.setItem('commandsCollapsed', commandsSection.classList.contains('collapsed'));
 });
 
-// Collapsible command list header panel (playback controls)
-const commandListHeaderPanel = document.getElementById('commandListHeaderPanel');
-const commandListHeaderToggle = document.getElementById('commandListHeaderToggle');
-if (localStorage.getItem('commandListHeaderCollapsed') === 'true') {
-    commandListHeaderPanel.classList.add('collapsed');
+// Collapsible playback section
+const playbackSection = document.getElementById('playbackSection');
+const playbackToggle = document.getElementById('playbackToggle');
+if (localStorage.getItem('playbackCollapsed') === 'true') {
+    playbackSection.classList.add('collapsed');
 }
-commandListHeaderToggle.addEventListener('click', () => {
-    commandListHeaderPanel.classList.toggle('collapsed');
-    localStorage.setItem('commandListHeaderCollapsed', commandListHeaderPanel.classList.contains('collapsed'));
+playbackToggle.addEventListener('click', () => {
+    playbackSection.classList.toggle('collapsed');
+    localStorage.setItem('playbackCollapsed', playbackSection.classList.contains('collapsed'));
+});
+
+newSessionBtn.addEventListener('click', async () => {
+    if (currentSession && currentSession.commands && currentSession.commands.length > 0) {
+        const discard = await modal.confirm('Discard Current Session?', 'Starting a new session will discard your unsaved changes. Proceed?');
+        if (!discard) return;
+    }
+
+    const customContent = document.createElement('div');
+    customContent.className = 'new-session-dialog';
+    customContent.innerHTML = `
+        <div class="form-group" style="margin-top: 1rem;">
+            <label for="templateSelect">Choose a Template</label>
+            <select id="templateSelect" class="form-select" style="width: 100%; padding: 0.8rem; background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary); margin-top: 0.5rem;">
+                <option value="blank">Blank Session (Start from Scratch)</option>
+                <option value="3d_print">3D Printing Template (Sets units to mm, scale to 0.001)</option>
+                <option value="stl_edit">STL Edit Template (Set units & Import STL)</option>
+            </select>
+        </div>
+    `;
+
+    if (await modal.show('New Session', 'Create a new Blender MCP session:', 'confirm', customContent)) {
+        const template = customContent.querySelector('#templateSelect').value;
+        const now = Math.floor(Date.now() / 1000);
+        const isoString = new Date().toISOString();
+
+        if (template === 'blank') {
+            currentSession = {
+                metadata: {
+                    name: 'New Blank Session',
+                    model: '',
+                    created_at: isoString,
+                    description: 'A new session started from scratch.'
+                },
+                commands: []
+            };
+        } else if (template === '3d_print') {
+            currentSession = {
+                metadata: {
+                    name: '3D Printing Session',
+                    model: '',
+                    created_at: isoString,
+                    description: '3D printing workflow in millimeters.'
+                },
+                commands: [
+                    {
+                        tool: 'set_scene_units',
+                        arguments: {
+                            system: 'METRIC',
+                            length_unit: 'MILLIMETERS',
+                            scale: 0.001
+                        },
+                        timestamp: now,
+                        description: 'Configure scene units to millimeters and set unit scale to 0.001 (divide by 1000).'
+                    }
+                ]
+            };
+        } else if (template === 'stl_edit') {
+            currentSession = {
+                metadata: {
+                    name: 'STL Edit Session',
+                    model: '',
+                    created_at: isoString,
+                    description: 'Import STL and prepare for editing.'
+                },
+                commands: [
+                    {
+                        tool: 'set_scene_units',
+                        arguments: {
+                            system: 'METRIC',
+                            length_unit: 'MILLIMETERS',
+                            scale: 0.001
+                        },
+                        timestamp: now,
+                        description: 'Configure scene units to millimeters and set unit scale to 0.001 (divide by 1000).'
+                    },
+                    {
+                        tool: 'import_model',
+                        arguments: {
+                            filepath: 'assets/3DBenchy.stl'
+                        },
+                        timestamp: now + 1,
+                        description: 'Import the base STL model to modify.'
+                    }
+                ]
+            };
+        }
+
+        renderSession();
+        resetExecutionState();
+        saveBtn.disabled = playAllBtn.disabled = playBtn.disabled = false;
+    }
 });
 
 loadBtn.addEventListener('click', () => fileInput.click());
@@ -120,6 +214,16 @@ fileInput.addEventListener('change', (e) => {
 });
 
 commandFilter.addEventListener('input', renderCommands);
+
+sessionName.addEventListener('input', (e) => {
+    if (currentSession && currentSession.metadata) currentSession.metadata.name = e.target.value;
+});
+sessionModel.addEventListener('input', (e) => {
+    if (currentSession && currentSession.metadata) currentSession.metadata.model = e.target.value;
+});
+sessionDescription.addEventListener('input', (e) => {
+    if (currentSession && currentSession.metadata) currentSession.metadata.description = e.target.value;
+});
 saveBtn.addEventListener('click', () => {
     if (!currentSession) return;
     const blob = new Blob([JSON.stringify(currentSession, null, 2)], { type: 'application/json' });

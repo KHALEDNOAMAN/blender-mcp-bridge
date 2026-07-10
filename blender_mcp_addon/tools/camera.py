@@ -1,7 +1,9 @@
+# blender_mcp_addon/tools/camera.py
+
 import math
 
-import bpy
-from mathutils import Vector
+import bpy  # type: ignore
+from mathutils import Vector  # type: ignore
 
 from ..utils import get_object
 

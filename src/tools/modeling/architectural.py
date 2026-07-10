@@ -1,3 +1,5 @@
+# src/tools/modeling/architectural.py
+
 from mcp import types
 
 

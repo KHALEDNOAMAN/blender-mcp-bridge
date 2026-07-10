@@ -1,4 +1,6 @@
-import bpy
+# blender_mcp_addon/tools/collections.py
+
+import bpy  # type: ignore
 
 from ..utils import get_collection, get_object
 

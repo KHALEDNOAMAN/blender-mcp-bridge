@@ -1,3 +1,5 @@
+# tests/scenarios/grid_layout.py
+
 from tests.scenarios.modules.row_collections import create_collections_row
 from tests.scenarios.modules.row_modifiers import create_modifiers_row
 from tests.scenarios.modules.row_operators import create_operators_row
@@ -11,7 +13,7 @@ class GridLayoutScenario:
     def __init__(self, client: MCPClient):
         self.client = client
 
-    def run(self, module: str = None):
+    def run(self, module: str | None = None):
         print(f"Starting Grid Layout Scenario (Modular) - Module: {module or 'ALL'}...")
 
         if not module or module == "primitives":

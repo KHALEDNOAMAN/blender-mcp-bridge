@@ -1,8 +1,10 @@
+# blender_mcp_addon/tools/modeling/architectural.py
+
 import math
 
-import bmesh
-import bpy
-import mathutils
+import bmesh  # type: ignore
+import bpy  # type: ignore
+import mathutils  # type: ignore
 
 from ...utils import get_collection, get_object
 

@@ -1,10 +1,12 @@
+# blender_mcp_addon/server.py
+
 import json
 import queue
 import socket
 import threading
 import traceback
 
-import bpy
+import bpy  # type: ignore
 
 from .tools.animation import AnimationTools
 from .tools.camera import CameraTools
@@ -17,6 +19,7 @@ from .tools.printing import PrintingTools
 from .tools.rendering import RenderingTools
 from .tools.scene import SceneTools
 from .tools.sculpting import SculptingTools
+from .utils import DEFAULT_HOST, DEFAULT_PORT
 
 
 class BlenderMCPServer(
@@ -35,7 +38,7 @@ class BlenderMCPServer(
     """Blender MCP Server for n8n with componentized tools"""
 
     def __init__(self):
-        self.server_socket = None
+        self.server_socket: socket.socket | None = None
         self.running = False
         self.server_thread = None
         self.command_queue = queue.Queue()
@@ -85,10 +88,11 @@ class BlenderMCPServer(
             "bound_box": bound_box,
         }
 
-    def start_server(self, host="0.0.0.0", port=8888):
+    def start_server(self, host=DEFAULT_HOST, port=DEFAULT_PORT):
         if self.running:
             return
         try:
+            self.addon_log("Attempting to start MCP Server...")
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.server_socket.bind((host, port))
@@ -97,10 +101,14 @@ class BlenderMCPServer(
             self.server_thread = threading.Thread(target=self._server_loop, daemon=True)
             self.server_thread.start()
             self._register_timer()
+            self.addon_log(f"MCP Server successfully started on {host}:{port}")
             print(f"MCP Server started on {host}:{port}")
         except Exception as e:
-            print(f"Failed to start server: {e}")
-            traceback.print_exc()
+            import traceback
+
+            error_msg = f"Failed to start server: {e}\n{traceback.format_exc()}"
+            print(error_msg)
+            self.addon_log(error_msg)
 
     def _register_timer(self):
         if self.timer_handle:
@@ -129,6 +137,8 @@ class BlenderMCPServer(
     def _server_loop(self):
         while self.running:
             try:
+                if not self.server_socket:  # type: ignore
+                    break
                 self.server_socket.settimeout(1.0)
                 try:
                     client, _ = self.server_socket.accept()
@@ -263,6 +273,7 @@ class BlenderMCPServer(
             "create_text": self.create_text,
             "create_plane": self.create_plane,
             "create_empty": self.create_empty,
+            "create_polygon": self.create_polygon,
             "duplicate_object": self.duplicate_object,
             "duplicate_selection": self.duplicate_selection,
             "create_and_array": self.create_and_array,
@@ -329,6 +340,7 @@ class BlenderMCPServer(
             "repair_mesh": self.repair_mesh,
             "apply_voxel_remesh": self.apply_voxel_remesh,
             "export_model": self.export_model,
+            "import_model": self.import_model,
             # Sculpting
             "enter_sculpt_mode": self.enter_sculpt_mode,
             "exit_sculpt_mode": self.exit_sculpt_mode,

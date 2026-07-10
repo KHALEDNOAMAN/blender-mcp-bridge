@@ -1,6 +1,8 @@
+# blender_mcp_addon/tools/animation.py
+
 import math
 
-import bpy
+import bpy  # type: ignore
 
 from ..utils import get_object
 

@@ -1,3 +1,5 @@
+# tests/scenarios/arch_layout.py
+
 """
 HDB 3-Room Flat - Integration Test Scenario (Synced with my_session.json)
 ========================================================================

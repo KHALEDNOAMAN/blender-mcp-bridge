@@ -1,3 +1,5 @@
+# src/tools/lighting.py
+
 from mcp import types
 
 

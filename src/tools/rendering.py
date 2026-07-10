@@ -1,3 +1,5 @@
+# src/tools/rendering.py
+
 from mcp import types
 
 

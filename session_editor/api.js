@@ -1,3 +1,5 @@
+//session_editor/api.js
+
 async function checkConnection() {
     const ports = [8008, 8000];
     for (const port of ports) {

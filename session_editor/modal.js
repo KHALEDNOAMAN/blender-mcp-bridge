@@ -1,3 +1,5 @@
+//session_editor/modal.js
+
 const modal = {
     overlay: document.getElementById('modalOverlay'),
     title: document.getElementById('modalTitle'),

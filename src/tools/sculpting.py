@@ -1,3 +1,5 @@
+# src/tools/sculpting.py
+
 from mcp import types
 
 

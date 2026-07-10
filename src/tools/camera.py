@@ -1,3 +1,5 @@
+# src/tools/camera.py
+
 from mcp import types
 
 

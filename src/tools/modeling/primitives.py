@@ -1,3 +1,5 @@
+# src/tools/modeling/primitives.py
+
 from mcp import types
 
 
@@ -349,6 +351,65 @@ def get_primitive_tools() -> list[types.Tool]:
                     },
                 },
                 "required": ["location"],
+            },
+        ),
+        types.Tool(
+            name="create_polygon",
+            description="Create a flat polygon mesh from exact vertex coordinates, then optionally extrude for thickness. Perfect for trapezoids, triangles, or any custom flat shape where you need precise control over each corner position.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "vertices": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {"type": "number"},
+                        },
+                        "description": "List of [x, y] or [x, y, z] vertex positions defining the polygon outline (ordered CW or CCW). Values are in scene units (mm when scene is MILLIMETERS).",
+                    },
+                    "location": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "XYZ world-space origin for the object",
+                    },
+                    "extrude": {
+                        "type": "number",
+                        "description": "If > 0, extrude the polygon upward (+Z) by this amount to create a solid (in scene units).",
+                        "default": 0,
+                    },
+                    "taper": {
+                        "type": "number",
+                        "description": "Optional: Scale multiplier applied to the extruded top face in X and Y relative to the centroid (e.g. 1.2 to flare outwards, 0.8 to taper inwards). Default is 1.0.",
+                        "default": 1.0,
+                    },
+                    "top_vertices": {
+                        "anyOf": [
+                            {
+                                "type": "array",
+                                "items": {"type": "array", "items": {"type": "number"}},
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "array",
+                                    "items": {"type": "array", "items": {"type": "number"}},
+                                },
+                            },
+                        ],
+                        "description": "Optional: Exact coordinates of the top face vertices (2D array for a single layer, or 3D array of layers for multi-layer lofting).",
+                    },
+                    "name": {"type": "string", "description": "Object name"},
+                    "rotation": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Optional: Euler rotation in degrees [X, Y, Z]",
+                    },
+                    "collection": {
+                        "type": "string",
+                        "description": "Optional: Name of the collection to move the object to.",
+                    },
+                },
+                "required": ["vertices", "location"],
             },
         ),
     ]

@@ -1,14 +1,14 @@
-# Sculpted Mushroom Keychain
+# Sculpted Mushroom Keychain — Red Cap, White Spots
 
-An organic mushroom keychain that combines primitive modeling, boolean cutting,
-freeform sculpting, and 3D-print prep into one build — created with the
-Blender MCP server driven by an n8n agent. The stem has a keyring hole
-drilled straight through it (rather than a separate ring loop), keeping the
-model simple to print with no thin, fragile geometry.
+A two-color sculpted mushroom keychain built in three phases: cap sculpting, undercut with
+bell chamber, then 13 warts socketed onto the finished smooth surface. Red cap, white spots
+and stem for the classic amanita two-color 3D print. The stem has a keyring hole drilled
+straight through it, keeping geometry simple with no fragile parts.
 
-**Model Used:** z-ai/glm-5v-turbo (via OpenRouter)
+**Model Used:** claude-fable-5 (Claude Code)
 
-![Mushroom Keychain Workflow](assets/images/keychain_workflow.png)
+![Mushroom Keychain Stem](assets/images/keychain_stem.png)
+![Mushroom Keychain Cap](assets/images/keychain_cap.png)
 
 ## How to Replay
 
@@ -18,531 +18,99 @@ To recreate this keychain in your own Blender instance, ensure the MCP server is
 python -m src.main play community/mushroom_keychain/session.json
 ```
 
-## User Prompts to Recreate in Blender
+One replay produces the complete two-color mushroom and exports two **same-origin** STL files:
+- `mushroom_cap_red.stl` — the red cap
+- `mushroom_stem_white.stl` — the white body (stem + 13 spots)
 
-### 1. Project Initialization
-**User:**
-> Create a new collection called 'MushroomKeychain' and make it active. Set the scene units to metric millimeters for 3D printing.
+Both files share the same world coordinates, so they reassemble perfectly in the slicer.
+The session is idempotent: it wipes the scene and rebuilds from scratch every run.
 
-**Assistant:**
-> All done! Here's what I set up:
->
-> | Task | Status |
-> |---|---|
-> | Collection 'MushroomKeychain' | Created (or already existed) |
-> | Active Collection | Now set to MushroomKeychain — all new objects will go here |
-> | Scene Units | Metric Millimeters with scale 0.001 — ready for 3D printing |
->
-> Your workspace is now configured! Any objects we create will be placed in the MushroomKeychain collection, and the units are set so 1 Blender unit = 1 mm — perfect for exporting to STL/3MF for slicing.
->
-> What would you like to create first?
-
----
-
-### 2. The Stem
-**User:**
-> Create a cone named 'Stem' — 5mm base radius tapering to 4mm at the top, 20mm tall, standing upright with its base on the ground plane (location Z = 10mm). Put it in the MushroomKeychain collection.
-
-**Assistant:**
-> Done! Here's the Stem cone:
->
-> | Property | Value |
-> |---|---|
-> | Name | Stem |
-> | Type | Cone |
-> | Base Radius (bottom) | 5 mm |
-> | Top Radius | 4 mm (slight taper inward) |
-> | Height | 20 mm |
-> | Location | [0, 0, 10] mm — base at Z=0, top at Z=20 |
-> | Collection | MushroomKeychain |
->
-> The stem is standing upright with its base on the ground plane. The slight taper from 5mm → 4mm gives it a natural mushroom stem shape.
->
-> Ready for the cap next?
-
----
-
-### 3. The Cap
-**User:**
-> Create an icosphere named 'Cap' with a 14mm radius, 3 subdivisions for smooth sculpting, centered at Z = 20mm — exactly at the Stem's top — so it embeds into the Stem rather than resting on top of it.
-
-**Assistant:**
-> Done! Here's your Cap icosphere:
->
-> | Property | Value |
-> |---|---|
-> | Name | Cap |
-> | Type | Icosphere |
-> | Radius | 14 mm (28 mm diameter) |
-> | Subdivisions | 3 — smooth enough for sculpting |
-> | Location | [0, 0, 20] mm |
-> | Collection | MushroomKeychain |
->
-> How they fit together:
-> ```
->        ╭───────╮  ← Z = 34 mm (Cap top)
->       /   Cap   \     radius = 14mm
->      │  (sphere) │
->      │     ●     │ ← Z = 20 mm (Cap center = Stem top)
->      │    /|\    │
->      │   / │ \   │ ← Overlap zone! Cap embeds into Stem
->      │  /  │  \  │
->      │ /  Stem \ │
->      |/   cone  \│
->      ╰───────────╯  ← Z = 0 mm (Stem base)
-> ```
->
-> The Cap is centered right where the Stem's top is, so the sphere embeds ~14mm into the stem — perfect for a natural mushroom look! Once we join them together later, it'll be a seamless shape.
->
-> Ready for some sculpting details like spots, curves, or a keyring loop?
-
----
-
-### 4. Ring Hole (Keychain Attachment)
-**User:**
-> Create a cylinder named 'RingHole', 1mm radius, 20mm long, rotated 90° about Y so it lies horizontal, positioned at Z = 4mm above the ground plane.
-
-**Assistant:**
-> Done! Here's your RingHole:
->
-> | Property | Value |
-> |---|---|
-> | Name | RingHole |
-> | Type | Cylinder |
-> | Radius | 1 mm (2mm diameter hole) |
-> | Length | 20 mm (horizontal) |
-> | Rotation | 90° about Y-axis (lies flat along X) |
-> | Location | [0, 0, 4] mm — centered at Z=4 |
-> | Collection | MushroomKeychain |
->
-> Current model layout:
-> ```
->        ╭───────╮  ← Cap (sphere, r=14mm)
->       /         \
->      │     ●     │ ← Z = 20
->      │    /|\    │
->      │   / │ \   │
->      │  /  │  \  │
->──────│─●───┼───●─│──← RingHole (horizontal, Z=4)
->      │ /  Stem  \│
->      ╰───────────╯  ← Z = 0-10
-> ```
->
-> The RingHole passes horizontally through the lower part of the stem at Z=4mm — perfect positioning! Once we use a boolean difference to cut this out, it'll create a clean keyring hole through the mushroom body.
->
-> Ready to join the parts and cut the ring hole, or add more details first?
-
-**User:**
-> Boolean-difference RingHole from Stem using the EXACT solver.
-
-**Assistant:**
-> Done! Boolean DIFFERENCE applied successfully:
->
-> | Detail | Value |
-> |---|---|
-> | Base Object | Stem |
-> | Cutter | RingHole |
-> | Operation | DIFFERENCE (cut hole) |
-> | Solver | EXACT (clean geometry) |
-> | Cutter Status | Hidden |
->
-> Result:
-> ```
->        ╭───────╮  ← Cap (sphere)
->       /         \
->      │     ●     │
->      │    /|\    │
->      │   / │ \   │
->      │  /  │  \  │
->──────│─○───┼───○─│──← Clean 2mm hole through Stem!
->      │ / (hole) \│     RingHole hidden
->      ╰───────────╯
-> ```
->
-> The Stem now has a clean horizontal keyring hole through it at Z=4mm. The RingHole cutter is hidden so it won't show in renders or exports.
->
-> Next steps could be:
-> - Join Stem + Cap into one solid piece
-> - Sculpt the cap into a more mushroom-like dome shape with spots
-> - Add a base/stand or flatten the bottom
->
-> What would you like to do next?
-
-**User:**
-> Apply all modifiers on Stem to permanently bake the hole in.
-
-**Assistant:**
-> Done! All modifiers on Stem have been baked into the mesh:
->
-> | Detail | Status |
-> |---|---|
-> | Object | Stem |
-> | Modifiers Applied | Boolean (RingHole cut) — now permanent geometry |
-> | Mesh Status | Clean, solid mesh with keyring hole baked in |
->
-> Current state:
-> ```
->        ╭───────╮  ← Cap (separate icosphere)
->       /         \
->      │     ●     │
->      │    /|\    │
->      │   / │ \   │
->      │  /  │  \  │
->──────│─○───┼───○─│──← Hole is NOW part of the actual mesh!
->      │/ (baked) \│     No more modifier stack
->      ╰───────────╯
-> ```
->
-> The hole is now permanent vertex geometry — no more dependency on the RingHole object or the Boolean modifier. The Stem is ready for:
-> - Joining with Cap (into one solid piece)
-> - Sculpting details (dome shaping, gills, spots)
-> - Exporting to STL/3MF
->
-> What's next?
-
-**User:**
-> Delete RingHole.
-
-**Assistant:**
-> Done! RingHole deleted permanently.
->
-> | Object | Status |
-> |---|---|
-> | Stem | Cone with baked keyring hole |
-> | Cap | Icosphere (r=14mm) |
-> | RingHole | Deleted |
->
-> Clean workspace! Ready for the next step — join, sculpt, or export?
+**Checkpoint: Inspect Phases**
+Use the session editor to stop at these phase markers and view intermediate results:
+- **End of Phase 1** (command 15): Sculpted dome with organic bumps, X-symmetrized — before the undercut
+- **End of Phase 2** (command 23): Smooth cap with bell undercut and flat bottom — before warts are added
 
 > [!IMPORTANT]
-> Apply the modifier **before** deleting the cutter, not after. If the cutter object is deleted while the Boolean modifier is still un-applied, the modifier silently loses its target and reverts to doing nothing — you'll get a solid Stem with no hole and no error message.
+> Use the current bundled Blender addon (`blender_mcp_addon/`) — this session relies on
+> its batch-safe `delete *`, exact boolean solvers, and modifier baking. Older addon builds
+> may fail the cleanup or produce misaligned geometry on the undercut.
 
----
+## What the Session Builds
 
-### 5. Squash the Cap into a Dome
-**User:**
-> Squash the Cap flatter along its vertical axis so it looks like a dome instead of a full sphere, and apply the scale transform.
+| Stage | Highlights |
+|---|---|
+| Stem | Tapered cone (5 → 4 mm, 24 mm tall) with keyring hole (ø2 mm, re-drilled post-remesh for crispness) |
+| Cap — Phase 1 | Flattened icosphere (14 mm r, 0.55 scale), squashed dome shape, sculpted with inflate + grab for organic bumps, X-symmetrized |
+| Cap — Phase 2 | **Undercut** — flat slice at Z=19 removes the ellipsoid's curl-under lower wall (proven root cause of earlier shattering). Bell hollowed into flat face: ceiling Z=21.4 (50% green-line height), opening r~12.2, flat rim ring 3.2 mm (sized so every wart keeps ≥1 mm cap wall above bell). Then 0.25 mm voxel remesh + Laplacian smooth. **Nothing smooths after this** — warts cannot be erased. |
+| Spores — Phase 3 | 13 white warts (r=2.0–3.6 mm, subdivision 4) positioned to socket into the red cap with verified ≥1.00 mm clearance above bell. Stem trimmed to bell ceiling, joined with warts into MushroomWhite body. |
+| Materials | Red cap (RGB 0.8, 0.05, 0.05); white body (RGB 0.92, 0.92, 0.90) — colors baked for slicer visibility |
+| Print prep | Bake all booleans → remesh + smooth cap → trim stem → join stem + warts → `check_mesh_for_printing` on both bodies → export two aligned STLs |
 
-**Assistant:**
-> Done! Cap is now a proper mushroom dome:
->
-> | Step | Status |
-> |---|---|
-> | Scale Z | Squashed to 0.55× (55% of original height) |
-> | Transforms Applied | Baked into mesh vertices |
->
-> Before → After:
-> ```
->   BEFORE (full sphere):        AFTER (dome):
->       ╭───────╮                  ╭─────────╮
->      │         │                ╰─── Cap ───╯
->      │   Cap   │                ╱           ╲
->       ╰───────╯                │      ● Z=20 │ ← flatter, wider
->                                │     /|\     │
->                                │    / │ \    │
->                                │   / Stem\   │
->                                ╰─────────────╯
-> ```
->
-> The cap now looks like a classic mushroom dome — wider and flatter than a full sphere! Height reduced from ~28mm to ~15.4mm while keeping the width.
->
-> Ready to join Stem + Cap into one solid piece?
+## Hard-Won Lessons Baked Into This Session
 
----
+- **Boolean difference after smooth destroys geometry.** Cutting warts INTO the smooth cap via DIFFERENCE broke the undercut and bell. **Fix:** Keep warts as separate white objects, trim stem against cap edge, join stem + warts into one body for printing.
+- **The undercut at Z=19 is load-bearing.** It kills the curl-under wall where the old ellipsoid tried to punch through in X/Y. Without it, any socket-cutter will rupture side walls.
+- **Re-drill holes AFTER remesh + smooth.** The keyring hole closes or distorts during remesh; cutting it again post-smooth gives a crisp bore.
+- **STL carries no color.** Cap and stem/warts are exported as two same-origin STLs; the Blender materials (red and white) only style the viewport. Color comes from importing both files as one multi-part object in the slicer and assigning a filament per part.
 
-### 6. Round Out the Dome
-**User:**
-> Enter sculpt mode on Cap and inflate it outward by about 1.5mm to round out the dome, but mask anything below the flat underside so that stays untouched. Exit sculpt mode.
+## Printing (Bambu Studio Two-Color Setup)
 
-**Assistant:**
-> Done! Sculpting complete:
->
-> | Step | Status |
-> |---|---|
-> | Enter Sculpt Mode | Done |
-> | Inflate +1.5mm | 161 vertices affected (dome only) |
-> | Mask Below Z=12.5 | Flat underside protected |
-> | Exit Sculpt Mode | Back to Object Mode |
->
-> Result:
-> ```
->           ╭─────────╮  ← Rounded dome (inflated ~1.5mm outward)
->          ╰─── Cap ───╯
->         ╱   (plump!)  ╲
->        │      ● Z=20   │
->        │     /|\       │
->        │    / │ \      │
->        │   / Stem\     │
->        ╰──────┬────────╯
->               ╰────── Underside untouched (flat)
-> ```
->
-> The cap now has a plumper, rounder mushroom dome shape — the top and sides got the inflation treatment, while the flat underside where it meets the stem stayed perfectly still.
->
-> Ready for spots, joining with Stem, or something else?
+The key step: import **both STLs together as one multi-part object**. Filament assignment in
+Bambu Studio happens per *part*, and parts only exist when the files are loaded as one object.
 
----
+1. **Add two filaments first.** In the Prepare tab's **Filament** section, click **+** so the
+   project has two filament slots: **1 = red**, **2 = white**. With only one slot defined,
+   every part points at the same filament and "changing the color" recolors the whole model.
+2. **File → Import**, and select **both** `mushroom_cap_red.stl` and `mushroom_stem_white.stl`
+   **in the same import dialog**.
+3. Bambu Studio asks: *"Load these files as a single object with multiple parts?"* → click **Yes**.
+   The cap and body snap into their original assembled positions (they share the same origin).
+4. Assign colors in the **Objects tab**, not the 3D viewport — clicking the model in the
+   viewport always selects the whole object; parts are only reachable in the list. In the left
+   sidebar switch **Global → Objects**, click the **expand arrow (▸)** on the object, and set
+   the filament dropdown on each **part row**:
+   - `mushroom_cap_red` part → filament **1** (red)
+   - `mushroom_stem_white` part → filament **2** (white)
 
-### 7. One Organic Bump
-**User:**
-> Enter sculpt mode on Cap again and use the grab tool to pull one small bump on the edge of the dome outward, to make it look a bit more organic and less perfectly round. Exit sculpt mode.
+   If the object shows **no expand arrow**, the meshes fused into one part on import —
+   right-click the object → **Split → To parts**, then assign red to the cap row and white
+   to the stem + spot rows (splitting is by loose shells, so the spots become their own rows).
+5. Enable supports: **Support → Tree (auto)**. Upright, the flat rim ring under the cap is a
+   near-horizontal overhang and needs them — but the trees only touch the under-cap region,
+   so the scars are hidden on the finished piece.
+6. Slice and print. The model prints upright — flat stem base on the plate.
 
-**Assistant:**
-> Done! Organic bump added:
->
-> | Step | Status |
-> |---|---|
-> | Enter Sculpt Mode | Done |
-> | Grab Bump | 3 vertices pulled at [12, 6, 17] |
-> | Direction | Outward + upward + right (+0.9, +0.4, +0.8mm) |
-> | Radius | 3mm (small localized area) |
-> | Exit Sculpt Mode | Back to Object Mode |
->
-> Result:
-> ```
->           ╭──────────╮
->          │   (dome)   │
->         ╱     ●      ┃ ← small organic bump pulled out here!
->        │     Z=20     │
->        │     /|\      │
->        │    / │ \     │
->        │   / Stem\    │
->        ╰──────┬───────╯
-> ```
->
-> The cap now has a subtle organic irregularity — no longer a mathematically perfect dome, but with a tiny natural-looking bulge on one edge. Makes it look more like a real mushroom!
->
-> Want to add a few more bumps for character, or move on to spots / gills / joining?
+> [!WARNING]
+> If you import the files one at a time (or answer **No**), they load as two independent
+> objects: Bambu Studio scatters them across the plate and per-part coloring won't work.
+> Delete them and re-import both together.
 
----
+### Print Notes
 
-### 8. Symmetrize
-**User:**
-> Symmetrize the Cap across the X axis so both halves match.
+- The white spots sit half-buried in the cap — the overlap is intentional. Slicers resolve
+  interpenetrating parts cleanly: the wart volume prints white, the cap volume red.
+- **Don't tilt the model hoping to skip supports.** Tilted 45°, the mushroom rests on a
+  knife-edge of cap rim and needs supports just to stand — relocated onto the visible cap
+  surface. Upright with tree supports puts all contact marks under the cap where they're
+  invisible. (To compare orientations yourself, rotate in the slicer — the multi-part object
+  rotates as one — and check the sliced support volume.)
+- Print time — ~30-45 min depending on layer height and infill (keychain scale).
 
-**Assistant:**
-> Done! Cap symmetrized:
->
-> | Detail | Value |
-> |---|---|
-> | Object | Cap |
-> | Axis | X (left ↔ right) |
-> | Source Side | Positive X → mirrored to Negative X |
->
-> Result:
-> ```
->            ╭─────────╮
->           │   (dome)   │
->        ╭─╱     ●      ╲─╮  ← Matching bumps on BOTH sides!
->       │                  │
->       │       Z=20       │
->       │       /|\        │
->       │      / │ \       │
->       │     / Stem\      │
->       ╰────────┬─────────╯
-> ```
->
-> The cap now has mirror-symmetric organic bumps on both sides — looks like a naturally balanced, slightly irregular mushroom dome! Perfect symmetry for a clean 3D print.
->
-> Ready to join Stem + Cap, add spots, or something else?
+Result: classic red amanita cap with crisp white warts, white stem meeting the bell interior,
+keyring hole threaded through the stem.
 
----
+**Note:** Bambu Studio may show a configuration warning about "ensure_vertical_shell_thickness"
+being replaced with "enabled". This is normal and does not affect the print quality — simply
+click OK to dismiss it.
 
-### 9. Join
-**User:**
-> Join Stem and Cap into a single object named 'MushroomKeychain'.
+### STL Render
 
-**Assistant:**
-> Done! MushroomKeychain created:
->
-> | Detail | Value |
-> |---|---|
-> | Joined Objects | Stem + Cap |
-> | New Name | MushroomKeychain |
-> | Status | Single solid mesh |
->
-> Final Model:
-> ```
->            ╭─────────╮
->           │  (dome)   │
->        ╭─╱    ●       ╲─╮  ← Symmetric organic bumps
->       │                  │
->       │       Z=20       │  ← Cap embedded into stem
->       │       /|\        │
->───────│  ───○──┼──○──────│──← Baked keyring hole!
->       │     / Stem\      │
->       ╰──────────────────╯
-> ```
->
-> Complete Feature List:
->
-> | Feature | Details |
-> |---|---|
-> | Stem | Tapered cone (5mm → 4mm, 20mm tall) with keyring hole baked in |
-> | Cap | Flattened dome, inflated, organic bumps, X-symmetrized |
-> | Hole | 2mm × 20mm horizontal through lower stem at Z=4mm |
-> | Object | Single unified mesh — ready for export! |
->
-> Want to add material/color, check mesh for printing, or export to STL/3MF?
+![Mushroom Keychain STL Render](assets/images/keychain_render.png)
+*The complete exported model showing the assembled red cap with white warts and stem.*
 
----
+### Printed Result
 
-### 10. Voxel Remesh
-**User:**
-> Apply a voxel remesh to MushroomKeychain with a small voxel size (around 0.5mm) to fuse all the parts into one watertight solid.
-
-**Assistant:**
-> Done! MushroomKeychain is now a watertight solid:
->
-> | Detail | Value |
-> |---|---|
-> | Voxel Size | 0.5mm |
-> | Adaptivity | 0 (uniform detail) |
-> | Loose Parts Cleaned | Done |
->
-> Mesh Check Results:
->
-> | Check | Status |
-> |---|---|
-> | Watertight | YES |
-> | Boundary Edges (holes) | 0 |
-> | Non-manifold Edges | 0 |
-> | Degenerate Edges/Faces | 24 / 5 (negligible) |
-> | Volume | 9,745 mm³ (~9.7 cm³) |
->
-> Your Mushroom Keychain is PRINT-READY!
-> ```
->            ╭────────╮
->           │  ╲__╱    │    ← One solid piece!
->        ╭─╱   dome    ╲─╮       No internal faces
->       │       ●        │       No holes (except keyring!)
->───────│───○───┼───○────│    ← Clean manifold geometry
->       │    / stem\     │       Watertight
->       ╰────────────────╯
-> ```
->
-> Next options:
-> - Export to STL/3MF for printing
-> - Add a red cap + beige stem material
-> - Check mesh again with check_mesh_for_printing
->
-> What would you like to do?
-
----
-
-### 11. Smooth
-**User:**
-> Smooth the MushroomKeychain mesh a couple of passes to clean up any blocky remesh artifacts.
-
-**Assistant:**
-> Done! MushroomKeychain smoothed:
->
-> | Detail | Value |
-> |---|---|
-> | Smoothing Passes | 3 |
-> | Strength per Pass | 0.5 (medium) |
->
-> Result:
-> ```
->   BEFORE (blocky):          AFTER (smooth):
->   ┌───────────┐            ╭────────────╮
->  ╱ ▓▓▓▒▒▒░░░░░░╲           │  (smooth)  │
-> │ ▓▓▓▒▒▒░░░░░░░░│         ╱    dome      ╲
->  ╲▓▓▓▒▒▒░░░░░░░╱          │      ●       │
->                           │     /|\      │
->                           │    /Stem\    │
->                           ╰──────────────╯
-> ```
->
-> The voxel remesh blocky edges are now rounded and clean — the mushroom surface will feel smooth to the touch when printed!
->
-> Print-Ready Summary:
->
-> | Feature | Status |
-> |---|---|
-> | Watertight | Yes |
-> | Smooth Surface | 3 passes |
-> | Keyring Hole | Baked in |
-> | Organic Shape | Symmetric bumps |
->
-> Ready to export, add colors, or check for printing?
-
----
-
-### 12. Print Readiness Check
-**User:**
-> Check MushroomKeychain for 3D printing readiness — tell me if it's watertight and report any problem edges.
-
-**Assistant:**
-> MushroomKeychain — 3D Printing Report
->
-> | Check | Result | Status |
-> |---|---|---|
-> | Watertight | YES | PASS |
-> | Boundary Edges (holes) | 0 | PASS |
-> | Non-manifold Edges (T-junctions) | 0 | PASS |
-> | Degenerate Edges | 0 | PASS |
-> | Degenerate Faces | 0 | PASS |
-> | Volume | 9,723 mm³ (~9.7 cm³) | Solid |
->
-> PERFECT SCORE — Ready to Print!
-> ```
->            ╭────────╮
->           │   ╲__╱   │
->        ╭─╱    dome    ╲─╮
->       │        ●         │
->───────│──○─────┼────○────│  ← Clean hole, clean mesh
->       │     /stem\       │
->       ╰──────────────────╯
-> ```
->
-> Summary:
-> - Zero problem edges — smoothing cleaned up the few degenerates from remesh
-> - Fully watertight — slicer will accept it without errors
-> - Volume ~9.7 cm³ — lightweight keychain, prints fast!
->
-> Ready to export? I can save it as STL or 3MF right now!
-
----
-
-### 13. Export
-**User:**
-> Export MushroomKeychain as an STL file called 'mushroom_keychain.stl'.
-
-**Assistant:**
-> Done! Exported successfully!
->
-> | Detail | Value |
-> |---|---|
-> | File | mushroom_keychain.stl |
-> | Format | STL (triangulated mesh) |
-> | Location | ~/blender-mcp-n8n/assets/mushroom_keychain.stl |
->
-> Your Mushroom Keychain is ready for printing!
-> ```
->            ╭─────────╮
->           │   ╲__╱    │
->        ╭─╱    dome    ╲─╮
->       │        ●         │
->───────│──○─────┼────○────│  ← Keyring hole
->       │     /stem\       │
->       ╰──────────────────╯
-> ```
->
-> Complete Build Summary:
->
-> | Step | Done |
-> |---|---|
-> | Stem (cone with keyring hole) | ✅ |
-> | Cap (flattened dome, inflated, bumps, symmetrized) | ✅ |
-> | Joined into one piece | ✅ |
-> | Voxel remesh (watertight solid) | ✅ |
-> | Smoothed (3 passes) | ✅ |
-> | Mesh check passed | ✅ |
-> | Exported to STL | ✅ |
->
-> Load `mushroom_keychain.stl` into your slicer (Cura, PrusaSlicer, BambuStudio) and print! 🍄🔑
-
-![Mushroom Keychain Preview](assets/images/keychain_preview.png)
+![Mushroom Keychain Printed](assets/images/mushroom_printed.jpeg)
+*The final two-color 3D printed mushroom keychain — red cap, white spores and stem.*
 
 ---

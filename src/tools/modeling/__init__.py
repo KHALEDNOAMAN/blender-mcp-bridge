@@ -1,3 +1,5 @@
+# src/tools/modeling/__init__.py
+
 from mcp import types
 
 from .architectural import get_architectural_tools

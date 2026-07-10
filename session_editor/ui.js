@@ -1,3 +1,5 @@
+//session_editor/ui.js
+
 function stringifyCompact(obj) {
     const json = JSON.stringify(obj, null, 2);
     return json.replace(/\[\s+([^\[\{\]]+)\s+\]/g, (match, p1) => {

@@ -1,7 +1,9 @@
+# blender_mcp_addon/tools/modeling/transforms.py
+
 import math
 
-import bpy
-import mathutils
+import bpy  # type: ignore
+import mathutils  # type: ignore
 
 from ...utils import get_collection, get_object
 
@@ -49,7 +51,7 @@ class ModelingTransforms:
             new_obj.scale = scale
 
         if collection:
-            self._move_to_collection_helper(new_obj, collection)
+            self._move_to_collection_helper(new_obj, collection)  # type: ignore
 
         removed_count = 0
         if remove_modifiers:
@@ -119,7 +121,7 @@ class ModelingTransforms:
                     new_obj.scale = scale
 
                 if collection:
-                    self._move_to_collection_helper(new_obj, collection)
+                    self._move_to_collection_helper(new_obj, collection)  # type: ignore
 
                 removed_count = 0
                 if remove_modifiers:
@@ -265,11 +267,21 @@ class ModelingTransforms:
         bpy.context.view_layer.objects.active = obj
         # Copy names first to avoid list mutation issues during iteration
         mod_names = [mod.name for mod in obj.modifiers]
+        failures = []
         for name in mod_names:
             try:
                 bpy.ops.object.modifier_apply(modifier=name)
             except Exception as e:
                 print(f"[MCP] Failed to apply modifier {name} on {object_name}: {e}")
+                failures.append(f"'{name}': {e}")
+        if failures:
+            # A silently skipped modifier leaves the object in a state later
+            # steps (join/remesh) corrupt further - fail loudly instead.
+            raise ValueError(
+                f"CRITICAL ERROR: failed to apply {len(failures)} modifier(s) on '{object_name}': "
+                + "; ".join(failures)
+                + ". The object is in a partial state - fix the cause before continuing the pipeline."
+            )
         return {
             "success": True,
             "message": f"Applied all modifiers permanently on {object_name}",

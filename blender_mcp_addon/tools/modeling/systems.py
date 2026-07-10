@@ -1,4 +1,6 @@
-import bpy
+# blender_mcp_addon/tools/modeling/systems.py
+
+import bpy  # type: ignore
 
 from ...utils import hex_to_rgb
 
@@ -42,7 +44,7 @@ class ModelingSystems:
                 bsdf.inputs["Metallic"].default_value = 0.3
 
         created_objs = []
-        from mathutils import Vector
+        from mathutils import Vector  # type: ignore
 
         # 1. Create Segments (handles X, Y, Z and Diagonals naturally)
         for i in range(len(points) - 1):
@@ -155,7 +157,7 @@ class ModelingSystems:
                 "message": "At least two points required for a tray run",
             }
 
-        from mathutils import Vector
+        from mathutils import Vector  # type: ignore
 
         created_objs = []
         segments = []  # (v1, v2, length) for support distribution
@@ -308,7 +310,7 @@ class ModelingSystems:
         collection=None,
     ):
         """Internal helper to add a cylinder hinge to bridge tray rotations."""
-        from mathutils import Vector
+        from mathutils import Vector  # type: ignore
 
         # 1. Determine local width axis (pivot axis)
         # Using Cross(Dir, Up) to find the 'Side' vector
@@ -364,7 +366,7 @@ class ModelingSystems:
         rotation=None,
     ):
         """Add tray support variants with context."""
-        from mathutils import Vector
+        from mathutils import Vector  # type: ignore
 
         objs = []
 
@@ -386,7 +388,7 @@ class ModelingSystems:
             import math
 
             euler = [math.radians(r) for r in rotation]
-            from mathutils import Euler
+            from mathutils import Euler  # type: ignore
 
             final_rot_quat = Euler(euler, "XYZ").to_quaternion()
 

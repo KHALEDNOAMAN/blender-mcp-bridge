@@ -1,3 +1,5 @@
+//session_editor/playback.js
+
 async function playNext(index, continuous = true) {
     if (!isPlaying || index >= currentSession.commands.length) {
         stopPlayback();
@@ -72,6 +74,66 @@ function startPlayback(startIndex = null, continuous = true) {
     playNext(startIndex, continuous);
 }
 
+function startPlaybackToActive(startIndex, endIndex) {
+    if (!currentSession || currentSession.commands.length === 0) return;
+    if (endIndex < startIndex) endIndex = startIndex;
+
+    if (commandFilter.value) {
+        commandFilter.value = '';
+        renderCommands(startIndex);
+    }
+
+    isPlaying = true;
+    playAllBtn.disabled = true;
+    playBtn.disabled = true;
+    stopBtn.disabled = false;
+    playNextToActive(startIndex, endIndex);
+}
+
+function playNextToActive(index, endIndex) {
+    if (!isPlaying || index > endIndex || index >= currentSession.commands.length) {
+        stopPlayback();
+        return;
+    }
+    const cards = document.querySelectorAll('.command-card');
+    const card = cards[index];
+
+    expandCard(card);
+    scrollToCard(card);
+
+    const cmd = currentSession.commands[index];
+    runCommand(cmd.tool, cmd.arguments).then(res => {
+        const btn = card.querySelector('.run-cmd');
+        if (res.error) {
+            cmd.execution_status = 'error';
+            card.style.borderColor = 'var(--danger-color)';
+            if (btn) {
+                btn.textContent = '✗ Error';
+                btn.style.color = '#fff';
+                btn.style.backgroundColor = 'var(--danger-color)';
+                btn.style.borderColor = 'var(--danger-color)';
+            }
+            stopPlayback();
+            return;
+        } else {
+            cmd.execution_status = 'success';
+            card.style.borderColor = 'var(--success-color)';
+            card.classList.add('cmd-executed');
+            if (btn) {
+                btn.textContent = '✓ Done';
+                btn.style.color = '';
+                btn.style.backgroundColor = '';
+                btn.style.borderColor = '';
+            }
+        }
+        if (index === endIndex) {
+            stopPlayback();
+            return;
+        }
+        playbackTimeout = setTimeout(() => playNextToActive(index + 1, endIndex), parseInt(playbackDelay.value) || 500);
+    });
+}
+
 function stopPlayback() {
     isPlaying = false;
     clearTimeout(playbackTimeout);
@@ -87,13 +149,26 @@ function updatePlaybackButtonsState() {
     const expandedCard = document.querySelector('.command-card.expanded');
     if (expandedCard) {
         playBtn.disabled = expandedCard.classList.contains('cmd-executed');
+        playToActiveBtn.disabled = expandedCard.classList.contains('cmd-executed');
     } else {
         playBtn.disabled = false;
+        playToActiveBtn.disabled = true;
     }
 }
 
 playAllBtn.addEventListener('click', () => startPlayback(0, true));
 playBtn.addEventListener('click', () => startPlayback(null, true));
+const playToActiveBtn = document.getElementById('playToActiveBtn');
+playToActiveBtn.addEventListener('click', () => {
+    const activeCard = document.querySelector('.command-card.expanded');
+    if (activeCard) {
+        const cards = Array.from(document.querySelectorAll('.command-card'));
+        const activeIndex = cards.indexOf(activeCard);
+        if (activeIndex !== -1) {
+            startPlaybackToActive(0, activeIndex);
+        }
+    }
+});
 stopBtn.addEventListener('click', stopPlayback);
 
 function resetExecutionState() {

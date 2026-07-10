@@ -11,39 +11,23 @@ This guide explains how to run the integration test suite for the Blender MCP ad
     pip install -r requirements.txt
     ```
 
-### Transport Modes
-
-The test runner supports two transport modes for communicating with the MCP server:
-
--   **Stateless**: Uses simple HTTP POST requests with a session ID. This emulates how n8n and other stateless clients interact with the server.
--   **Stateful (Default)**: Uses the official MCP SDK to perform a standard HTTP Streamable handshake and long-running session.
-
-```bash
-# Run in stateful mode (default)
-python tests/run_integration.py run --transport stateful
-
-# Run in stateless mode
-python tests/run_integration.py run --transport stateless
-```
-
 ## Running Tests
 
 The test runner is a CLI tool located at `tests/run_integration.py`.
 
 ### 1. Run Scenario
 
-The runner now supports multiple scenarios via the `--scenario` (or `-s`) flag.
+The runner supports multiple scenarios via the `--scenario` (or `-s`) flag. Run all scenarios or a specific one:
 
-#### Standard Grid Test
-To run the standard grid layout scenario (primitives, modifiers, etc.):
 ```bash
+# Run all scenarios (default)
+python tests/run_integration.py run
+
+# Run specific scenario
 python tests/run_integration.py run --scenario grid
-```
-
-#### Arch Layout Test
-To run the architectural layout scenario (synced with fine-tuned session values):
-```bash
 python tests/run_integration.py run --scenario arch
+python tests/run_integration.py run --scenario print
+python tests/run_integration.py run --scenario filament_tag
 ```
 
 **What each scenario validates:**
@@ -69,12 +53,15 @@ python tests/run_integration.py run --scenario arch
     -   **Annotation**: 3D labels for rooms (Bedroom, Bath, Kitchen, etc.) with rotation support.
 3.  **Captures** the scene state to `tests/benchmarks/arch_last_run.json`.
 
+#### Print Scenario
+Tests 3D printing toolchain (STL export, mesh checking, support generation).
+
+#### Filament Tag Scenario
+Tests multi-material and filament assignment workflows.
+
 ### Advanced Run Options
 
 ```bash
-# Run all tests (Grid only support for modules)
-python tests/run_integration.py run -s grid
-
 # Run specific module (Grid scenario only)
 python tests/run_integration.py run -s grid --module modifiers
 
@@ -82,9 +69,9 @@ python tests/run_integration.py run -s grid --module modifiers
 python tests/run_integration.py verify -s arch
 ```
 
-If the scene matches the expected state, you will see `✅ Verification Passed!`. If not, it will report missing or unexpected objects and property mismatches.
+If the scene matches the expected state, you will see verification output. If not, it will report missing or unexpected objects and property mismatches.
 
-### 3. Run and Verify in One Step
+### 2. Run and Verify in One Step
 
 You can run and verify in a single command:
 
@@ -101,6 +88,21 @@ python tests/run_integration.py approve -s arch
 ```
 
 This copies `tests/benchmarks/<scenario>_last_run.json` to `tests/benchmarks/<scenario>_expected.json`.
+
+### Transport Modes
+
+The test runner supports two transport modes for communicating with the MCP server:
+
+-   **Stateless**: Uses simple HTTP POST requests with a session ID. This emulates how n8n and other stateless clients interact with the server.
+-   **Stateful (Default)**: Uses the official MCP SDK to perform a standard HTTP Streamable handshake and long-running session.
+
+```bash
+# Run in stateful mode (default)
+python tests/run_integration.py run --transport stateful
+
+# Run in stateless mode
+python tests/run_integration.py run --transport stateless
+```
 
 ## Extending the Test Suite
 

@@ -1,7 +1,9 @@
+# blender_mcp_addon/tools/modeling/operators.py
+
 import math
 import random
 
-import bpy
+import bpy  # type: ignore
 
 from ...utils import get_collection, get_object
 
@@ -21,7 +23,7 @@ class ModelingOperators:
     ):
         """Create primitive + apply ARRAY modifier"""
         # Note: self refers to the combined ModelingTools class
-        result = self.create_primitive(
+        result = self.create_primitive(  # type: ignore
             primitive_type,
             location,
             scale=scale,
@@ -31,7 +33,7 @@ class ModelingOperators:
             **primitive_kwargs,
         )
         obj_name = result["name"]
-        mod_result = self.apply_modifier(
+        mod_result = self.apply_modifier(  # type: ignore
             obj_name,
             "ARRAY",
             count=array_count,
@@ -101,7 +103,7 @@ class ModelingOperators:
                 if use_radial_rotation:
                     obj.rotation_euler = rot
                 if collection:
-                    self._move_to_collection_helper(obj, collection)
+                    self._move_to_collection_helper(obj, collection)  # type: ignore
                 created.append(obj.name)
             else:
                 new_obj = obj.copy()
@@ -130,7 +132,7 @@ class ModelingOperators:
             bpy.context.view_layer.objects.active = bpy.data.objects.get(created[0])
 
         if join_immediately:
-            join_res = self.join_objects(
+            join_res = self.join_objects(  # type: ignore
                 object_names=created, new_name=joined_name or f"{object_name}_Joined"
             )
             return {
@@ -164,13 +166,13 @@ class ModelingOperators:
             bpy.ops.object.mode_set(mode="OBJECT")
 
         if pattern:
-            self.select_by_pattern(pattern)
+            self.select_by_pattern(pattern)  # type: ignore
             object_names = [o.name for o in bpy.context.selected_objects]
 
         if object_names:
             if not active_object and len(object_names) > 0:
                 active_object = object_names[0]
-            self.select_objects(object_names, active_object)
+            self.select_objects(object_names, active_object)  # type: ignore
 
         if not bpy.context.selected_objects:
             raise ValueError("No objects selected to join")
@@ -279,8 +281,8 @@ class ModelingOperators:
 
     def _select_faces_by_normal(self, obj, target_normal, angle_threshold_deg=1.0):
         """Select faces whose normal is within threshold of target_normal (world space)"""
-        import bmesh
-        import mathutils
+        import bmesh  # type: ignore
+        import mathutils  # type: ignore
 
         # Ensure we are in object mode
         if bpy.context.mode != "OBJECT":
@@ -402,8 +404,8 @@ class ModelingOperators:
         filter_normal=None,
         angle_threshold=1.0,
     ):
-        import bmesh
-        import mathutils
+        import bmesh  # type: ignore
+        import mathutils  # type: ignore
 
         obj = get_object(object_name)
         bpy.context.view_layer.objects.active = obj
@@ -459,7 +461,7 @@ class ModelingOperators:
             "message": f"Sheared '{object_name}' on {axis} axis by {value}.",
         }
 
-    def _find_modifier_dependents(self, obj, **kwargs):
+    def _find_modifier_dependents(self, obj, ignore_names=None, **kwargs):
         """Find other objects whose UN-APPLIED modifiers still point at `obj`.
 
         Deleting a modifier's target object (e.g. a Boolean cutter) before
@@ -467,12 +469,17 @@ class ModelingOperators:
         goes empty and the modifier stops doing anything, so a subsequent
         apply bakes in the *unmodified* mesh with no error. This lets us
         catch that before it happens instead of after.
+
+        `ignore_names`: dependents in this set are skipped — used for batch
+        deletes where holder and target are removed together, which is safe.
         """
-        import bpy
+        import bpy  # type: ignore
 
         dependents = []
         for other in bpy.data.objects:
             if other == obj:
+                continue
+            if ignore_names and other.name in ignore_names:
                 continue
             for mod in other.modifiers:
                 for prop in mod.bl_rna.properties:
@@ -489,7 +496,7 @@ class ModelingOperators:
         """Delete object(s) by name or pattern. Handles hidden objects."""
         import fnmatch
 
-        import bpy
+        import bpy  # type: ignore
 
         # Ensure we're in Object mode
         if bpy.context.mode != "OBJECT":
@@ -508,10 +515,13 @@ class ModelingOperators:
                 if fnmatch.fnmatch(coll.name, pattern):
                     collections_to_remove.append(coll)
 
-            # Guard: refuse if any match is still an un-applied modifier target
+            # Guard: refuse if any match is still an un-applied modifier target,
+            # unless the dependent is deleted in this same batch (holder and
+            # cutter going together is safe).
+            batch_names = {obj.name for obj in objects_to_delete}
             blocked = []
             for obj in objects_to_delete:
-                deps = self._find_modifier_dependents(obj)
+                deps = self._find_modifier_dependents(obj, ignore_names=batch_names)
                 if deps:
                     blocked.append(f"'{obj.name}' is still used by {', '.join(deps)}")
             if blocked:

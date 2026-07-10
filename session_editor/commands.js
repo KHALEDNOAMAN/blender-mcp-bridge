@@ -1,3 +1,5 @@
+//session_editor/commands.js
+
 async function openEditModal(cmd, index) {
     const content = document.getElementById('newCommandTemplate').content.cloneNode(true);
     const catSelect = content.querySelector('#categorySelect');

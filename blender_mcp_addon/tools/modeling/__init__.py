@@ -1,3 +1,5 @@
+# blender_mcp_addon/tools/modeling/__init__.py
+
 from .architectural import ModelingArchitectural
 from .modifiers import ModelingModifiers
 from .operators import ModelingOperators

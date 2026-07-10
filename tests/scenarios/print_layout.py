@@ -1,3 +1,5 @@
+# src/tests/scenarios/print_layout.py
+
 import json
 
 from tests.utils.mcp_client import MCPClient

@@ -1,4 +1,8 @@
-import bpy
+# blender_mcp_addon/utils.py
+
+import os
+
+import bpy  # type: ignore
 
 
 def hex_to_rgb(hex_color):
@@ -24,3 +28,11 @@ def get_collection(name):
         coll = bpy.data.collections.new(name)
         bpy.context.scene.collection.children.link(coll)
     return coll
+
+
+DEFAULT_HOST = (
+    os.environ.get("BLENDER_ADDON_HOST") or os.environ.get("BLENDER_MCP_HOST") or "0.0.0.0"
+)
+DEFAULT_PORT = int(
+    os.environ.get("BLENDER_ADDON_PORT") or os.environ.get("BLENDER_MCP_PORT") or 8585
+)

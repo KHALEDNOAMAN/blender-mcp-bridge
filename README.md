@@ -356,7 +356,7 @@ Set environment variables in `.env`:
 
 ```
 BLENDER_MCP_HOST=127.0.0.1
-BLENDER_MCP_PORT=8888
+BLENDER_MCP_PORT=8585
 BLENDER_ASSETS_DIR=C:/path/to/your/assets
 
 ```

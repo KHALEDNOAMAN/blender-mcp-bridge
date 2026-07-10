@@ -1,3 +1,5 @@
+# src/tools/modeling/selection.py
+
 from mcp import types
 
 

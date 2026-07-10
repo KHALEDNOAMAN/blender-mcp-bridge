@@ -1,3 +1,5 @@
+# src/tools/printing.py
+
 from mcp import types
 
 
@@ -96,7 +98,7 @@ def get_printing_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="export_model",
-            description="Export the specified object or the entire selection to standard slicer formats (STL or 3MF). Relative paths are resolved against the BLENDER_ASSETS_DIR folder.",
+            description="Export the specified object or the entire selection to standard formats (STL or 3MF). 3MF preserves materials and colors for multi-color printing. Relative paths are resolved against the BLENDER_ASSETS_DIR folder.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -106,18 +108,32 @@ def get_printing_tools() -> list[types.Tool]:
                     },
                     "filepath": {
                         "type": "string",
-                        "description": "Optional: Filepath to export the model to (e.g. 'keychain.stl'). Defaults to '[object_name].stl' inside assets directory if omitted.",
+                        "description": "Optional: Filepath to export the model to (e.g. 'keychain.stl', 'model.3mf'). Defaults to '[object_name].stl' inside assets directory if omitted.",
                     },
                     "format": {
                         "type": "string",
                         "enum": ["STL", "3MF"],
-                        "description": "File format to export (default: 'STL').",
+                        "description": "File format to export (default: 'STL'). Use 3MF for multi-color printing with material preservation. Requires threemf_io addon for 3MF export.",
                     },
                     "selection_only": {
                         "type": "boolean",
                         "description": "Export only selected objects (default: true).",
                     },
                 },
+            },
+        ),
+        types.Tool(
+            name="import_model",
+            description="Import a 3D model file (STL, OBJ, or FBX) into the scene and select it. Relative paths are resolved against the BLENDER_ASSETS_DIR folder.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "filepath": {
+                        "type": "string",
+                        "description": "Filepath of the model to import (e.g. 'keychain.stl' or 'f:/models/part.obj').",
+                    },
+                },
+                "required": ["filepath"],
             },
         ),
     ]
