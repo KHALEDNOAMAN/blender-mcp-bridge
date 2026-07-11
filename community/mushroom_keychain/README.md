@@ -1,116 +1,135 @@
-# Sculpted Mushroom Keychain — Red Cap, White Spots
+# Mushroom Keychain v3 — Click-Together, Zero Supports
 
-A two-color sculpted mushroom keychain built in three phases: cap sculpting, undercut with
-bell chamber, then 13 warts socketed onto the finished smooth surface. Red cap, white spots
-and stem for the classic amanita two-color 3D print. The stem has a keyring hole drilled
-straight through it, keeping geometry simple with no fragile parts.
+A two-color amanita mushroom keychain, **redesigned twice from print reviews**. Gently domed
+red cap with 12 rounded white spores, and a **separate white stem that clicks into the cap**
+with a snap-fit post. Both parts print flat on the plate with **no supports, no bridges, and
+the display face in perfect top-surface quality**. Keyring hole is ø3 mm.
 
 **Model Used:** claude-fable-5 (Claude Code)
 
-![Mushroom Keychain Stem](assets/images/keychain_stem.png)
-![Mushroom Keychain Cap](assets/images/keychain_cap.png)
+![v3 Print Plate](assets/images/keychain_v3_plate.png)
+*Both parts exactly as they print: cap display-face-up, stem standing with the click post.*
+
+![v3 Cap Closeup](assets/images/keychain_v3_cap.png)
+*Rounded spore domes — the cut face is buried in the cap, only the curve shows.*
+
+## Design History — Three Prints of Lessons
+
+1. **v1 (printed):** upright one-piece mushroom. The domed cap forced tree supports (wasted
+   filament) and the 13 full-sphere spots bulged out like fungus warts.
+2. **v2 (drafts):** one-piece flipped upside-down to kill supports. First draft's flat-top
+   cap read as a plate; second draft's flat-faced spore pads showed concave waists — and
+   either way the 8 outer spores hovered over air in print orientation, printing as
+   unsupported floating islands.
+3. **v3 (this session):** split the parts. With the stem separate, the cap prints
+   **display-face-up** — dome and spores fully supported from below, zero compromises —
+   and the stem prints standing. A snap-fit click post joins them after printing.
+
+## Design
+
+| Element | Geometry |
+|---|---|
+| Cap | **True dome**: ellipsoid ø28 mm cut at its equator, so the widest circle *is* the flat base — the wall starts vertical at the plate and curves smoothly to the 5 mm apex. No under-curl rim, zero overhang printed face-up |
+| Spores | Squashed spheres (z-scale 0.4) **cut below the equator, rounded side out**, cut face buried in the cap. 4 inner (r=2.2, ring r=5, tilted 8°) + 8 outer (r=2.6, ring r=9.8, interleaved 22.5°, tilted 19° to hug the dome). Inner ring deliberately smaller than outer |
+| Snap socket (in cap) | ø6.4 bore, 3.4 deep, internal groove to r3.5 at 2.0 mm, ø7.4→6.4 entry chamfer (also defeats first-layer elephant-foot) |
+| Click post (on stem) | ø6.2 shaft rising 3.3 mm above the stem shoulder, rounded snap ring to ø6.7 at 2.0 mm, 2.4 mm flex slot splitting it into two prongs |
+| Stem | Tapered cone 5 → 4 mm over 20 mm; ø3 mm keyring hole near the base |
+
+![v3 Snap Post](assets/images/keychain_v3_snap.png)
+*The click post: slotted prongs, rounded snap ring, keyring bore below.*
+
+**Snap engineering (FDM-tuned):** the ring squeezes 0.15 mm per side through the bore; the
+slot lets each prong flex that far at ~3.5 % strain — inside PLA's limit for occasional
+clicks (PETG clicks forever). The rounded torus profiles self-guide on insertion and allow
+deliberate removal. Shaft-to-bore clearance is 0.1 mm per side; the post bottoms 0.1 mm
+short of the socket ceiling so the cap always seats tight on the stem shoulder.
 
 ## How to Replay
 
-To recreate this keychain in your own Blender instance, ensure the MCP server is running and execute:
+Ensure the MCP server is running, then:
 
 ```bash
 python -m src.main play community/mushroom_keychain/session.json
 ```
 
-One replay produces the complete two-color mushroom and exports two **same-origin** STL files:
-- `mushroom_cap_red.stl` — the red cap
-- `mushroom_stem_white.stl` — the white body (stem + 13 spots)
-
-Both files share the same world coordinates, so they reassemble perfectly in the slicer.
-The session is idempotent: it wipes the scene and rebuilds from scratch every run.
+One replay wipes the scene, rebuilds everything, and exports **three** STL files:
+- `mushroom_cap_red.stl` — the red cap with the snap socket (flat face on Z=0)
+- `mushroom_spores_white.stl` — the 12 white spores (same origin as the cap)
+- `mushroom_stem_white.stl` — the white stem with click post (its own object, standing)
 
 **Checkpoint: Inspect Phases**
-Use the session editor to stop at these phase markers and view intermediate results:
-- **End of Phase 1** (command 15): Sculpted dome with organic bumps, X-symmetrized — before the undercut
-- **End of Phase 2** (command 23): Smooth cap with bell undercut and flat bottom — before warts are added
+Use the session editor to stop at these phase markers:
+- **End of Phase 1** (command 12): domed cap with click socket
+- **End of Phase 2** (command 35): cap with all 12 rounded spores
+- **End of Phase 3** (command 48): stem with click post and keyring bore
 
 > [!IMPORTANT]
 > Use the current bundled Blender addon (`blender_mcp_addon/`) — this session relies on
-> its batch-safe `delete *`, exact boolean solvers, and modifier baking. Older addon builds
-> may fail the cleanup or produce misaligned geometry on the undercut.
-
-## What the Session Builds
-
-| Stage | Highlights |
-|---|---|
-| Stem | Tapered cone (5 → 4 mm, 24 mm tall) with keyring hole (ø2 mm, re-drilled post-remesh for crispness) |
-| Cap — Phase 1 | Flattened icosphere (14 mm r, 0.55 scale), squashed dome shape, sculpted with inflate + grab for organic bumps, X-symmetrized |
-| Cap — Phase 2 | **Undercut** — flat slice at Z=19 removes the ellipsoid's curl-under lower wall (proven root cause of earlier shattering). Bell hollowed into flat face: ceiling Z=21.4 (50% green-line height), opening r~12.2, flat rim ring 3.2 mm (sized so every wart keeps ≥1 mm cap wall above bell). Then 0.25 mm voxel remesh + Laplacian smooth. **Nothing smooths after this** — warts cannot be erased. |
-| Spores — Phase 3 | 13 white warts (r=2.0–3.6 mm, subdivision 4) positioned to socket into the red cap with verified ≥1.00 mm clearance above bell. Stem trimmed to bell ceiling, joined with warts into MushroomWhite body. |
-| Materials | Red cap (RGB 0.8, 0.05, 0.05); white body (RGB 0.92, 0.92, 0.90) — colors baked for slicer visibility |
-| Print prep | Bake all booleans → remesh + smooth cap → trim stem → join stem + warts → `check_mesh_for_printing` on both bodies → export two aligned STLs |
+> batch-safe `delete *`, exact boolean solvers, modifier baking, hex `base_color`
+> materials, `create_torus`, and `duplicate_object` placement.
 
 ## Hard-Won Lessons Baked Into This Session
 
-- **Boolean difference after smooth destroys geometry.** Cutting warts INTO the smooth cap via DIFFERENCE broke the undercut and bell. **Fix:** Keep warts as separate white objects, trim stem against cap edge, join stem + warts into one body for printing.
-- **The undercut at Z=19 is load-bearing.** It kills the curl-under wall where the old ellipsoid tried to punch through in X/Y. Without it, any socket-cutter will rupture side walls.
-- **Re-drill holes AFTER remesh + smooth.** The keyring hole closes or distorts during remesh; cutting it again post-smooth gives a crisp bore.
-- **STL carries no color.** Cap and stem/warts are exported as two same-origin STLs; the Blender materials (red and white) only style the viewport. Color comes from importing both files as one multi-part object in the slicer and assigning a filament per part.
+- **Splitting parts beats clever orientation.** Two trivially printable parts + a snap
+  joint outperform any single-piece orientation: v2's flipped one-piece design always left
+  some spores printing as floating islands over air.
+- **UNION overlapping shells — never `join_objects` them before a boolean.** Joining the
+  stem + post + ring produced a self-intersecting mesh that the EXACT solver silently
+  reduced to **zero triangles**. Boolean UNION each piece in, apply, then cut.
+- **Never trust object origins mid-pipeline.** The deployed addon bakes location into the
+  mesh during dimension-fitting, so origins quietly end up at world zero. Templates for
+  `duplicate_object` must be built **at the world origin** (origin == mesh center survives
+  any addon version), and final placement uses `location_offset` — pure translation,
+  origin-independent.
+- **One object per `transform_object` call.** The bridge schema types `object_name` as a
+  string; a list is silently dropped with `success: false` in the payload — and playback
+  still prints SUCCESS. **Verify geometry (STL triangle counts and bounding boxes), not
+  exit codes.**
+- **Spores: bury the cut, show the curve.** Flat-face-out pads read as machined buttons
+  with concave waists; rounded-side-out reads as amanita.
+- **STL carries no color.** Color comes from importing cap + spores as one multi-part
+  object in the slicer and assigning a filament per part.
 
 ## Printing (Bambu Studio Two-Color Setup)
 
-The key step: import **both STLs together as one multi-part object**. Filament assignment in
-Bambu Studio happens per *part*, and parts only exist when the files are loaded as one object.
-
-1. **Add two filaments first.** In the Prepare tab's **Filament** section, click **+** so the
-   project has two filament slots: **1 = red**, **2 = white**. With only one slot defined,
-   every part points at the same filament and "changing the color" recolors the whole model.
-2. **File → Import**, and select **both** `mushroom_cap_red.stl` and `mushroom_stem_white.stl`
-   **in the same import dialog**.
-3. Bambu Studio asks: *"Load these files as a single object with multiple parts?"* → click **Yes**.
-   The cap and body snap into their original assembled positions (they share the same origin).
-4. Assign colors in the **Objects tab**, not the 3D viewport — clicking the model in the
-   viewport always selects the whole object; parts are only reachable in the list. In the left
-   sidebar switch **Global → Objects**, click the **expand arrow (▸)** on the object, and set
-   the filament dropdown on each **part row**:
+1. **Add two filaments**: slot **1 = red**, slot **2 = white**.
+2. **File → Import**, select `mushroom_cap_red.stl` **and** `mushroom_spores_white.stl`
+   **together in one dialog** → answer **Yes** to *"Load these files as a single object
+   with multiple parts?"* — the spores snap onto the cap (same origin).
+3. **File → Import** again, `mushroom_stem_white.stl` **by itself** — it loads as its own
+   object standing next to the cap (if asked to merge, answer **No**).
+4. In the **Objects tab**, expand the cap object and set per part:
    - `mushroom_cap_red` part → filament **1** (red)
-   - `mushroom_stem_white` part → filament **2** (white)
+   - `mushroom_spores_white` part → filament **2** (white)
+   - the stem object → filament **2** (white)
+5. **Supports: OFF.** Both parts are fully self-supporting: the cap is a dome rising from
+   its flat base, the stem is a standing taper (the ø3 mm keyring bore and the small snap
+   details bridge themselves).
+6. Slice and print — one job, two colors, no support waste.
 
-   If the object shows **no expand arrow**, the meshes fused into one part on import —
-   right-click the object → **Split → To parts**, then assign red to the cap row and white
-   to the stem + spot rows (splitting is by loose shells, so the spots become their own rows).
-5. Enable supports: **Support → Tree (auto)**. Upright, the flat rim ring under the cap is a
-   near-horizontal overhang and needs them — but the trees only touch the under-cap region,
-   so the scars are hidden on the finished piece.
-6. Slice and print. The model prints upright — flat stem base on the plate.
+### Assembly
 
-> [!WARNING]
-> If you import the files one at a time (or answer **No**), they load as two independent
-> objects: Bambu Studio scatters them across the plate and per-part coloring won't work.
-> Delete them and re-import both together.
+Push the stem's click post into the socket under the cap until it **clicks** — the prongs
+flex inward, the ring seats in the groove, and the cap sits flush on the stem shoulder.
+It's firm but reversible; add a dab of glue if you want it permanent. (PLA prongs tolerate
+occasional re-clicking; PETG tolerates lots.)
 
 ### Print Notes
 
-- The white spots sit half-buried in the cap — the overlap is intentional. Slicers resolve
-  interpenetrating parts cleanly: the wart volume prints white, the cap volume red.
-- **Don't tilt the model hoping to skip supports.** Tilted 45°, the mushroom rests on a
-  knife-edge of cap rim and needs supports just to stand — relocated onto the visible cap
-  surface. Upright with tree supports puts all contact marks under the cap where they're
-  invisible. (To compare orientations yourself, rotate in the slicer — the multi-part object
-  rotates as one — and check the sliced support volume.)
-- Print time — ~30-45 min depending on layer height and infill (keychain scale).
+- The spore undersides are buried ~0.2 mm into the cap — intentional overlap; the slicer
+  resolves interpenetrating parts (spore volume white, cap volume red).
+- The flex slot shows as a small 1.6 mm notch on the stem sides just below the shoulder —
+  hidden once the cap is clicked on.
+- If the click is too tight or too loose, scale the **stem only** ±1–2 % in the slicer —
+  it adjusts the interference without touching the cap.
 
-Result: classic red amanita cap with crisp white warts, white stem meeting the bell interior,
-keyring hole threaded through the stem.
+### Spore Layout
 
-**Note:** Bambu Studio may show a configuration warning about "ensure_vertical_shell_thickness"
-being replaced with "enabled". This is normal and does not affect the print quality — simply
-click OK to dismiss it.
+![v3 Spore Layout](assets/images/keychain_v3_top.png)
+*Top view — 4 smaller inner spores + 8 larger outer, interleaved.*
 
-### STL Render
+### Assets
 
-![Mushroom Keychain STL Render](assets/images/keychain_render.png)
-*The complete exported model showing the assembled red cap with white warts and stem.*
-
-### Printed Result
-
-![Mushroom Keychain Printed](assets/images/mushroom_printed.jpeg)
-*The final two-color 3D printed mushroom keychain — red cap, white spores and stem.*
-
----
+`keychain_v3_*.png` are the current renders; `keychain_cap.png`, `keychain_stem.png`,
+`keychain_render.png`, and `mushroom_printed.jpeg` are from **v1**, kept for design
+history. `mushroom_keychain.3mf` is the v1 Bambu project — rebuild it from the new STLs.

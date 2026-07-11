@@ -1,6 +1,22 @@
 # blender_mcp_addon/tools/rendering.py
 
+import os
+
 import bpy  # type: ignore
+
+
+def _resolve_output_path(path):
+    """Resolve relative render paths against BLENDER_ASSETS_DIR, like export_model.
+
+    Absolute paths and Blender-relative '//' paths pass through untouched.
+    Without this, a bare filename lands in Blender's CWD (often unwritable, e.g. C:\\).
+    """
+    if os.path.isabs(path) or path.startswith("//"):
+        return path
+    assets_dir = os.environ.get("BLENDER_ASSETS_DIR")
+    if assets_dir:
+        return os.path.join(assets_dir, path)
+    return os.path.abspath(path)
 
 
 class RenderingTools:
@@ -27,7 +43,7 @@ class RenderingTools:
         if resolution_y:
             scene.render.resolution_y = resolution_y
         if output_path:
-            scene.render.filepath = output_path
+            scene.render.filepath = _resolve_output_path(output_path)
 
         return {
             "success": True,
@@ -38,7 +54,7 @@ class RenderingTools:
     def render_frame(self, output_path=None):
         """Render current frame"""
         if output_path:
-            bpy.context.scene.render.filepath = output_path
+            bpy.context.scene.render.filepath = _resolve_output_path(output_path)
 
         bpy.ops.render.render(write_still=True)
 
@@ -57,7 +73,7 @@ class RenderingTools:
         if end_frame:
             scene.frame_end = end_frame
         if output_dir:
-            scene.render.filepath = output_dir
+            scene.render.filepath = _resolve_output_path(output_dir)
 
         bpy.ops.render.render(animation=True)
 
