@@ -205,17 +205,40 @@ async def mcp_asgi(scope, receive, send):
 
 async def root_redirect(request):
     return Response(
-        "Blender MCP Server is running. Access /editor/ for the Session Editor.",
+        "Blender MCP Server is running. Access /editor/ for Studio.",
         media_type="text/plain",
     )
 
+
+async def studio_not_built(request):
+    return Response(
+        "Studio has not been built yet. Run:\n\n"
+        "  cd studio\n"
+        "  npm install\n"
+        "  npm run build\n\n"
+        "Then restart this server. Alternatively, run `npm run dev` inside "
+        "studio/ for a hot-reloading dev server on its own port.",
+        media_type="text/plain",
+        status_code=503,
+    )
+
+
+# Studio's build output (studio/dist) is gitignored and only exists after
+# `npm run build` — guard the mount so a missing build doesn't crash startup,
+# it just serves a helpful message at /editor instead.
+STUDIO_DIST = "studio/dist"
+_editor_route = (
+    Mount("/editor", StaticFiles(directory=STUDIO_DIST, html=True), name="editor")
+    if os.path.isdir(STUDIO_DIST)
+    else Route("/editor", studio_not_built)
+)
 
 # Create the Starlette app
 starlette_app = Starlette(
     routes=[
         Route("/", root_redirect),
         Mount("/mcp", app=mcp_asgi),
-        Mount("/editor", StaticFiles(directory="session_editor", html=True), name="editor"),
+        _editor_route,
     ],
     lifespan=lifespan,
 )

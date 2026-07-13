@@ -5,13 +5,15 @@ Status: DRAFT — not locked. Cross-check against this before/after implementati
 ## 1. Naming
 
 - Product name: **Studio** (not "IDE" — rejected explicitly).
-- Working repo folder rename: `session_editor/` → `studio/` (TBD timing, see Migration).
+- `session_editor/` retired and deleted (2026-07-13) — see §10 Migration checklist.
+  `studio/` is the sole editor now; the Bridge Server serves its build at `/editor`.
 
 ## 2. Scope decision: retire session editor, fold into Studio
 
-The session editor's command-sequence/replay model becomes Studio's "timeline" view.
-No parallel tool maintained. Existing session JSON format (`metadata` + `commands[]`)
-stays the on-disk format; Studio adds an optional DAG layer on top (see §4) without
+The session editor's command-sequence/replay model became Studio's guided panel
+view. No parallel tool maintained — `session_editor/` has been deleted (§10).
+Existing session JSON format (`metadata` + `commands[]`) stays the on-disk format;
+Studio adds optional `parameters` (§4) and `branches` (§5) layers on top without
 breaking that format for simple linear sessions.
 
 ## 3. Frontend: Vite + React, JAMstack
@@ -255,14 +257,46 @@ in a hand-written session, or directly fix a branch's `ranges` array.
 - Failure surfaces as an inline message near the Apply button (which range,
   which branch, what's out of bounds) — not a generic "invalid session" toast.
 
-## 7. Non-goals / explicitly deferred
+## 7. Command tree / branch diagram
+
+A visual DAG of the session's structure — commands and how branches jump between
+them — NOT a 3D geometry preview. Explicitly scoped this way after weighing a
+three.js scene-preview idea: a fake geometry preview (primitive proxies for each
+command, no booleans/materials/text evaluation) risks being actively misleading
+given this session's repeated lesson that "looks right" and "is right" diverge
+easily for boolean/modifier results — a diagram of session *structure* is honest
+by construction since it only renders data Studio already has, not a guess at
+what Blender will draw.
+
+### 7.1 Placement and rendering approach
+
+- New collapsible `CommandTreePanel`, same pattern as `BranchesPanel`, placed
+  below it in the sidebar.
+- Hand-rolled SVG, not a new graph-library dependency (`react-flow`, `dagre`,
+  etc. rejected) — the actual graph shape here is simple: a linear spine of
+  commands plus branch ranges as overlays, not an arbitrary node/edge graph.
+  Consistent with `lib/expr.js`'s same reasoning (small custom logic over a
+  new dependency when the problem is genuinely small).
+
+### 7.2 Layout: horizontal spine + range brackets
+
+- One row of numbered ticks/dots for commands `1..N` (a Gantt-chart-style
+  timeline, not a vertical list — scales via horizontal scroll for large N).
+- One colored horizontal bracket per branch, below the spine, spanning each
+  of its ranges with visible gaps where it skips commands — directly shows
+  "this branch covers these commands, jumps over these."
+- Clicking a command tick jumps to/expands that command in the main
+  `CommandList`, same interaction as the JSON outline's click-to-jump (§6).
+- No branches defined → just the plain numbered spine, no brackets.
+
+## 8. Non-goals / explicitly deferred
 
 - WASM browser→localhost bridge: dropped. Plain fetch/WebSocket to the local MCP
   bridge is sufficient; no browser sandbox limitation actually requires WASM.
 - No change to the MCP protocol or `blender_mcp_addon/server.py` call contract.
   n8n's existing MCP usage is unaffected by anything in this doc.
 
-## 8. Known cleanup (found during this review, not yet fixed)
+## 9. Known cleanup (found during this review, not yet fixed)
 
 Hardcoded absolute paths that should resolve via `BLENDER_ASSETS_DIR` instead:
 - `blender_mcp_addon/server.py:53` — debug STL path
@@ -273,10 +307,11 @@ Hardcoded absolute paths that should resolve via `BLENDER_ASSETS_DIR` instead:
 Not fixed in this pass — flagging for explicit sign-off before editing generated
 session assets or addon debug code.
 
-## 9. Migration checklist (fill in as implemented)
+## 10. Migration checklist (fill in as implemented)
 
 - [x] Vite + React scaffold — new `studio/` folder created alongside `session_editor/`
-      (not a rename yet; `session_editor/` untouched, retirement is a separate step)
+      (initially not a rename; `session_editor/` retired separately once Studio
+      reached full parity — see the retirement entry below)
 - [x] Port timeline/command-card view from current `app.js`/`ui.js` — 1:1 feature
       port: session load/save, metadata panel, command list (add/edit/delete/
       move/filter), schema-driven dynamic args form, playback (play all / play /
@@ -342,7 +377,38 @@ session assets or addon debug code.
       Parameters panel reflected the change; confirmed an out-of-bounds
       branch range and malformed JSON syntax both correctly block Apply with
       an inline error and keep the editor in JSON mode.
-- [ ] Fix hardcoded paths (§8), pending sign-off — still open
+- [x] Retire `session_editor/` (§2) — deleted (2026-07-13) now that Studio has
+      full feature parity plus parameters/expressions/branching/JSON-mode it
+      never had. `src/server.py`'s `/editor` mount now points at
+      `studio/dist` instead of `session_editor/`, guarded with an
+      `os.path.isdir` check — if `studio/dist` doesn't exist (gitignored,
+      only produced by `npm run build`), `/editor` serves a short 503 message
+      with the build command instead of crashing server startup or 404ing
+      silently. Verified via a throwaway server instance on a separate port
+      (didn't touch the live bridge on 8008, which a user was still running):
+      confirmed `/editor` correctly serves Studio's `<title>Blender MCP
+      Studio</title>` build output. `README.md` and `community/README.md`
+      updated to describe Studio (not session_editor) as the editor, including
+      the new `http://localhost:8008/editor/` zero-setup access path.
+- [x] Command tree / branch diagram (§7) — new `CommandTreePanel`, same
+      collapsible-panel pattern as `BranchesPanel`. Hand-rolled SVG (no new
+      dependency): a horizontal spine of numbered ticks for `commands[]`,
+      with one colored bracket row per branch below it, spanning each range
+      with visible gaps where it jumps over commands. Clicking a tick reuses
+      the same expand/jump interaction as the JSON outline (§6). Deliberately
+      NOT a 3D geometry preview — that idea was explicitly rejected after
+      weighing it: a fake primitive-proxy preview (no boolean/text/material
+      evaluation) risks being actively misleading given this session's
+      repeated lesson that "looks right" and "is right" diverge easily for
+      boolean results; a structure-only diagram is honest by construction
+      since it only renders data already in the session (order + ranges).
+      Verified end-to-end against the live bridge with the 3-branch/10-command
+      test session: spine showed all 10 ticks, branch rows correctly showed
+      Feature A as one continuous bar (#1-#3), Feature B and C each as two
+      separate bars with a visible gap between them (confirming the jump is
+      visually distinguishable from a contiguous range), and clicking tick #7
+      correctly expanded `create_text (TagLabel)` in the command list.
+- [ ] Fix hardcoded paths (§9), pending sign-off — still open
 
 ### Bugs found & fixed during Studio scaffold verification (2026-07-13)
 

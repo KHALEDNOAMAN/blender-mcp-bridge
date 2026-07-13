@@ -5,6 +5,7 @@ import MetadataPanel from './components/MetadataPanel';
 import ParametersPanel from './components/ParametersPanel';
 import BranchesPanel from './components/BranchesPanel';
 import BranchBuilder from './components/BranchBuilder';
+import CommandTreePanel from './components/CommandTreePanel';
 import PlaybackPanel from './components/PlaybackPanel';
 import CommandList from './components/CommandList';
 import Modal from './components/Modal';
@@ -12,6 +13,7 @@ import DynamicArgsForm from './components/DynamicArgsForm';
 import NewSessionDialog from './components/NewSessionDialog';
 import JsonSessionEditor from './components/JsonSessionEditor';
 import { useModal } from './hooks/useModal';
+import { useResizableSidebar } from './hooks/useResizableSidebar';
 import { useConnection } from './hooks/useConnection';
 import { runCommand } from './lib/api';
 import { buildSessionFromTemplate } from './lib/sessionTemplates';
@@ -21,6 +23,7 @@ import { validateBranches, validateSessionShape } from './lib/sessionValidation'
 export default function App() {
     const { apiBase, connectionStatus, availableTools, refetchTools } = useConnection();
     const modalApi = useModal();
+    const sidebar = useResizableSidebar();
 
     const [session, setSession] = useState(null);
     const [filter, setFilter] = useState('');
@@ -31,6 +34,7 @@ export default function App() {
     const [metadataCollapsed, setMetadataCollapsed] = useState(() => localStorage.getItem('metadataCollapsed') !== 'false');
     const [parametersCollapsed, setParametersCollapsed] = useState(() => localStorage.getItem('parametersCollapsed') === 'true');
     const [branchesCollapsed, setBranchesCollapsed] = useState(() => localStorage.getItem('branchesCollapsed') === 'true');
+    const [commandTreeCollapsed, setCommandTreeCollapsed] = useState(() => localStorage.getItem('commandTreeCollapsed') === 'true');
     const [runningBranch, setRunningBranch] = useState(null);
     const [viewMode, setViewMode] = useState('guided'); // 'guided' | 'json' — §6
     const [commandsCollapsed, setCommandsCollapsed] = useState(() => localStorage.getItem('commandsCollapsed') === 'true');
@@ -626,6 +630,15 @@ export default function App() {
         localStorage.setItem('branchesCollapsed', next);
         return next;
     });
+    const toggleCommandTree = () => setCommandTreeCollapsed((prev) => {
+        const next = !prev;
+        localStorage.setItem('commandTreeCollapsed', next);
+        return next;
+    });
+
+    // Click-to-jump from the tree diagram (§7.2) reuses the same expand
+    // interaction as the command list itself.
+    const handleJumpToCommand = (idx) => setExpandedIdx(idx);
 
     const filteredCount = hasCommands
         ? session.commands.filter((c) => c.tool.toLowerCase().includes(filter.toLowerCase())).length
@@ -659,7 +672,7 @@ export default function App() {
                 </main>
             ) : (
             <main>
-                <div className="left-sidebar">
+                <div className="left-sidebar" style={{ flexBasis: sidebar.width }}>
                     <MetadataPanel
                         session={session}
                         collapsed={metadataCollapsed}
@@ -682,6 +695,13 @@ export default function App() {
                         isPlaying={isPlaying}
                         runningBranch={runningBranch}
                     />
+                    <CommandTreePanel
+                        commands={hasCommands ? session.commands : []}
+                        branches={(session && session.branches) || {}}
+                        collapsed={commandTreeCollapsed}
+                        onToggle={toggleCommandTree}
+                        onJumpToCommand={handleJumpToCommand}
+                    />
                     <PlaybackPanel
                         collapsed={playbackCollapsed}
                         onToggle={togglePlayback}
@@ -703,6 +723,12 @@ export default function App() {
                         onClearScene={handleClearScene}
                     />
                 </div>
+
+                <div
+                    className={`sidebar-resize-handle${sidebar.isDragging ? ' dragging' : ''}`}
+                    onPointerDown={sidebar.handlePointerDown}
+                    title="Drag to resize"
+                />
 
                 <section id="commandsSection" className={`card glass commands-collapsible${commandsCollapsed ? ' collapsed' : ''}`}>
                     <div className="commands-header" onClick={toggleCommands} title="Toggle commands list">

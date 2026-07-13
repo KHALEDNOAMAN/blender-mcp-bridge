@@ -110,26 +110,16 @@ uv run python -m src.main play path/to/session.json --transport stateless
 > **Performance Note**: Stateful mode is significantly faster for playback because it maintains a persistent connection. Stateless mode requires a full MCP handshake (Initialize/Discover) for *every* individual tool call in the recording, leading to noticeable overhead.
 
 ### Session Format
-Sessions are stored as JSON files containing metadata (name, description, timestamp) and a list of command objects (tool name, arguments, timestamp).
+Sessions are stored as JSON files containing metadata (name, description) and a list
+of command objects (tool name, arguments). Studio sessions may also include optional
+`parameters` (global, parametric values referenced from command arguments via
+`${name}` tokens, including arithmetic expressions) and `branches` (named, jumpable
+subsets of the command list) — see [`docs/studio_design_v1.md`](docs/studio_design_v1.md)
+for the full spec. Plain linear sessions with neither key work exactly as before.
 
-### Session Editor (Visual Inspector)
-We provide a built-in static web editor to inspect and edit your recordings:
-1. Open `session_editor/index.html` in your web browser.
-2. Click **Load Session** and select your `session.json`.
-3. You can:
-   - Edit metadata (Session Name, Description).
-   - Filter commands by tool name.
-   - **Add & Edit Commands**: Use the interactive modal with schema validation to discover tools, safely modify arguments, or add entirely new steps.
-   - Edit tool arguments directly in the JSON editor cards.
-   - Reorder or delete unnecessary commands.
-   - **Export JSON** to save your changes to a new file.
-
-### Studio (Vite + React, in development)
-`studio/` is the in-progress successor to the Session Editor above — a Vite + React
-rebuild that will eventually add parametric global parameters and feature branching
-on top of the same recording/playback workflow. See [`docs/studio_design_v1.md`](docs/studio_design_v1.md)
-for the design doc and migration status. For now it has 1:1 feature parity with the
-Session Editor; `session_editor/` remains the stable option until Studio replaces it.
+### Studio (Visual Editor)
+Studio is the built-in visual editor for inspecting, editing, and replaying your
+recordings — a Vite + React app that talks directly to the MCP Bridge Server.
 
 **Setup** (run from the `studio/` directory, not the project root — it's a separate
 npm package from any Node tooling elsewhere in the repo):
@@ -155,10 +145,30 @@ before deploying:
 npm run preview
 ```
 
+Once built, the Bridge Server also serves Studio directly at **`http://localhost:8008/editor/`**
+(no separate `npm run dev` needed) — if `studio/dist/` doesn't exist yet, that route
+returns a short message with the build command instead of failing.
+
 Studio talks directly to the MCP Bridge Server over HTTP (same `/mcp` endpoint used
 by n8n), so **the Bridge Server must be running** (`uv run python -m src.main serve`)
 for Studio to connect. It auto-detects the bridge on `localhost:8008` then
 `localhost:8000`.
+
+In Studio you can:
+- Edit session metadata (Name, Description, AI Model).
+- Filter commands by tool name.
+- **Add & Edit Commands**: an interactive modal with schema validation to discover
+  tools, safely modify arguments, or add entirely new steps.
+- Edit tool arguments directly in the JSON editor cards, or toggle to a whole-session
+  **Guided / JSON view** for bulk edits with a command outline for quick navigation.
+- Reorder or delete commands, and replay them (Play All / Play / Play to Active).
+- Define **global parameters** (`${name}` tokens, including arithmetic expressions
+  like `${box_height} / 2`) so command arguments stay reusable across resizes/edits.
+- Define **branches** — named, non-contiguous ranges of the command list you can jump
+  between and run independently (e.g. a "plain" feature vs. a "with extra part"
+  feature sharing a common base) — via the Branches panel's click-to-pick range
+  builder.
+- **Export JSON** to save your changes to a new file.
 
 ### 3. Configure n8n Workflow
 

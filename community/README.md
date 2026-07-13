@@ -24,9 +24,9 @@ Then build your scene using n8n or your AI agent as usual. Every modeling comman
 
 ### 2. Clean the Recording (Recommended)
 
-Large or messy sessions make playback slow for others. Use the built-in editor to tidy it:
+Large or messy sessions make playback slow for others. Use Studio to tidy it:
 
-1.  Open `session_editor/index.html` in your web browser.
+1.  Run the Bridge Server, then open `http://localhost:8008/editor/` (or `cd studio && npm run dev` for hot-reload).
 2.  **Load** your `session.json`.
 3.  **Delete** mistakes or unnecessary commands.
 4.  **Export JSON** to save the cleaned file.
