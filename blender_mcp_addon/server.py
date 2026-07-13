@@ -274,6 +274,7 @@ class BlenderMCPServer(
             "create_plane": self.create_plane,
             "create_empty": self.create_empty,
             "create_polygon": self.create_polygon,
+            "create_watertight_plate": self.create_watertight_plate,
             "duplicate_object": self.duplicate_object,
             "duplicate_selection": self.duplicate_selection,
             "create_and_array": self.create_and_array,

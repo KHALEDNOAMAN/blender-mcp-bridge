@@ -354,6 +354,86 @@ def get_primitive_tools() -> list[types.Tool]:
             },
         ),
         types.Tool(
+            name="create_watertight_plate",
+            description=(
+                "Build a WATERTIGHT extruded plate from a 2D outline with through-holes and "
+                "engraved (recessed) regions - all in one indexed mesh, no boolean operations. "
+                "Use this instead of create_polygon + boolean_operation for printable flat parts "
+                "with holes or text: boolean cutouts routinely produce non-manifold meshes that "
+                "slicers silently repair (deleting the holes/text). Returns is_watertight and "
+                "non_manifold_edges in the payload - success is false if the mesh is not watertight."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "Object name"},
+                    "outline": {
+                        "type": "array",
+                        "items": {"type": "array", "items": {"type": "number"}},
+                        "description": "Outer boundary as [[x,y], ...] in scene units (mm).",
+                    },
+                    "thickness": {
+                        "type": "number",
+                        "description": "Plate height; the solid spans z=0..thickness.",
+                    },
+                    "holes": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {"type": "array", "items": {"type": "number"}},
+                        },
+                        "description": "Optional list of [[x,y],...] loops cut fully through.",
+                    },
+                    "circle_holes": {
+                        "type": "array",
+                        "items": {"type": "array", "items": {"type": "number"}},
+                        "description": "Optional list of [cx, cy, r] circular through-holes.",
+                    },
+                    "engrave_regions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "outer": {
+                                    "type": "array",
+                                    "items": {"type": "array", "items": {"type": "number"}},
+                                },
+                                "holes": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "array",
+                                        "items": {"type": "array", "items": {"type": "number"}},
+                                    },
+                                },
+                            },
+                            "required": ["outer"],
+                        },
+                        "description": (
+                            "Optional regions recessed from the TOP face by engrave_depth. "
+                            "Each has an outer loop and optional hole loops (e.g. text glyph "
+                            "contours + their counters). Use for engraved text: cut-through text "
+                            "would drop the enclosed counters of letters like R/8/9."
+                        ),
+                    },
+                    "engrave_depth": {
+                        "type": "number",
+                        "default": 0.6,
+                        "description": "Recess depth from the top face for engrave_regions.",
+                    },
+                    "location": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "XYZ world-space origin (default [0,0,0]).",
+                    },
+                    "collection": {
+                        "type": "string",
+                        "description": "Optional: collection to place the object in.",
+                    },
+                },
+                "required": ["name", "outline", "thickness"],
+            },
+        ),
+        types.Tool(
             name="create_polygon",
             description="Create a flat polygon mesh from exact vertex coordinates, then optionally extrude for thickness. Perfect for trapezoids, triangles, or any custom flat shape where you need precise control over each corner position.",
             inputSchema={

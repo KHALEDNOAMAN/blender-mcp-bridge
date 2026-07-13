@@ -611,3 +611,176 @@ class ModelingPrimitives:
         for c in obj.users_collection:
             c.objects.unlink(obj)
         coll.objects.link(obj)
+
+    # ────────────────────────────────────────────────────────────────────
+    # Watertight plate: 2D profile with holes + engraved regions, built as
+    # a single indexed mesh (caps + walls share vertex indices), so the
+    # result is watertight BY CONSTRUCTION — no boolean operations.
+    # Added after boolean text cutouts repeatedly produced non-manifold
+    # STLs that slicers silently "repaired" (deleting holes/text).
+    # ────────────────────────────────────────────────────────────────────
+    def create_watertight_plate(
+        self,
+        name,
+        outline,
+        thickness,
+        holes=None,
+        circle_holes=None,
+        engrave_regions=None,
+        engrave_depth=0.6,
+        location=(0, 0, 0),
+        collection=None,
+        **kwargs,
+    ):
+        """Build a watertight extruded plate from a 2D outline.
+
+        outline:          [[x,y], ...] outer boundary.
+        thickness:        plate height (z 0..thickness).
+        holes:            list of [[x,y],...] loops cut fully through.
+        circle_holes:     list of [cx, cy, r] circles cut fully through.
+        engrave_regions:  list of {"outer": [[x,y],...], "holes": [[[x,y],...], ...]}
+                          recessed from the TOP face down by engrave_depth
+                          (e.g. text glyphs: outer contour + counters).
+        engrave_depth:    depth of the engraved recess from the top face.
+        """
+        import mathutils
+        from mathutils import Vector
+        from mathutils.geometry import tessellate_polygon
+
+        holes = holes or []
+        circle_holes = circle_holes or []
+        engrave_regions = engrave_regions or []
+
+        def clean(loop, eps=1e-3):
+            out = []
+            for p in loop:
+                p = (float(p[0]), float(p[1]))
+                if not out or abs(p[0] - out[-1][0]) > eps or abs(p[1] - out[-1][1]) > eps:
+                    out.append(p)
+            while len(out) > 2 and abs(out[0][0] - out[-1][0]) <= eps and abs(out[0][1] - out[-1][1]) <= eps:
+                out.pop()
+            return out
+
+        def jitter(loop, salt):
+            # deterministic sub-micron jitter breaks collinear tessellation
+            # degeneracies (T-junctions) without affecting print dimensions
+            out = []
+            for i, (x, y) in enumerate(loop):
+                h = (hash((salt, i)) % 1000 - 500) * 1e-6
+                out.append((x + h, y - h))
+            return out
+
+        def circle_loop(cx, cy, r, n=48):
+            return [
+                (cx + r * math.cos(2 * math.pi * i / n), cy + r * math.sin(2 * math.pi * i / n))
+                for i in range(n)
+            ]
+
+        outline = clean(outline)
+        hole_loops = [clean(h) for h in holes] + [clean(circle_loop(*c)) for c in circle_holes]
+        eng = []
+        for k, r in enumerate(engrave_regions):
+            eng.append(
+                {
+                    "outer": jitter(clean(r["outer"]), ("eo", k)),
+                    "holes": [jitter(clean(h), ("eh", k, j)) for j, h in enumerate(r.get("holes", []))],
+                }
+            )
+
+        z_top = float(thickness)
+        z_floor = z_top - float(engrave_depth)
+
+        verts = []          # (x, y, z)
+        faces = []          # index tuples
+
+        def add_ring(loop, z):
+            base = len(verts)
+            for x, y in loop:
+                verts.append((x, y, z))
+            return list(range(base, base + len(loop)))
+
+        def add_walls(bot_ids, top_ids):
+            n = len(bot_ids)
+            for i in range(n):
+                j = (i + 1) % n
+                faces.append((bot_ids[i], bot_ids[j], top_ids[j], top_ids[i]))
+
+        def tess(loops2d):
+            """Tessellate loops (first outer, rest holes); returns triangles as
+            indices into the concatenated loop vertices."""
+            data = [[Vector(p) for p in lp] for lp in loops2d]
+            return tessellate_polygon(data)
+
+        def add_cap(loops2d, ring_ids_concat):
+            for tri in tess(loops2d):
+                faces.append(tuple(ring_ids_concat[i] for i in tri))
+
+        # rings
+        out_b = add_ring(outline, 0.0)
+        out_t = add_ring(outline, z_top)
+        hole_rings = [(add_ring(h, 0.0), add_ring(h, z_top)) for h in hole_loops]
+        eng_rings = []
+        for r in eng:
+            o_f = add_ring(r["outer"], z_floor)
+            o_t = add_ring(r["outer"], z_top)
+            c_pairs = [(add_ring(c, z_floor), add_ring(c, z_top)) for c in r["holes"]]
+            eng_rings.append((o_f, o_t, c_pairs))
+
+        # bottom cap: outline + through-holes
+        add_cap([outline] + hole_loops, out_b + [i for hb, _ in hole_rings for i in hb])
+        # top cap: outline + through-holes + engrave outers
+        add_cap(
+            [outline] + hole_loops + [r["outer"] for r in eng],
+            out_t
+            + [i for _, ht in hole_rings for i in ht]
+            + [i for (_, o_t, _) in eng_rings for i in o_t],
+        )
+        # engrave counter islands (top face) and engrave floors
+        for r, (o_f, o_t, c_pairs) in zip(eng, eng_rings):
+            for c_loop, (c_f, c_t) in zip(r["holes"], c_pairs):
+                add_cap([c_loop], c_t)
+            add_cap([r["outer"]] + r["holes"], o_f + [i for c_f, _ in c_pairs for i in c_f])
+        # walls
+        add_walls(out_b, out_t)
+        for hb, ht in hole_rings:
+            add_walls(hb, ht)
+        for o_f, o_t, c_pairs in eng_rings:
+            add_walls(o_f, o_t)
+            for c_f, c_t in c_pairs:
+                add_walls(c_f, c_t)
+
+        # build mesh
+        mesh = bpy.data.meshes.new(name)
+        mesh.from_pydata(verts, [], faces)
+        mesh.update()
+        obj = bpy.data.objects.new(name, mesh)
+        bpy.context.collection.objects.link(obj)
+        obj.location = location
+
+        # consistent outward normals
+        import bmesh
+        bm = bmesh.new()
+        bm.from_mesh(mesh)
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+        # watertight report
+        boundary = sum(1 for e in bm.edges if len(e.link_faces) != 2)
+        bm.to_mesh(mesh)
+        bm.free()
+        mesh.update()
+
+        if collection:
+            self._move_to_collection_helper(obj, collection)
+
+        return {
+            "success": boundary == 0,
+            "name": obj.name,
+            "is_watertight": boundary == 0,
+            "non_manifold_edges": boundary,
+            "vertices": len(verts),
+            "faces": len(faces),
+            "dimensions": list(obj.dimensions),
+            "message": (
+                f"Watertight plate '{obj.name}' created: {len(verts)} verts, "
+                f"{len(faces)} faces, non-manifold edges: {boundary}."
+            ),
+        }
