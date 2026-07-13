@@ -10,7 +10,6 @@ const commandCount = document.getElementById('commandCount');
 const commandFilter = document.getElementById('commandFilter');
 const sessionName = document.getElementById('sessionName');
 const sessionModel = document.getElementById('sessionModel');
-const sessionCreatedAt = document.getElementById('sessionCreatedAt');
 const sessionDescription = document.getElementById('sessionDescription');
 const commandTemplate = document.getElementById('commandTemplate');
 const themeToggle = document.getElementById('themeToggle');

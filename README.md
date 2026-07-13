@@ -124,6 +124,42 @@ We provide a built-in static web editor to inspect and edit your recordings:
    - Reorder or delete unnecessary commands.
    - **Export JSON** to save your changes to a new file.
 
+### Studio (Vite + React, in development)
+`studio/` is the in-progress successor to the Session Editor above — a Vite + React
+rebuild that will eventually add parametric global parameters and feature branching
+on top of the same recording/playback workflow. See [`docs/studio_design_v1.md`](docs/studio_design_v1.md)
+for the design doc and migration status. For now it has 1:1 feature parity with the
+Session Editor; `session_editor/` remains the stable option until Studio replaces it.
+
+**Setup** (run from the `studio/` directory, not the project root — it's a separate
+npm package from any Node tooling elsewhere in the repo):
+
+```bash
+cd studio
+npm install
+```
+
+**Development** — starts a hot-reloading dev server (default `http://localhost:5173`):
+```bash
+npm run dev
+```
+
+**Production build** — outputs a static bundle to `studio/dist/`:
+```bash
+npm run build
+```
+
+**Preview a production build** — serves the `dist/` output locally to sanity-check it
+before deploying:
+```bash
+npm run preview
+```
+
+Studio talks directly to the MCP Bridge Server over HTTP (same `/mcp` endpoint used
+by n8n), so **the Bridge Server must be running** (`uv run python -m src.main serve`)
+for Studio to connect. It auto-detects the bridge on `localhost:8008` then
+`localhost:8000`.
+
 ### 3. Configure n8n Workflow
 
 ![n8n Design](docs/images/blender-mcp-for-n8n.png)

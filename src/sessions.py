@@ -1,9 +1,7 @@
 # src/sessions.py
 
 import json
-import time
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
 from typing import Any
 
 
@@ -13,7 +11,6 @@ class SessionMetadata:
     model: str = ""
     description: str = ""
     documentation_url: str = ""
-    created_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
 
 @dataclass
@@ -21,7 +18,6 @@ class SessionCommand:
     tool: str
     arguments: dict[str, Any]
     description: str | None = None
-    timestamp: float = field(default_factory=time.time)
     execution_status: str | None = None
 
 

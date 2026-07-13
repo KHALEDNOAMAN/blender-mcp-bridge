@@ -73,7 +73,6 @@ function renderSession() {
     if (!currentSession) return;
     sessionName.value = currentSession.metadata.name || '';
     sessionModel.value = currentSession.metadata.model || '';
-    sessionCreatedAt.value = currentSession.metadata.created_at || '';
     sessionDescription.value = currentSession.metadata.description || '';
     renderCommands();
 }
@@ -118,7 +117,6 @@ function renderCommands(expandIdx = 0) {
             if (identifier) displayName += ` <span style="opacity: 0.6; font-size: 0.85em;">(${identifier})</span>`;
         }
         card.querySelector('.tool-name').innerHTML = displayName;
-        card.querySelector('.timestamp').textContent = new Date(cmd.timestamp * 1000).toLocaleTimeString();
         card.querySelector('.command-header').addEventListener('click', (e) => { if (!e.target.closest('.command-actions')) expandCard(card); });
 
         const btn = card.querySelector('.run-cmd');

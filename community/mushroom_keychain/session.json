@@ -2,7 +2,6 @@
   "metadata": {
     "name": "Mushroom Keychain v3 - Click-Together, Zero Supports",
     "model": "claude-fable-5",
-    "created_at": "2026-07-11T00:00:00.000Z",
     "description": "v3 after the v2 design review: (1) spores now show their ROUNDED side (cut face buried in the cap) - real amanita warts are rounded bumps, and v2's flat-face-out pads produced concave waists; (2) the 4 inner spores are smaller than the 8 outer ones; (3) the stem is a SEPARATE part joined by a snap-fit click post - this lets the cap print display-face-UP with every surface fully supported (v2's flipped one-piece print left the 8 slope spores as floating islands over air). Cap: TRUE dome - ellipsoid cut at its equator, widest circle at the base, 5mm tall over o28mm, zero overhang printed face-up with a snap socket (o6.4 bore, internal groove, entry chamfer). Stem: tapered cone with a slotted click post (o6.2 shaft, o6.7 rounded snap ring, 2.4mm flex slot, ~3.5% prong strain - PLA-safe) and the o3mm keyring hole. Exports THREE STLs: red cap + white spores (same origin, import together as one multi-part object) and the white stem (own object, prints standing). No flips, no supports, no bridges."
   },
   "commands": [
@@ -13,7 +12,6 @@
         "length_unit": "MILLIMETERS",
         "scale": 0.001
       },
-      "timestamp": 1784170000,
       "description": "Set scene to millimeters."
     },
     {
@@ -21,7 +19,6 @@
       "arguments": {
         "pattern": "*"
       },
-      "timestamp": 1784170000,
       "description": "Wipe the scene for an idempotent replay."
     },
     {
@@ -41,7 +38,6 @@
           10
         ]
       },
-      "timestamp": 1784170001,
       "description": "PHASE 1: cap blank - ellipsoid with z semi-axis 5mm on r14. The equator (widest circle, r14) sits exactly at Z=22 where the bottom cut lands, making the cap a TRUE DOME: widest at its base, wall starting vertical at the plate and curving inward to the apex at Z=27 - no under-curl, no overhang ring (design review: the cap must be a dome, not a flying saucer)."
     },
     {
@@ -59,7 +55,6 @@
           8
         ]
       },
-      "timestamp": 1784170001,
       "description": "Bottom slice cutter - top face at Z=22, the ellipsoid's EQUATOR: the flat base is the widest cross-section, so printing face-up has zero overhang anywhere on the cap."
     },
     {
@@ -69,7 +64,6 @@
         "object_b": "BottomCutter",
         "operation": "DIFFERENCE"
       },
-      "timestamp": 1784170001,
       "description": "Slice the cap at its equator: a 5mm-tall dome, o28 base. This face is the build-plate face AND the mating plane where the cap seats on the stem shoulder."
     },
     {
@@ -85,7 +79,6 @@
         "depth": 5,
         "vertices": 48
       },
-      "timestamp": 1784170002,
       "description": "Snap socket bore cutter - o6.4, reaching 3.4mm into the cap (to Z=25.4, leaving a 1.6mm roof under the apex at 27). Extends below the bottom face so no coplanar-face boolean flakiness."
     },
     {
@@ -95,7 +88,6 @@
         "object_b": "SocketBoreCutter",
         "operation": "DIFFERENCE"
       },
-      "timestamp": 1784170002,
       "description": "Cut the socket bore. The stem's o6.2 shaft slides in with 0.1mm/side clearance."
     },
     {
@@ -110,7 +102,6 @@
         "major_radius": 3.15,
         "minor_radius": 0.35
       },
-      "timestamp": 1784170002,
       "description": "Internal groove cutter - torus reaching r3.5 at Z=24 (2.0mm above the mating plane at 22, same station as the stem's snap ring). The rounded groove profile lets the click disengage if you ever want the parts apart."
     },
     {
@@ -120,7 +111,6 @@
         "object_b": "GrooveCutter",
         "operation": "DIFFERENCE"
       },
-      "timestamp": 1784170002,
       "description": "Cut the annular snap groove into the bore wall (lip depth 0.15mm over the bore radius)."
     },
     {
@@ -136,7 +126,6 @@
         "radius2": 3.2,
         "depth": 1.0
       },
-      "timestamp": 1784170002,
       "description": "Entry chamfer cutter - widens the socket mouth from o7.4 to o6.4 over the first 0.9mm. Guides the post in AND cancels first-layer elephant-foot squeeze at the bore opening."
     },
     {
@@ -146,7 +135,6 @@
         "object_b": "EntryChamferCutter",
         "operation": "DIFFERENCE"
       },
-      "timestamp": 1784170002,
       "description": "Cut the entry chamfer."
     },
     {
@@ -154,7 +142,6 @@
       "arguments": {
         "object_name": "Cap"
       },
-      "timestamp": 1784170002,
       "description": "Bake the dome slice and the full snap socket. *** END OF PHASE 1 *** Stop here to view: domed cap with click socket."
     },
     {
@@ -174,7 +161,6 @@
           1.76
         ]
       },
-      "timestamp": 1784170003,
       "description": "PHASE 2: inner-spore template (r2.2 - SMALLER than the outer ring per design review), squashed z-scale 0.4. Built AT THE WORLD ORIGIN so origin == mesh center survives any addon version (some builds bake location at creation; a template elsewhere makes rotated duplicates swing around a phantom pivot)."
     },
     {
@@ -192,7 +178,6 @@
           6
         ]
       },
-      "timestamp": 1784170003,
       "description": "Template cutter - top face at Z=-0.2: removes the BOTTOM of the lens, keeping the rounded dome up. The cut face gets buried in the cap and the ROUNDED side shows - real amanita warts are rounded bumps, not flat pads (v2's flat-face-out look was the review's main complaint)."
     },
     {
@@ -202,7 +187,6 @@
         "object_b": "TplCutterA",
         "operation": "DIFFERENCE"
       },
-      "timestamp": 1784170003,
       "description": "Cut the inner template: dome up, flat underside 0.2 below its equator (~61% kept - 'cut at least half' of the squashed sphere)."
     },
     {
@@ -210,7 +194,6 @@
       "arguments": {
         "object_name": "TplInner"
       },
-      "timestamp": 1784170003,
       "description": "Bake the template cut BEFORE duplicating (live modifiers on duplicates cut in wrong world positions)."
     },
     {
@@ -229,7 +212,6 @@
           0
         ]
       },
-      "timestamp": 1784170004,
       "description": "Inner spore East - ring r=5 on the new 5mm dome (surface 26.68), cut face sunk ~0.25, tilted 8 degrees outward to match the local slope."
     },
     {
@@ -248,7 +230,6 @@
           90
         ]
       },
-      "timestamp": 1784170004,
       "description": "Inner spore North. - ring r=5 on the new 5mm dome (surface 26.68), cut face sunk ~0.25, tilted 8 degrees outward to match the local slope."
     },
     {
@@ -267,7 +248,6 @@
           180
         ]
       },
-      "timestamp": 1784170004,
       "description": "Inner spore West. - ring r=5 on the new 5mm dome (surface 26.68), cut face sunk ~0.25, tilted 8 degrees outward to match the local slope."
     },
     {
@@ -286,7 +266,6 @@
           270
         ]
       },
-      "timestamp": 1784170004,
       "description": "Inner spore South - ring r=5 on the new 5mm dome (surface 26.68), cut face sunk ~0.25, tilted 8 degrees outward to match the local slope."
     },
     {
@@ -294,7 +273,6 @@
       "arguments": {
         "pattern": "TplInner"
       },
-      "timestamp": 1784170004,
       "description": "Remove the inner template."
     },
     {
@@ -314,7 +292,6 @@
           2.08
         ]
       },
-      "timestamp": 1784170005,
       "description": "Outer-spore template (r2.6, the bigger ring), squashed z-scale 0.4, again at the world origin."
     },
     {
@@ -332,7 +309,6 @@
           6
         ]
       },
-      "timestamp": 1784170005,
       "description": "Template cutter - top face at Z=-0.25: keeps the rounded dome with a flat underside."
     },
     {
@@ -342,7 +318,6 @@
         "object_b": "TplCutterB",
         "operation": "DIFFERENCE"
       },
-      "timestamp": 1784170005,
       "description": "Cut the outer template."
     },
     {
@@ -350,7 +325,6 @@
       "arguments": {
         "object_name": "TplOuter"
       },
-      "timestamp": 1784170005,
       "description": "Bake before duplicating."
     },
     {
@@ -369,7 +343,6 @@
           22.5
         ]
       },
-      "timestamp": 1784170006,
       "description": "Outer spore 1 of 8 - ring r=9.8 (surface 25.57), cut face sunk ~0.35 (deeper: the dome is curvier here), tilted 19 degrees to match the local slope."
     },
     {
@@ -388,7 +361,6 @@
           67.5
         ]
       },
-      "timestamp": 1784170006,
       "description": "Outer spore 2 of 8 (67.5 degrees). - ring r=9.8 (surface 25.57), cut face sunk ~0.35 (deeper: the dome is curvier here), tilted 19 degrees to match the local slope."
     },
     {
@@ -407,7 +379,6 @@
           112.5
         ]
       },
-      "timestamp": 1784170006,
       "description": "Outer spore 3 of 8 (112.5 degrees). - ring r=9.8 (surface 25.57), cut face sunk ~0.35 (deeper: the dome is curvier here), tilted 19 degrees to match the local slope."
     },
     {
@@ -426,7 +397,6 @@
           157.5
         ]
       },
-      "timestamp": 1784170006,
       "description": "Outer spore 4 of 8 (157.5 degrees). - ring r=9.8 (surface 25.57), cut face sunk ~0.35 (deeper: the dome is curvier here), tilted 19 degrees to match the local slope."
     },
     {
@@ -445,7 +415,6 @@
           202.5
         ]
       },
-      "timestamp": 1784170006,
       "description": "Outer spore 5 of 8 (202.5 degrees). - ring r=9.8 (surface 25.57), cut face sunk ~0.35 (deeper: the dome is curvier here), tilted 19 degrees to match the local slope."
     },
     {
@@ -464,7 +433,6 @@
           247.5
         ]
       },
-      "timestamp": 1784170006,
       "description": "Outer spore 6 of 8 (247.5 degrees). - ring r=9.8 (surface 25.57), cut face sunk ~0.35 (deeper: the dome is curvier here), tilted 19 degrees to match the local slope."
     },
     {
@@ -483,7 +451,6 @@
           292.5
         ]
       },
-      "timestamp": 1784170006,
       "description": "Outer spore 7 of 8 (292.5 degrees). - ring r=9.8 (surface 25.57), cut face sunk ~0.35 (deeper: the dome is curvier here), tilted 19 degrees to match the local slope."
     },
     {
@@ -502,7 +469,6 @@
           337.5
         ]
       },
-      "timestamp": 1784170006,
       "description": "Outer spore 8 of 8 (337.5 degrees). - ring r=9.8 (surface 25.57), cut face sunk ~0.35 (deeper: the dome is curvier here), tilted 19 degrees to match the local slope."
     },
     {
@@ -510,7 +476,6 @@
       "arguments": {
         "pattern": "TplOuter"
       },
-      "timestamp": 1784170006,
       "description": "Remove the outer template."
     },
     {
@@ -532,7 +497,6 @@
         ],
         "new_name": "CapSpores"
       },
-      "timestamp": 1784170007,
       "description": "Join all 12 rounded spores into the white cap-decoration body. *** END OF PHASE 2 *** Stop here to view: domed cap with rounded warts."
     },
     {
@@ -548,7 +512,6 @@
         "radius2": 4,
         "depth": 20
       },
-      "timestamp": 1784170008,
       "description": "PHASE 3: stem - SEPARATE PART, built standing at X=30. Tapered cone, base r=5 on the plate, shoulder r=4 at Z=20. The cap's flat underside seats on this shoulder when clicked together."
     },
     {
@@ -564,7 +527,6 @@
         "depth": 3.6,
         "vertices": 48
       },
-      "timestamp": 1784170008,
       "description": "Click post - o6.2 shaft rising 3.3mm above the shoulder (socket is 3.4 deep: 0.1 bottoming clearance), rooted 0.3mm into the stem tip."
     },
     {
@@ -579,7 +541,6 @@
         "major_radius": 3.0,
         "minor_radius": 0.35
       },
-      "timestamp": 1784170008,
       "description": "Snap ring - rounded bulge to r3.35 at 2.0mm above the shoulder, the SAME station as the cap's groove. 0.15mm interference against the o6.4 bore; the round profile self-guides on insertion and allows deliberate removal."
     },
     {
@@ -589,7 +550,6 @@
         "object_b": "SnapPost",
         "operation": "UNION"
       },
-      "timestamp": 1784170008,
       "description": "UNION the post into the stem - NOT join_objects: joining overlapping closed shells makes a self-intersecting mesh that the EXACT boolean solver later reduces to nothing (we watched the stem export 0 triangles). Union produces one clean manifold shell."
     },
     {
@@ -597,7 +557,6 @@
       "arguments": {
         "object_name": "Stem"
       },
-      "timestamp": 1784170008,
       "description": "Bake the post union."
     },
     {
@@ -607,7 +566,6 @@
         "object_b": "SnapRing",
         "operation": "UNION"
       },
-      "timestamp": 1784170008,
       "description": "UNION the snap ring onto the post."
     },
     {
@@ -615,7 +573,6 @@
       "arguments": {
         "object_name": "Stem"
       },
-      "timestamp": 1784170008,
       "description": "Bake the ring union - the stem is now a single manifold shell, safe to cut."
     },
     {
@@ -623,7 +580,6 @@
       "arguments": {
         "pattern": "Snap*"
       },
-      "timestamp": 1784170008,
       "description": "Remove the (hidden) union operands so they cannot reach the exports."
     },
     {
@@ -641,7 +597,6 @@
           5.4
         ]
       },
-      "timestamp": 1784170009,
       "description": "Flex slot cutter - 2.4mm slot through the post down into the stem tip (Z 18.4-23.8). Splits post and ring into two 1.9mm prongs; each flexes 0.15mm on insertion = ~3.5% strain, safe for a one-time PLA click (PETG clicks forever). The slot shows as a small 1.6mm notch on the stem sides below the shoulder - hidden once assembled."
     },
     {
@@ -651,7 +606,6 @@
         "object_b": "SlotCutter",
         "operation": "DIFFERENCE"
       },
-      "timestamp": 1784170009,
       "description": "Cut the flex slot."
     },
     {
@@ -672,7 +626,6 @@
         "depth": 20,
         "vertices": 32
       },
-      "timestamp": 1784170009,
       "description": "Keyring hole cutter, radius 1.5 (o3mm - reduced 25% from the o4 draft that looked oversized on the stem). Near the stem base with a 3.5mm wall below."
     },
     {
@@ -682,7 +635,6 @@
         "object_b": "RingHoleCutter",
         "operation": "DIFFERENCE"
       },
-      "timestamp": 1784170009,
       "description": "Cut the o4mm keyring hole."
     },
     {
@@ -690,7 +642,6 @@
       "arguments": {
         "object_name": "Stem"
       },
-      "timestamp": 1784170009,
       "description": "Bake slot + hole. *** END OF PHASE 3 *** Stop here to view: stem with click post and keyring bore."
     },
     {
@@ -698,7 +649,6 @@
       "arguments": {
         "pattern": "*Cutter*"
       },
-      "timestamp": 1784170010,
       "description": "Remove all cutter objects so nothing stray can reach the exports."
     },
     {
@@ -711,7 +661,6 @@
           -22
         ]
       },
-      "timestamp": 1784170010,
       "description": "PHASE 4: drop the cap (dome base was modeled at Z=22) so its flat underside sits on Z=0, plate-ready display-face-up. Pure translation via location_offset - origin-independent, immune to the deployed addon's location-baking. One object per call (the bridge schema silently drops lists)."
     },
     {
@@ -724,7 +673,6 @@
           -22
         ]
       },
-      "timestamp": 1784170010,
       "description": "Drop the spores by the same 22mm so they stay socketed on the cap dome - same-origin alignment preserved for the multi-part slicer import."
     },
     {
@@ -734,7 +682,6 @@
         "base_color": "#CC0D0D",
         "roughness": 0.5
       },
-      "timestamp": 1784170011,
       "description": "Red material for the cap (hex base_color - RGBA 'color' lists are an outdated schema)."
     },
     {
@@ -744,7 +691,6 @@
         "base_color": "#EBEBE6",
         "roughness": 0.6
       },
-      "timestamp": 1784170011,
       "description": "White material for spores and stem."
     },
     {
@@ -755,7 +701,6 @@
         ],
         "material_name": "CapRed"
       },
-      "timestamp": 1784170011,
       "description": "Cap goes red."
     },
     {
@@ -767,7 +712,6 @@
         ],
         "material_name": "PureWhite"
       },
-      "timestamp": 1784170011,
       "description": "Spores and stem go white."
     },
     {
@@ -775,7 +719,6 @@
       "arguments": {
         "object_name": "Cap"
       },
-      "timestamp": 1784170012,
       "description": "Waterproofing check on the red cap body (with socket)."
     },
     {
@@ -783,7 +726,6 @@
       "arguments": {
         "object_name": "CapSpores"
       },
-      "timestamp": 1784170012,
       "description": "Waterproofing check on the 12 spore shells."
     },
     {
@@ -791,7 +733,6 @@
       "arguments": {
         "object_name": "Stem"
       },
-      "timestamp": 1784170012,
       "description": "Waterproofing check on the stem with click post."
     },
     {
@@ -801,7 +742,6 @@
         "filepath": "mushroom_cap_red.stl",
         "format": "STL"
       },
-      "timestamp": 1784170013,
       "description": "Export the red cap STL - flat face on Z=0, display-face-up, plate-ready. Same world origin as the spores: import these two together as ONE multi-part object."
     },
     {
@@ -811,7 +751,6 @@
         "filepath": "mushroom_spores_white.stl",
         "format": "STL"
       },
-      "timestamp": 1784170013.1,
       "description": "Export the white spores STL (same origin as the cap)."
     },
     {
@@ -821,7 +760,6 @@
         "filepath": "mushroom_stem_white.stl",
         "format": "STL"
       },
-      "timestamp": 1784170013.2,
       "description": "Export the white stem STL - its own object, prints standing beside the cap. Import it in a SECOND import action so it does not merge into the cap's multi-part object."
     }
   ]

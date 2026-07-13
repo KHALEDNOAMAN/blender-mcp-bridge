@@ -1,0 +1,12 @@
+/* Global reset — app visuals come from style.css (ported from session_editor) */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  height: 100%;
+}

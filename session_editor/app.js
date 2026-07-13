@@ -42,10 +42,10 @@ addCommandBtn.addEventListener('click', async () => {
             target[parts[parts.length - 1]] = v;
         });
         if (!currentSession) {
-            currentSession = { metadata: { name: 'New Session', model: '', created_at: new Date().toISOString(), description: '' }, commands: [] };
+            currentSession = { metadata: { name: 'New Session', model: '', description: '' }, commands: [] };
             renderSession();
         }
-        const newCmd = { tool: toolName, arguments: args, timestamp: Math.floor(Date.now() / 1000), description: '' };
+        const newCmd = { tool: toolName, arguments: args, description: '' };
         const expIdx = Array.from(document.querySelectorAll('.command-card')).findIndex(c => c.classList.contains('expanded'));
         let newIdx;
         if (expIdx !== -1) {
@@ -120,15 +120,12 @@ newSessionBtn.addEventListener('click', async () => {
 
     if (await modal.show('New Session', 'Create a new Blender MCP session:', 'confirm', customContent)) {
         const template = customContent.querySelector('#templateSelect').value;
-        const now = Math.floor(Date.now() / 1000);
-        const isoString = new Date().toISOString();
 
         if (template === 'blank') {
             currentSession = {
                 metadata: {
                     name: 'New Blank Session',
                     model: '',
-                    created_at: isoString,
                     description: 'A new session started from scratch.'
                 },
                 commands: []
@@ -138,7 +135,6 @@ newSessionBtn.addEventListener('click', async () => {
                 metadata: {
                     name: '3D Printing Session',
                     model: '',
-                    created_at: isoString,
                     description: '3D printing workflow in millimeters.'
                 },
                 commands: [
@@ -149,7 +145,6 @@ newSessionBtn.addEventListener('click', async () => {
                             length_unit: 'MILLIMETERS',
                             scale: 0.001
                         },
-                        timestamp: now,
                         description: 'Configure scene units to millimeters and set unit scale to 0.001 (divide by 1000).'
                     }
                 ]
@@ -159,7 +154,6 @@ newSessionBtn.addEventListener('click', async () => {
                 metadata: {
                     name: 'STL Edit Session',
                     model: '',
-                    created_at: isoString,
                     description: 'Import STL and prepare for editing.'
                 },
                 commands: [
@@ -170,7 +164,6 @@ newSessionBtn.addEventListener('click', async () => {
                             length_unit: 'MILLIMETERS',
                             scale: 0.001
                         },
-                        timestamp: now,
                         description: 'Configure scene units to millimeters and set unit scale to 0.001 (divide by 1000).'
                     },
                     {
@@ -178,7 +171,6 @@ newSessionBtn.addEventListener('click', async () => {
                         arguments: {
                             filepath: 'assets/3DBenchy.stl'
                         },
-                        timestamp: now + 1,
                         description: 'Import the base STL model to modify.'
                     }
                 ]
