@@ -274,8 +274,23 @@ header {
 
 .actions {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 1rem;
     align-items: center;
+}
+
+/* §10: community sample dropdown — sized to match the header's .btn
+   buttons (padding/font-size) rather than .form-select's default full-width
+   form-field styling, since it sits inline in a row of buttons here. */
+.community-sample-select {
+    width: auto;
+    min-width: 160px;
+    max-width: 220px;
+    flex-shrink: 0;
+    padding: 0.6rem 1.8rem 0.6rem 0.9rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
 }
 
 /* Status Indicator */

@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "presync-community": "node scripts/sync-community-sessions.mjs",
+    "dev": "npm run presync-community && vite",
+    "build": "npm run presync-community && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },

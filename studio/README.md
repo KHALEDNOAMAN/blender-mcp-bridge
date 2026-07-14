@@ -1,16 +1,29 @@
-# React + Vite
+# Studio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Studio is the visual editor for inspecting, editing, and replaying Blender MCP
+session recordings — a Vite + React app that talks directly to the MCP Bridge
+Server over HTTP. See the [top-level README](../README.md#studio-visual-editor)
+for setup, usage, and the session JSON format, and
+[`docs/studio_design_v1.md`](../docs/studio_design_v1.md) for the full design spec.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+`npm run dev` and `npm run build` both run `scripts/sync-community-sessions.mjs`
+first (via the `presync-community` script), which copies `../community/*/session.json`
+into `public/community/` and writes a manifest so the "Load Community Sample"
+dropdown can fetch a static list. That output directory is generated and
+gitignored — never hand-edit or commit it.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm run build    # outputs static bundle to studio/dist/
+npm run preview  # preview the production build
+npm run lint      # oxlint
+```
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Once built, the Bridge Server also serves Studio directly at
+`http://localhost:8008/editor/`.

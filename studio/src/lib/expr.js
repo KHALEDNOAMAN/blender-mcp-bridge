@@ -38,10 +38,22 @@ function tokenize(source) {
  * still handled by the plain single-token substitution path in lib/params.js
  * for backward compatibility / simplicity; this only needs to catch
  * genuinely-expression-shaped strings.
+ *
+ * Must tokenize cleanly under TOKEN_RE (the same tokenizer evaluateExpression
+ * uses) end-to-end, not just contain an operator character somewhere — a
+ * plain identifier like "Wall_Bed2-3_Center" contains a digit and a "-" but
+ * is not expression-shaped, and a substring/regex check alone would wrongly
+ * route it into the parser and throw "Unexpected character at position 0".
  */
 export function looksLikeExpression(source) {
     if (typeof source !== 'string') return false;
-    return /[+\-*/()]/.test(source) && /\$\{[a-zA-Z_][a-zA-Z0-9_]*\}|\d/.test(source);
+    if (!/[+\-*/()]/.test(source) || !/\$\{[a-zA-Z_][a-zA-Z0-9_]*\}|\d/.test(source)) return false;
+    try {
+        const tokens = tokenize(source.trim());
+        return tokens.length > 0;
+    } catch {
+        return false;
+    }
 }
 
 /** Collect every ${name} reference in an expression string, in source order, de-duplicated. */

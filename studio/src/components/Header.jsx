@@ -17,6 +17,8 @@ export default function Header({
     viewModeToggleDisabled,
     demoMode,
     onToggleDemoMode,
+    communitySessions,
+    onLoadCommunitySession,
 }) {
     // §9: demo mode is a distinct badge state, never folded into
     // connected/error — going offline must never silently look like
@@ -72,6 +74,19 @@ export default function Header({
                 />
                 <button className="btn btn-secondary" onClick={onNewSession}>New Session</button>
                 <button className="btn btn-primary" onClick={onLoadClick}>Load Session</button>
+                {communitySessions.length > 0 && (
+                    <select
+                        className="form-select community-sample-select"
+                        value=""
+                        onChange={(e) => onLoadCommunitySession(e.target.value)}
+                        title="Load a sample session from the community gallery"
+                    >
+                        <option value="" disabled>Community Sample…</option>
+                        {communitySessions.map((s) => (
+                            <option key={s.id} value={s.id}>{s.title}</option>
+                        ))}
+                    </select>
+                )}
                 <button className="btn btn-success" onClick={onAddCommand}>+ New Command</button>
                 <button className="btn btn-secondary" disabled={saveDisabled} onClick={onSave}>Export JSON</button>
             </div>

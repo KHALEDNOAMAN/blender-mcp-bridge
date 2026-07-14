@@ -58,6 +58,10 @@ export default function App() {
     const jsonModeParamsSnapshotRef = useRef(null); // §6.7: restored on Discard
     const [commandsCollapsed, setCommandsCollapsed] = useState(() => localStorage.getItem('commandsCollapsed') === 'true');
     const [playbackDelay, setPlaybackDelay] = useState(500);
+    // §10: community sample sessions, fetched once from the manifest
+    // scripts/sync-community-sessions.mjs generates at
+    // public/community/index.json (build-time copy of community/*/session.json).
+    const [communitySessions, setCommunitySessions] = useState([]);
 
     const sessionRef = useRef(session);
     sessionRef.current = session;
@@ -76,11 +80,26 @@ export default function App() {
         document.body.classList.add(theme);
     }, [theme]);
 
+    // §10: fetch the community sample manifest once on mount — same-origin,
+    // no bridge dependency, so this works connected, in demo mode, or on a
+    // static host with no backend at all.
+    useEffect(() => {
+        fetch(`${import.meta.env.BASE_URL}community/index.json`)
+            .then((res) => (res.ok ? res.json() : []))
+            .then(setCommunitySessions)
+            .catch(() => setCommunitySessions([]));
+    }, []);
+
     const hasCommands = !!(session && session.commands && session.commands.length > 0);
     const hasBranches = !!(session && session.branches && Object.keys(session.branches).length > 0);
     const anyExecuted = hasCommands && session.commands.some((c) => c.execution_status === 'success');
     const activeCard = expandedIdx !== null && session && session.commands ? session.commands[expandedIdx] : null;
     const activeExecuted = activeCard && activeCard.execution_status === 'success';
+    // Play resumes from (active, or active+1 if active already succeeded) —
+    // disabled only once there's genuinely nothing left in that range, i.e.
+    // the active command is the last one AND it already succeeded.
+    const playResumeIndex = (expandedIdx ?? 0) + (activeExecuted ? 1 : 0);
+    const nothingLeftToPlay = hasCommands && playResumeIndex >= session.commands.length;
 
     // Keep the ActionBar's branch dropdown pointed at a valid branch — reset
     // to the first one whenever branches change and the current selection
@@ -215,7 +234,18 @@ export default function App() {
     }, [dispatchCommand, filter, markStatus, modalApi]);
 
     const handlePlayAll = () => playFrom(0, null);
-    const handlePlay = () => playFrom(expandedIdxRef.current ?? 0, null);
+    // "Play" resumes from the active command through the end. If the active
+    // command already succeeded (e.g. user ran "Play to Active" and stopped
+    // there, or clicked back to review an earlier already-run command),
+    // start from the NEXT command instead of re-running it — this is what
+    // makes Play double as "continue from where I stopped," not just
+    // "replay from whatever's expanded."
+    const handlePlay = () => {
+        const active = expandedIdxRef.current ?? 0;
+        const activeCmd = sessionRef.current?.commands?.[active];
+        const startIndex = activeCmd?.execution_status === 'success' ? active + 1 : active;
+        playFrom(startIndex, null);
+    };
     const handlePlayToActive = () => {
         const active = expandedIdxRef.current;
         if (active === null || active === undefined) return;
@@ -372,27 +402,56 @@ export default function App() {
 
     const handleLoadClick = () => fileInputRef.current && fileInputRef.current.click();
 
+    // Shared by file-picker loads (handleFileSelected) and community-sample
+    // loads (handleLoadCommunitySession) — same reset/normalize steps either
+    // way, just a different source for the raw parsed object.
+    const loadSessionObject = (loaded) => {
+        if (loaded.commands) {
+            loaded.commands.forEach((cmd) => { delete cmd.execution_status; });
+        }
+        jsonModeParamsSnapshotRef.current = null;
+        setSession(loaded);
+        setExpandedIdx(0);
+        setFilter('');
+        setViewMode('guided');
+    };
+
     const handleFileSelected = (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
             try {
-                const loaded = JSON.parse(ev.target.result);
-                if (loaded.commands) {
-                    loaded.commands.forEach((cmd) => { delete cmd.execution_status; });
-                }
-                jsonModeParamsSnapshotRef.current = null;
-                setSession(loaded);
-                setExpandedIdx(0);
-                setFilter('');
-                setViewMode('guided');
+                loadSessionObject(JSON.parse(ev.target.result));
             } catch (err) {
                 modalApi.alert('Error', 'Invalid JSON');
             }
         };
         reader.readAsText(file);
         e.target.value = '';
+    };
+
+    // §10: community sample sessions are bundled into Studio's own build at
+    // public/community/ (scripts/sync-community-sessions.mjs copies them
+    // from ../community/*/session.json at build time) — fetched relative to
+    // Studio's own origin, not the bridge, so this works identically
+    // connected, in demo mode, or standalone on GitHub Pages.
+    const handleLoadCommunitySession = async (id) => {
+        if (!id) return;
+        const entry = communitySessions.find((e) => e.id === id);
+        if (!entry) return;
+        if (hasCommands) {
+            const discard = await modalApi.confirm('Discard Current Session?', 'Loading a community sample will discard your unsaved changes. Proceed?');
+            if (!discard) return;
+        }
+        try {
+            const sessionRes = await fetch(`${import.meta.env.BASE_URL}community/${entry.file}`);
+            if (!sessionRes.ok) throw new Error(`HTTP ${sessionRes.status}`);
+            const loaded = await sessionRes.json();
+            loadSessionObject(loaded);
+        } catch (err) {
+            modalApi.alert('Load Failed', `Could not load community sample: ${err.message}`);
+        }
     };
 
     const handleSave = () => {
@@ -714,6 +773,8 @@ export default function App() {
                 viewModeToggleDisabled={!session}
                 demoMode={demoMode}
                 onToggleDemoMode={demoMode ? exitDemoMode : enterDemoMode}
+                communitySessions={communitySessions}
+                onLoadCommunitySession={handleLoadCommunitySession}
             />
 
             {viewMode === 'json' ? (
@@ -811,7 +872,7 @@ export default function App() {
                     actionBarProps={{
                         isPlaying,
                         playAllDisabled: isPlaying || !hasCommands || anyExecuted || hasBranches,
-                        playDisabled: isPlaying || !hasCommands || !!activeExecuted || hasBranches,
+                        playDisabled: isPlaying || !hasCommands || nothingLeftToPlay || hasBranches,
                         playToActiveDisabled: isPlaying || !hasCommands || expandedIdx === null || !!activeExecuted || hasBranches,
                         stopDisabled: !isPlaying,
                         hasBranches,

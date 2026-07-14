@@ -114,6 +114,20 @@ export default function CommandTreePanel({
         });
     };
 
+    // A branch range that's been merged into a larger collapsed marker (e.g.
+    // three branches' adjacent ranges collapsed one at a time, ending up as
+    // one #1-#10 marker) no longer has its OWN [start,end] present in
+    // collapsedRanges — only the merged superset does. Without this lookup,
+    // clicking that branch's bar called toggleRangeCollapsed with its
+    // original sub-range, which is a silent no-op once absorbed (not equal
+    // to, and already a subset of, the merged entry) — the bug reported:
+    // clicking a bar after several collapses stacked together did nothing,
+    // with no way back to the expanded ticks except realizing you had to
+    // click the spine marker itself instead.
+    const enclosingCollapsedRange = (start, end) => (
+        collapsedRanges.find(([s, e]) => s <= start && end <= e)
+    );
+
     const segments = buildSegments(commandCount, collapsedRanges);
     // idx -> segment-array-position, so branch ranges (defined in raw
     // command indices) and activeIndex can be located on the segment-based
@@ -219,6 +233,17 @@ export default function CommandTreePanel({
                                 const x = xForSegment(segIdx);
                                 if (seg.type === 'collapsed') {
                                     const label = `#${seg.start + 1}–#${seg.end + 1}`;
+                                    // §7.7: a collapsed marker hides its individual ticks,
+                                    // so it needs its own summary of what's inside — border
+                                    // reflects the range's execution state (all succeeded /
+                                    // any errored / not yet run) so collapsing a fully-run
+                                    // range doesn't erase that signal.
+                                    const rangeStatuses = commands.slice(seg.start, seg.end + 1).map((c) => c.execution_status);
+                                    const anyError = rangeStatuses.includes('error');
+                                    const allSuccess = rangeStatuses.every((s) => s === 'success');
+                                    const borderColor = anyError ? 'var(--danger-color)'
+                                        : allSuccess ? 'var(--success-color)'
+                                        : 'var(--glass-border)';
                                     return (
                                         <g
                                             key={`c-${seg.start}-${seg.end}`}
@@ -234,7 +259,7 @@ export default function CommandTreePanel({
                                                 height={16}
                                                 rx={8}
                                                 fill="var(--input-bg)"
-                                                stroke="var(--glass-border)"
+                                                stroke={borderColor}
                                                 strokeWidth={1}
                                             />
                                             <text
@@ -249,10 +274,22 @@ export default function CommandTreePanel({
                                 const idx = seg.idx;
                                 const cmd = commands[idx];
                                 const isActive = idx === activeIndex;
+                                // §7.7: execution status (green=success/red=error) is
+                                // independent of "active" (the ring/halo showing which
+                                // card is currently expanded for review) — previously
+                                // these were conflated into one isActive-driven color,
+                                // so reviewing an earlier command (e.g. #24) after
+                                // playback had moved on to #33 made #24's tick look
+                                // identical to every other not-yet-run tick, with no
+                                // trace that #1-33 had actually executed.
+                                const status = cmd.execution_status;
+                                const tickColor = status === 'success' ? 'var(--success-color)'
+                                    : status === 'error' ? 'var(--danger-color)'
+                                    : 'var(--accent-color)';
                                 return (
                                 <g
                                     key={idx}
-                                    className={`command-tree-tick${isActive ? ' active' : ''}`}
+                                    className={`command-tree-tick${isActive ? ' active' : ''}${status ? ` ${status}` : ''}`}
                                     onClick={() => onJumpToCommand(idx)}
                                     style={{ cursor: 'pointer' }}
                                 >
@@ -267,19 +304,16 @@ export default function CommandTreePanel({
                                         fill="transparent"
                                     />
                                     {isActive && (
-                                        <circle cx={x} cy={SPINE_Y} r={TICK_RADIUS + 4} fill="none" stroke="var(--success-color)" strokeWidth={2} />
+                                        <circle cx={x} cy={SPINE_Y} r={TICK_RADIUS + 4} fill="none" stroke="var(--accent-color)" strokeWidth={2} />
                                     )}
-                                    <circle
-                                        cx={x} cy={SPINE_Y} r={TICK_RADIUS}
-                                        fill={isActive ? 'var(--success-color)' : 'var(--accent-color)'}
-                                    />
+                                    <circle cx={x} cy={SPINE_Y} r={TICK_RADIUS} fill={tickColor} />
                                     <text
                                         x={x} y={SPINE_Y - 12}
                                         textAnchor="middle" fontSize="9" fill="var(--text-secondary)"
                                     >
                                         #{idx + 1}
                                     </text>
-                                    <title>{`#${idx + 1} ${cmd.tool}`}</title>
+                                    <title>{`#${idx + 1} ${cmd.tool}${status ? ` (${status})` : ''}`}</title>
                                 </g>
                                 );
                             })}
@@ -300,7 +334,17 @@ export default function CommandTreePanel({
                                         {(branch.ranges || []).map(([start, end], rangeIdx) => {
                                             const x1 = xStartForIndex(start);
                                             const x2 = xEndForIndex(end);
-                                            const isCollapsed = collapsedRanges.some(([s, e]) => s === start && e === end);
+                                            const enclosing = enclosingCollapsedRange(start, end);
+                                            const isCollapsed = !!enclosing;
+                                            // Clicking always toggles whatever range is ACTUALLY
+                                            // collapsed right now (the merged superset, if this
+                                            // bar's own range has been absorbed into one) — not
+                                            // this bar's original [start,end], which may no
+                                            // longer have any direct entry in collapsedRanges.
+                                            const [toggleStart, toggleEnd] = enclosing || [start, end];
+                                            const label = enclosing
+                                                ? `#${enclosing[0] + 1}–#${enclosing[1] + 1}`
+                                                : `#${start + 1}–#${end + 1}`;
                                             return (
                                                 <rect
                                                     key={rangeIdx}
@@ -314,9 +358,9 @@ export default function CommandTreePanel({
                                                     fillOpacity={isCollapsed ? 0.6 : 0.35}
                                                     stroke={color}
                                                     strokeWidth={1}
-                                                    onClick={() => toggleRangeCollapsed(start, end)}
+                                                    onClick={() => toggleRangeCollapsed(toggleStart, toggleEnd)}
                                                 >
-                                                    <title>{start === end ? '' : `${isCollapsed ? 'Expand' : 'Collapse'} #${start + 1}–#${end + 1}`}</title>
+                                                    <title>{start === end ? '' : `${isCollapsed ? 'Expand' : 'Collapse'} ${label}`}</title>
                                                 </rect>
                                             );
                                         })}

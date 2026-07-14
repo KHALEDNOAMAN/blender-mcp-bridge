@@ -42,7 +42,7 @@ export default function ActionBar({
                 <button className="btn btn-secondary btn-sm" title="Redo Last Command (Ctrl+Y)" onClick={onRedo}>↷ Redo</button>
                 <div className="vr"></div>
                 <button className="btn btn-success btn-sm" disabled={playAllDisabled} title={hasBranches ? branchNote : 'Play All Commands (Space)'} onClick={onPlayAll}>▶ Play All</button>
-                <button className="btn btn-success btn-sm" disabled={playDisabled} title={hasBranches ? branchNote : 'Play from Active (Ctrl+Enter)'} onClick={onPlay}>▶ Play</button>
+                <button className="btn btn-success btn-sm" disabled={playDisabled} title={hasBranches ? branchNote : 'Play from Active, or resume after it if already run (Ctrl+Enter)'} onClick={onPlay}>▶ Play</button>
                 <button className="btn btn-success btn-sm" disabled={playToActiveDisabled} title={hasBranches ? branchNote : 'Play up to Active Command'} onClick={onPlayToActive}>▶ Play to Active</button>
                 <button className="btn btn-danger btn-sm" disabled={stopDisabled} title="Stop Playback (Esc)" onClick={onStop}>⏹ Stop</button>
                 <div className="vr"></div>

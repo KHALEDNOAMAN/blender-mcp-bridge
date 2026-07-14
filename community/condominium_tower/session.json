@@ -457,7 +457,7 @@
       "tool": "set_world_background",
       "arguments": {
         "mode": "hdri",
-        "image_path": "f:/github-local/blender-mcp-n8n/assets/kloofendal_48d_partly_cloudy_puresky_4k.exr"
+        "image_path": "kloofendal_48d_partly_cloudy_puresky_4k.exr"
       },
       "description": "Perfect! I've successfully set up the environmental lighting:\n\nWorld Background set to HDRI:\n- Environment: kloofendal_48d_partly_cloudy_puresky_4k (4K partly cloudy sky)\n- Type: High Dynamic Range Image (HDRI)\n- Effect: Realistic environmental lighting with beautiful partly cloudy sky\n\nYour scene now has a complete cinematic setup:\n- Sun Light: Warm golden hour directional lighting (3.0 strength)\n- HDRI Sky: Partly cloudy realistic sky for environmental reflections and ambient light\n- Camera: Dramatic hero shot from ground level looking up at the tower\n- Trees: 30 naturally distributed around the building with realistic materials\n- Tower: Fully textured with glass, orange metallic accents, and marble surfaces\n\nThe combination of the warm sun and the realistic partly cloudy HDRI creates a beautiful, photorealistic render environment!"
     }
