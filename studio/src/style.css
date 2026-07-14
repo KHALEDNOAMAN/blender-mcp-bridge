@@ -310,6 +310,26 @@ header {
     box-shadow: 0 0 8px #da3633;
 }
 
+/* §9: demo mode reads as its own distinct state, amber not green/red — a
+   simulation is neither "really connected" nor "broken," and must never be
+   visually mistaken for either. */
+.status-indicator.demo {
+    background: rgba(210, 153, 34, 0.15);
+    color: #d29922;
+}
+
+.status-indicator.demo .dot {
+    background: #d29922;
+    box-shadow: 0 0 8px #d29922;
+    animation: pulse-amber 2s infinite;
+}
+
+@keyframes pulse-amber {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
 @keyframes pulse-green {
     0% {
         opacity: 1;

@@ -1,0 +1,64 @@
+name: Deploy Studio to GitHub Pages
+
+# Publishes Studio (studio/) as a static demo site — no Blender bridge is
+# reachable there, so it always launches in Demo Mode (docs/studio_design_v1.md
+# §9). This is separate from Studio's other deploy target, the bridge server's
+# own /editor/ mount (src/server.py), which needs a different Vite `base` path
+# — see studio/vite.config.js for how the two are distinguished.
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "studio/**"
+      - ".github/workflows/deploy-studio.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: "Build Studio (Pages target)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: studio/package-lock.json
+
+      - name: "Install dependencies"
+        working-directory: studio
+        run: npm ci
+
+      - name: "Build (base path = /blender-mcp-n8n/)"
+        working-directory: studio
+        env:
+          STUDIO_DEPLOY_TARGET: pages
+        run: npm run build
+
+      - name: "Upload Pages artifact"
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: studio/dist
+
+  deploy:
+    name: "Deploy to GitHub Pages"
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: "Deploy"
+        id: deployment
+        uses: actions/deploy-pages@v4

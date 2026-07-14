@@ -15,12 +15,21 @@ export default function Header({
     viewMode,
     onToggleViewMode,
     viewModeToggleDisabled,
+    demoMode,
+    onToggleDemoMode,
 }) {
+    // §9: demo mode is a distinct badge state, never folded into
+    // connected/error — going offline must never silently look like
+    // "connected" (that was the "Connected (null)" bug on GitHub Pages),
+    // and demo mode itself must read as "this is a simulation," not as a
+    // real connection.
     const statusClass = [
         'status-indicator',
+        demoMode ? 'demo' : '',
         connectionStatus.connected ? 'connected' : '',
-        connectionStatus.error ? 'error' : '',
+        connectionStatus.error && !demoMode ? 'error' : '',
     ].filter(Boolean).join(' ');
+    const statusLabel = demoMode ? 'Demo Mode' : connectionStatus.label;
 
     return (
         <header>
@@ -29,9 +38,20 @@ export default function Header({
                 <p className="subtitle">Blender MCP Recording Studio</p>
             </div>
             <div className="actions">
-                <div className={statusClass} title="Server Connection Status">
-                    <span className="dot"></span> <span className="status-text">{connectionStatus.label}</span>
+                <div className={statusClass} title={demoMode ? 'Simulated playback — no Blender bridge connected' : 'Server Connection Status'}>
+                    <span className="dot"></span> <span className="status-text">{statusLabel}</span>
                 </div>
+                {!connectionStatus.connected && (
+                    <button
+                        className="btn btn-secondary"
+                        onClick={onToggleDemoMode}
+                        title={demoMode
+                            ? 'Exit demo mode'
+                            : 'No Blender bridge reachable — simulate playback to explore Studio without one'}
+                    >
+                        {demoMode ? '✕ Exit Demo' : '▶ Try Demo Mode'}
+                    </button>
+                )}
                 <button className="btn btn-secondary" onClick={onThemeToggle}>
                     {theme === 'dark-theme' ? '☀️ Light' : '🌙 Dark'}
                 </button>

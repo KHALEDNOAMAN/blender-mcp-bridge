@@ -1,10 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { checkConnection, fetchTools } from '../lib/api';
 import { API_BASE_DEFAULT } from '../lib/toolCategories';
+import { DEMO_TOOLS } from '../lib/demoTools';
 
 /**
  * Ported from session_editor/api.js polling behavior
  * (setInterval(checkConnection, 5000) + checkConnection()).
+ *
+ * §9: `demoMode` is a separate, user-opted-into state from `connected` —
+ * going offline never silently switches behavior. It's exposed here (not
+ * derived ad-hoc in App.jsx) because it also needs to widen `availableTools`
+ * so "+ New Command" and Edit Command still work with a full tool list while
+ * disconnected, the same way they do live.
  */
 export function useConnection() {
     const [apiBase, setApiBase] = useState(API_BASE_DEFAULT);
@@ -12,6 +19,7 @@ export function useConnection() {
     const [errored, setErrored] = useState(false);
     const [label, setLabel] = useState('Disconnected');
     const [availableTools, setAvailableTools] = useState([]);
+    const [demoMode, setDemoMode] = useState(false);
     const apiBaseRef = useRef(apiBase);
     apiBaseRef.current = apiBase;
 
@@ -21,7 +29,8 @@ export function useConnection() {
             setApiBase(res.apiBase);
             setConnected(true);
             setErrored(false);
-            setLabel(`Connected (${res.port})`);
+            setLabel(res.port ? `Connected (${res.port})` : 'Connected');
+            setDemoMode(false);
             const tools = await fetchTools(res.apiBase);
             if (tools) setAvailableTools(tools);
         } else {
@@ -44,10 +53,26 @@ export function useConnection() {
         return tools;
     };
 
+    // Demo mode has no bridge to ask for a tool list, so it ships a static
+    // one (lib/demoTools.js, extracted from a live bridge) — good enough to
+    // browse/add commands and see real schema-driven forms while simulating
+    // playback.
+    const enterDemoMode = () => {
+        setDemoMode(true);
+        setAvailableTools(DEMO_TOOLS);
+    };
+    const exitDemoMode = () => {
+        setDemoMode(false);
+        setAvailableTools([]);
+    };
+
     return {
         apiBase,
         connectionStatus: { connected, error: errored, label },
         availableTools,
         refetchTools,
+        demoMode,
+        enterDemoMode,
+        exitDemoMode,
     };
 }

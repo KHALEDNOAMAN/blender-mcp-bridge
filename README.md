@@ -161,13 +161,23 @@ In Studio you can:
   tools, safely modify arguments, or add entirely new steps.
 - Edit tool arguments directly in the JSON editor cards, or toggle to a whole-session
   **Guided / JSON view** for bulk edits with a command outline for quick navigation.
-- Reorder or delete commands, and replay them (Play All / Play / Play to Active).
+  JSON mode includes live parametric-expression linting (undefined `${param}`
+  references, divide-by-zero, and syntax errors are flagged inline and block Apply).
+- Reorder or delete commands, and replay them from the **ActionBar** (Play All / Play
+  / Play to Active / Stop / Undo / Redo / Reset / Clear Scene), always visible at the
+  top of the **Command Timeline** dock regardless of whether the timeline's diagram
+  is expanded or collapsed.
 - Define **global parameters** (`${name}` tokens, including arithmetic expressions
   like `${box_height} / 2`) so command arguments stay reusable across resizes/edits.
 - Define **branches** — named, non-contiguous ranges of the command list you can jump
   between and run independently (e.g. a "plain" feature vs. a "with extra part"
   feature sharing a common base) — via the Branches panel's click-to-pick range
-  builder.
+  builder, then pick and run one from the ActionBar's branch dropdown.
+- **Command Timeline**: a horizontal diagram of command order and branch ranges at
+  the bottom of the window (resizable, click a tick to jump to that command). Long
+  branch ranges can be collapsed into a single condensed marker (click a branch's
+  range bar, Excel-style column grouping) to keep the diagram readable in sessions
+  with many commands.
 - **Export JSON** to save your changes to a new file.
 
 ### 3. Configure n8n Workflow

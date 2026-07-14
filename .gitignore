@@ -6,12 +6,18 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+/dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# Python venv's lib/lib64 only — bare `lib/`/`lib64/` (no leading slash)
+# matched at ANY depth, which silently excluded studio/src/lib/ (the app's
+# core parameter/expression/validation logic) from version control entirely
+# since Studio was first added. Anchored to repo root, where the venv
+# actually lives, so it no longer shadows unrelated lib/ directories
+# elsewhere in the tree.
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -31,11 +37,19 @@ venv.bak/
 /assets/
 tmp/
 
-# Ignore all JSON files
+# Ignore all JSON files (session recordings, generated benchmark output,
+# etc.) EXCEPT the allowlist below. `studio/` is a normal npm project where
+# JSON is legitimate source (package.json, package-lock.json, .oxlintrc.json)
+# rather than incidental session output, so it's excluded from this rule
+# entirely instead of being allowlisted file-by-file — this blanket pattern
+# previously (and silently) also matched studio/package.json and
+# studio/package-lock.json, which meant `npm ci`/`npm install` could never
+# have worked from a fresh clone.
 *.json
+!studio/**/*.json
 !tests/benchmarks/arch_expected.json
 !tests/benchmarks/grid_expected.json
 !community/**/*.json
 
-# Ignorte all log files
+# Ignore all log files
 *.log

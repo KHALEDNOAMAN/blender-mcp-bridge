@@ -15,12 +15,25 @@ import { useModal } from './hooks/useModal';
 import { useResizableSidebar } from './hooks/useResizableSidebar';
 import { useConnection } from './hooks/useConnection';
 import { runCommand } from './lib/api';
+import { simulateCommand } from './lib/demoApi';
 import { buildSessionFromTemplate } from './lib/sessionTemplates';
 import { resolveArgsObject } from './lib/params';
 import { validateBranches, validateSessionShape } from './lib/sessionValidation';
 
 export default function App() {
-    const { apiBase, connectionStatus, availableTools, refetchTools } = useConnection();
+    const {
+        apiBase, connectionStatus, availableTools, refetchTools,
+        demoMode, enterDemoMode, exitDemoMode,
+    } = useConnection();
+    // §9: single choke point every dispatch goes through — swaps in the
+    // demo-mode simulator instead of a real network call when demoMode is
+    // on, so callers (dispatchCommand, Undo/Redo, Clear Scene, branch wipe)
+    // don't each need their own demoMode check.
+    const demoModeRef = useRef(demoMode);
+    demoModeRef.current = demoMode;
+    const run = useCallback((base, tool, args) => (
+        demoModeRef.current ? simulateCommand(tool, args) : runCommand(base, tool, args)
+    ), []);
     const modalApi = useModal();
     const sidebar = useResizableSidebar();
     const jsonSidebar = useResizableSidebar({ storageKey: 'jsonSidebarWidth', minWidth: 200, maxWidth: 480, defaultWidth: 260 });
@@ -127,8 +140,8 @@ export default function App() {
         if (errors.length > 0) {
             return Promise.resolve({ error: `Invalid expression: ${errors.join('; ')}` });
         }
-        return runCommand(apiBase, tool, resolved);
-    }, [apiBase]);
+        return run(apiBase, tool, resolved);
+    }, [apiBase, run]);
 
     // --- Single-card run -----------------------------------------------------------
 
@@ -250,7 +263,7 @@ export default function App() {
 
         // Auto-wipe: clear the scene before replaying, matching how most
         // session templates already start with their own delete_object call.
-        const wipeRes = await runCommand(apiBase, 'delete_object', { pattern: '*' });
+        const wipeRes = await run(apiBase, 'delete_object', { pattern: '*' });
         if (wipeRes.error) {
             await modalApi.alert('Branch Run Failed', `Could not clear the scene: ${wipeRes.error}`);
             setIsPlaying(false);
@@ -285,7 +298,7 @@ export default function App() {
         stopRequestedRef.current = false;
         setIsPlaying(false);
         setRunningBranch(null);
-    }, [apiBase, dispatchCommand, filter, markStatus, modalApi, resetExecutionState]);
+    }, [apiBase, dispatchCommand, filter, markStatus, modalApi, resetExecutionState, run]);
 
     // --- Header actions --------------------------------------------------------
 
@@ -470,8 +483,8 @@ export default function App() {
             modalApi.patchTesting({ running: false });
             if (res.error) modalApi.alert('Failed', res.error);
         };
-        const doUndo = () => runCommand(apiBase, 'undo', {});
-        const doRedo = () => runCommand(apiBase, 'redo', {});
+        const doUndo = () => run(apiBase, 'undo', {});
+        const doRedo = () => run(apiBase, 'redo', {});
 
         const proceed = await modalApi.show(
             'Edit Command',
@@ -544,17 +557,17 @@ export default function App() {
     // --- Undo/redo/clear-scene ---------------------------------------------------
 
     const handleUndo = async () => {
-        const res = await runCommand(apiBase, 'undo', {});
+        const res = await run(apiBase, 'undo', {});
         if (res.error) modalApi.alert('Undo Failed', res.error);
     };
     const handleRedo = async () => {
-        const res = await runCommand(apiBase, 'redo', {});
+        const res = await run(apiBase, 'redo', {});
         if (res.error) modalApi.alert('Redo Failed', res.error);
     };
     const handleClearScene = async () => {
         const ok = await modalApi.confirm('Clear Scene', 'Delete ALL objects?');
         if (!ok) return;
-        const res = await runCommand(apiBase, 'delete_object', { pattern: '*' });
+        const res = await run(apiBase, 'delete_object', { pattern: '*' });
         if (res.error) modalApi.alert('Error', res.error);
         else resetExecutionState();
     };
@@ -699,6 +712,8 @@ export default function App() {
                 viewMode={viewMode}
                 onToggleViewMode={handleToggleViewMode}
                 viewModeToggleDisabled={!session}
+                demoMode={demoMode}
+                onToggleDemoMode={demoMode ? exitDemoMode : enterDemoMode}
             />
 
             {viewMode === 'json' ? (
