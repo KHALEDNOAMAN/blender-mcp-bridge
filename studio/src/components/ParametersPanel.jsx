@@ -48,25 +48,25 @@ export default function ParametersPanel({ parameters, collapsed, onToggle, onCha
                         </p>
                     )}
                     {entries.map(([name, value]) => (
-                        <div className="params-row" key={name} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                        <div className="params-row" key={name}>
                             <input
                                 type="text"
+                                className="params-row-name"
                                 defaultValue={name}
                                 spellCheck={false}
-                                style={{ flex: '0 0 40%' }}
                                 onBlur={(e) => handleNameChange(name, e.target.value.trim())}
                                 title="Parameter name"
                             />
                             <input
                                 type="text"
+                                className="params-row-value"
                                 value={value}
                                 spellCheck={false}
-                                style={{ flex: 1 }}
                                 onChange={(e) => handleValueChange(name, e.target.value)}
                                 title="Parameter value"
                             />
                             <button
-                                className="btn-icon"
+                                className="btn-icon params-row-delete"
                                 title={`Delete parameter "${name}"`}
                                 onClick={() => handleDelete(name)}
                             >×</button>

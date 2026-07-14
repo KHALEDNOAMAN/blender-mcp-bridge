@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { TOOL_CATEGORIES, HIDDEN_TOOLS } from '../lib/toolCategories';
 import { stringifyCompact } from '../lib/uiUtils';
 import { isParametric, extractParamName } from '../lib/params';
-import { looksLikeExpression, collectParamNames } from '../lib/expr';
+import { looksLikeExpression, collectParamNames, evaluateExpression, candidateStringsForField } from '../lib/expr';
 import SchemaField from './SchemaField';
 
 const categorizedTools = Object.values(TOOL_CATEGORIES).flat();
@@ -177,13 +177,30 @@ export default function DynamicArgsForm({ availableTools, initialTool, initialAr
 
         // A "${name}" token or expression referencing a param that isn't
         // known (and wasn't created inline via the quick-create affordance)
-        // blocks confirm, same as a required-and-empty field.
+        // blocks confirm, same as a required-and-empty field. Once every ref
+        // IS defined, also actually evaluate expressions (§4.5) — a syntax
+        // error or non-finite result (divide-by-zero etc.) blocks confirm
+        // too, not just an inline hint the user could otherwise ignore.
+        // Array/JSON-typed fields (location, dimensions) are checked
+        // per-element, not as one whole-field string — a field holding
+        // `[0, 0, "${h} / 0"]` is itself valid JSON syntax, so only walking
+        // its parsed elements finds the broken expression inside it.
+        const mergedParams = { ...parameters, ...pendingParams };
         Object.entries(values).forEach(([path, raw]) => {
             if (typeof raw !== 'string') return;
-            const bareName = extractParamName(raw);
-            const names = bareName !== null ? [bareName] : (looksLikeExpression(raw) ? collectParamNames(raw) : []);
-            const hasUndefined = names.some((n) => !(n in parameters) && !(n in pendingParams));
-            if (hasUndefined) invalid.add(path);
+            const hasBadCandidate = candidateStringsForField(raw).some((candidate) => {
+                const bareName = extractParamName(candidate);
+                const isExpression = bareName === null && looksLikeExpression(candidate);
+                const names = bareName !== null ? [bareName] : (isExpression ? collectParamNames(candidate) : []);
+                if (names.length === 0) return false;
+                const hasUndefined = names.some((n) => !(n in mergedParams));
+                if (hasUndefined) return true;
+                if (isExpression) {
+                    try { evaluateExpression(candidate, mergedParams); } catch { return true; }
+                }
+                return false;
+            });
+            if (hasBadCandidate) invalid.add(path);
         });
 
         setInvalidPaths(invalid);

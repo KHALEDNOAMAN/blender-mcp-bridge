@@ -115,6 +115,34 @@ with the formula only living in a comment. Expressions close that gap.
   json-typed field, the evaluated number is inserted as-is (no re-stringify/
   re-parse round-trip needed since the evaluator already produces a number).
 
+### 4.5 Non-finite result rejection (divide-by-zero, NaN)
+
+Found as a real gap while discussing what "guidance" the JSON editor could
+give (§6.4 follow-up): `evaluateExpression()` threw on syntax errors,
+undefined params, and non-numeric param values, but **not** on a divide-by-
+zero — `${x} / 0` evaluates to JS's `Infinity` without throwing, and that
+would silently reach the MCP dispatch as a bad argument instead of failing
+validation with a clear message.
+
+- `evaluateExpression()` now checks `Number.isFinite(result)` before
+  returning; a non-finite result (from `/0`, or any other operation that
+  produces `Infinity`/`-Infinity`/`NaN`) throws `"Expression evaluates to
+  <Infinity|NaN>: divide by zero or invalid math"` instead of returning the
+  non-finite value silently.
+- Same error surfaces through every existing call path unchanged — dispatch-
+  time resolution (§4.3 `resolveArgsObject`), the guided form's inline
+  validation (`DynamicArgsForm`/`SchemaField`), and the new JSON-mode
+  expression linter (§6.5) all consume `evaluateExpression()`, so the fix is
+  one change, not three.
+- **Explicitly out of scope**: semantic "wrong formula" or "out of range"
+  checking (e.g. a radius that evaluates to a negative number, or a scale
+  that's technically finite but physically nonsensical for a given tool).
+  That needs per-tool min/max/positivity metadata that doesn't exist
+  anywhere in the MCP schemas today (`src/tools/*.py` define types only, no
+  `minimum`/`maximum`) — adding it would be new schema work on the Python
+  side, a materially different and larger task than fixing the evaluator.
+  Not attempted here; revisit only as its own scoped piece of work.
+
 ## 5. Feature branching
 
 Concrete v1 spec, superseding the original DAG-node framing below (kept for
@@ -257,6 +285,220 @@ in a hand-written session, or directly fix a branch's `ranges` array.
 - Failure surfaces as an inline message near the Apply button (which range,
   which branch, what's out of bounds) — not a generic "invalid session" toast.
 
+### 6.4 Real code editor (CodeMirror), post-v1 upgrade
+
+The original plain-`<textarea>` JSON editor had zero "guidance" beyond the
+outline panel and Apply-time errors — no syntax highlighting, no line
+numbers, no live feedback while typing. Upgraded to CodeMirror 6 (modular:
+`@codemirror/lang-json` + a theme, not one monolithic package) rather than
+hand-rolling highlighting/line-numbers ourselves, since a real editor gets
+these correctly and for free — the first genuine exception to this doc's
+otherwise-consistent "no new dependency" pattern (§4.4, §7.1), justified
+because text editing is exactly the kind of solved problem not worth
+re-deriving in-house.
+
+- **Live linting**: `@codemirror/lang-json`'s built-in linter shows inline
+  syntax-error squiggles as you type, not only on Apply — real-time feedback
+  a plain textarea + Apply-time `JSON.parse` couldn't give.
+- **Shape validation stays separate**: `validateSessionShape`/`validateBranches`
+  (§6.3) remain an Apply-time check, run after CodeMirror confirms valid
+  syntax — a generic JSON linter has no notion of "this branch range is out
+  of bounds," that's session-schema-specific and stays our own code.
+- **Outline panel unchanged visually**, only its jump-to-line implementation
+  swapped from raw textarea `setSelectionRange`/`scrollTop` math to
+  CodeMirror's own cursor-dispatch + `scrollIntoView` effect — same UX,
+  more correct positioning (CodeMirror's line/column model handles this
+  properly, where the old approach approximated with a fixed line-height
+  constant).
+- Theme-aware: CodeMirror's editor theme follows Studio's existing
+  dark/light toggle rather than being a fixed third color scheme.
+
+### 6.5 Parametric expression linting in JSON mode
+
+§6.4's linter only understands generic JSON syntax — it has no idea `"${a} /
+0"` is a live expression, let alone a broken one. Added a second linter pass
+so JSON mode gives the same "guidance" on parametric values that a synced
+Command Tree / guided form already implies exists.
+
+- A second `linter()` source registered alongside the JSON-syntax one (§6.4),
+  same lint gutter, same red-squiggle UI — visually one system, not a
+  separate warnings panel (rejected: a distinct list below the editor reads
+  as a different, lesser class of problem than a JSON syntax error, when
+  from the user's perspective both mean "this won't work").
+- On each lint pass (same 750ms debounce as the JSON linter): parse the
+  document (skip silently if it doesn't parse — the JSON linter already
+  owns reporting that), walk every string value in `commands[].arguments`,
+  and for each one that's a bare `${name}` token or `looksLikeExpression()`
+  (§4.4) true, run it through `evaluateExpression()` against the session's
+  current `parameters` (plus any params referenced-but-undefined get their
+  own diagnostic, same message as the guided form's inline hint).
+- Diagnostics reported: undefined parameter reference, expression syntax
+  error, and non-finite result (§4.5) — each mapped back to its source line/
+  column in the document so the squiggle lands on the actual offending
+  string, not just "somewhere in this session."
+- Does NOT duplicate `validateSessionShape`/`validateBranches` (§6.3) — those
+  stay the Apply-time gate for branch range bounds; this linter is purely
+  about parametric expressions, live, before Apply is even clicked.
+
+**Bug found in the first implementation (same day, real user report):** the
+v1 `jsonExprLinter.js` scanned every double-quoted string literal in the raw
+document text via regex, not scoped to `commands[].arguments` as this
+section always specified — `looksLikeExpression()`'s heuristic ("contains an
+operator character AND a digit or `${...}`") is loose enough that ordinary
+prose in a `description` field (e.g. `"location.z = box_height / 2 (computed
+live)"` — has `/`, `(`, `)`, digits) matched it, then `evaluateExpression()`
+tried to tokenize the English sentence as math and threw, surfacing as a
+false-positive red squiggle under plain description text. Fixed by having
+the linter actually parse the JSON and walk only `commands[].arguments`
+subtrees (reusing `collectStringLeaves` from §4.5's array-field fix),
+computing each candidate string's real source offset via a source-text
+search anchored to its containing command's already-known start position —
+not a blind whole-document regex scan. `metadata`/`description` text is
+never inspected for expression syntax again.
+
+### 6.6 Parameters panel in JSON mode
+
+Found as a direct consequence of the above: when JSON mode flags an
+undefined parameter, there was no way to fix it without leaving JSON mode
+(and Guided-mode's own Parameters panel isn't visible there) — a genuine
+workflow dead end, reported directly by the user hitting it.
+
+- A parameters panel (same name/value editor as the Guided view's
+  `ParametersPanel`) is now docked in JSON mode too, alongside the outline.
+- **Immediate, not staged**: editing a parameter's value here takes effect
+  right away — same as it always has in Guided mode — independent of the
+  JSON textarea's own explicit-apply model (§6.2). These are two genuinely
+  separate pieces of state (the live parameter store vs. the pending JSON
+  text edit), each keeping its existing natural update model rather than
+  forcing one to match the other. This is *why* it's useful: the expression
+  linter (§6.5) re-checks against the live parameter set on every keystroke
+  in either place, so adding a missing parameter here makes its red squiggle
+  in the JSON textarea disappear immediately, without an Apply click.
+
+### 6.7 Discard must undo parameter edits too
+
+Real bug reported directly by the user: "immediate, not staged" (§6.6) meant
+a parameter edit — including deleting every parameter — was a genuine,
+permanent mutation the instant it happened, with **no relationship to
+Discard at all**. Clicking Discard only ever reset `viewMode` to `'guided'`;
+it never touched `session.parameters`, so deleting all parameters via the
+docked panel and then clicking Discard left the deletion in place — the
+opposite of what "Discard" means to a user (undo what I did in this
+JSON-editing session).
+
+- On toggling **into** JSON mode, `session.parameters` is snapshotted.
+- The docked panel keeps editing live (§6.6's rationale — instant linter
+  feedback — still holds, unchanged).
+- **Discard now restores the snapshot**, undoing any parameter edits made
+  while JSON mode was open, not just abandoning the pending JSON text.
+- **Apply JSON does NOT restore the snapshot** — Apply is the intentional
+  commit point; whatever the panel's current state is at that moment is
+  correct and expected to stick, exactly like it always has for every other
+  live-editing surface in Studio.
+- The snapshot is taken once per toggle-in, not continuously — re-entering
+  JSON mode later takes a fresh snapshot of whatever's current then.
+
+**Second bug found immediately while testing the fix above**: Apply JSON
+parses the *textarea's own text* and commits that wholesale via
+`setSession(parsedSession)` — but the textarea's `"parameters"` key is never
+rewritten when you edit the docked panel (§6.6 keeps panel edits live/
+immediate specifically so they don't round-trip through the debounced text
+editor). So deleting one parameter via the panel, then clicking **Apply**
+(not Discard), silently *reverted* the deletion — the stale textarea text's
+original parameter set overwrote the just-made live edit, the opposite
+direction of the Discard bug above. Fixed by making the docked panel the
+single authoritative source for `parameters`: `handleApplyJson` takes
+`commands`/`metadata`/`branches` from the parsed textarea as usual, but
+always uses the *live* `session.parameters` (whatever the panel currently
+shows) rather than the parsed text's own `"parameters"` key. The textarea
+can still display the current parameters as part of the full JSON view, but
+editing them there does nothing — the panel is where parameter edits
+actually happen, both while composing changes and at Apply time.
+
+### 6.8 Docked panel layout polish
+
+User feedback on a real screenshot after §6.6 shipped: the delete "×" button
+rendered as its own floating row between name and value inputs, and the
+panel had no way to widen the narrow fixed sidebar to see full parameter
+names/values.
+
+- Root cause of the floating delete button: `.json-editor-sidebar .params-row`
+  had been forced to `flex-direction: column` (an earlier attempt to fit
+  name+value in a narrow column by stacking them), which put the delete
+  button — a third flex child with no special sizing — on its own row
+  instead of inline. Removed the stacking override entirely; the row now
+  always lays out name/value/delete horizontally in one line (matching the
+  Guided-view Parameters panel's existing layout, per the user's reference
+  screenshot), just with smaller font/padding and a narrower name/value
+  split in the JSON-mode sidebar specifically.
+- Delete button recolored to `var(--danger-color)` (red), matching the
+  existing Clear button's styling — previously used the same neutral
+  `.btn-icon` style as every other icon button, which read as "just another
+  action," not a destructive one.
+- `useResizableSidebar()` (previously built for the Guided-view left
+  sidebar) was generalized to accept `storageKey`/`minWidth`/`maxWidth`/
+  `defaultWidth` instead of hardcoding them, so it could be reused for a
+  second, independent drag handle between the JSON-mode sidebar (outline +
+  Parameters panel) and the CodeMirror editor — its own localStorage key
+  (`jsonSidebarWidth`) and bounds (200–480px, default 260px) so resizing one
+  view's sidebar doesn't affect the other's. Verified: dragging the handle
+  100px widened the sidebar from 260px to 360px exactly, and the delete
+  button's computed color matched `--danger-color` (`rgb(218, 54, 51)`).
+
+### 6.9 Apply must block on parametric expression errors too
+
+Real bug, caught by the user from a live screenshot: after deleting
+parameters via the docked panel, the live lint gutter correctly showed red
+squiggles/dots for the now-undefined `${box_length}`/`${box_width}` refs —
+but **Apply JSON was still clickable and would have proceeded**, applying a
+session with commands that reference parameters that no longer exist.
+
+- `handleApply` checked JSON syntax (`JSON.parse`) and `validateSessionShape`
+  (§6.3, branch range bounds) but never checked parametric expression
+  problems — despite `findExpressionProblems()` (§6.5) already running live
+  in the same component for the lint gutter, it was never consulted at
+  Apply time, only used to paint squiggles.
+- Fixed: Apply now also runs `findExpressionProblems()` against the live
+  parameters and hard-blocks (same pattern as branch-range errors, not a
+  warn-and-allow confirm dialog — rejected because a warn-through defeats
+  the purpose here, it would just be one accidental click away from the
+  exact failure this bug report was about) if any undefined-param or
+  broken-expression problem exists anywhere in `commands[].arguments`. The
+  error list shown is the same `.json-session-editor-errors` area already
+  used for shape errors — one consistent place for "why Apply is blocked,"
+  not a second UI pattern. Messages are de-duplicated (`[...new
+  Set(...)]`) since the same undefined param is commonly referenced by
+  multiple fields on one command (e.g. both `location` and `dimensions`),
+  which would otherwise repeat an identical line once per occurrence.
+  Verified end-to-end: deleted `box_length` (still referenced by
+  `create_cube`'s `location`/`dimensions`) via the docked panel — Apply
+  correctly blocked with one deduplicated error line, editor stayed open;
+  adding `box_length` back via the panel and clicking Apply again then
+  succeeded normally.
+
+### 6.10 Parameters panel must be collapsible in JSON mode too
+
+User report: "in edit mode, the parameters panel are not collapsible." The
+docked `ParametersPanel` embedded in JSON mode (§6.6) rendered the same
+chevron-header UI as every other collapsible card, but clicking it did
+nothing.
+
+- Root cause: `JsonSessionEditor` passed `collapsed={false}` (a literal, not
+  state) and `onToggle={() => {}}` (a no-op) when rendering `ParametersPanel`
+  — copy-pasted plumbing that was never wired to real state when the panel
+  was first docked into JSON mode.
+- Fixed: added real `paramsCollapsed` state, seeded from and persisted to
+  `localStorage` (`jsonParametersCollapsed`), mirroring the pattern used by
+  other collapsible panels in the app. `onToggle` now flips and persists it.
+- Verified end-to-end with Playwright against the live bridge: measured
+  `.metadata-body`'s rendered height before/after toggling — collapsed to 0,
+  re-expanded back to the original height, and confirmed the collapsed state
+  survives a full page reload (new session load + JSON-mode re-entry still
+  showed the panel collapsed), i.e. the localStorage persistence path works,
+  not just the in-memory toggle. Screenshot confirmed the collapsed panel
+  renders correctly (header + badge count + right-pointing chevron, body
+  hidden), matching the collapsed styling used elsewhere in the app.
+
 ## 7. Command tree / branch diagram
 
 A visual DAG of the session's structure — commands and how branches jump between
@@ -296,16 +538,33 @@ what Blender will draw.
 - No change to the MCP protocol or `blender_mcp_addon/server.py` call contract.
   n8n's existing MCP usage is unaffected by anything in this doc.
 
-## 9. Known cleanup (found during this review, not yet fixed)
+## 9. Known cleanup — RESOLVED (2026-07-13)
 
-Hardcoded absolute paths that should resolve via `BLENDER_ASSETS_DIR` instead:
-- `blender_mcp_addon/server.py:53` — debug STL path
-- `blender_mcp_addon/server.py:188` — debug log file path
-- `assets/mushroom_bw_session.json:489,499` — baked-in `filepath` values
-- `community/benchy/session.json:1261` — baked-in `filepath` value
+Hardcoded absolute paths, fixed after explicit sign-off on each:
+- `blender_mcp_addon/server.py` `import_and_analyze_reference()` (hardcoded
+  debug STL fallback path) — **deleted entirely**, not patched. Confirmed via
+  grep it was unreachable: registered in the addon's dispatch table but had
+  no schema on the bridge side (`src/tools/`), so no MCP client could ever
+  call it. Its dispatch-table entry was removed too.
+- `blender_mcp_addon/server.py` `addon_log()` (hardcoded absolute log path) —
+  now resolves `__file__`-relative (`os.path.dirname(os.path.abspath(__file__))`),
+  not via `BLENDER_ASSETS_DIR` (that's semantically for export/render output,
+  not debug logs) or a new env var — always resolvable on any machine with
+  zero new config, appropriate for what's a try/except-silent-noop debug aid.
+- `assets/mushroom_bw_session.json` (2 `export_model` calls) and
+  `community/benchy/session.json` (1 `export_model` call) — baked-in absolute
+  `filepath` values replaced with bare filenames (e.g. `"mushroom_bw_cap_black.stl"`),
+  letting the bridge's existing `BLENDER_ASSETS_DIR` resolution in
+  `blender_mcp_addon/tools/printing.py` handle it, same as every other
+  session file already does. Verified live against the bridge: a bare
+  relative `filepath` on `export_model` correctly resolved to
+  `f:/github-proj/blender-mcp-n8n/assets/<name>.stl`, confirming the fixed
+  session files will export to the same place they did before, just without
+  a hardcoded absolute path baked into the JSON.
 
-Not fixed in this pass — flagging for explicit sign-off before editing generated
-session assets or addon debug code.
+Deployed addon copy (`%APPDATA%\Blender Foundation\Blender\5.0\scripts\addons\blender_mcp_addon`)
+synced with the fixed `server.py` — still needs an addon reload in Blender
+(F3 → Reload Scripts, or restart) to take effect; that step was left to the user.
 
 ## 10. Migration checklist (fill in as implemented)
 
@@ -344,6 +603,74 @@ session assets or addon debug code.
       literals), Play All succeeded on all 6 commands, and a Cycles render of
       the result confirmed a real open-top hollow box (walls, floor, and
       cavity all visibly correct), not just a numeric readout.
+- [x] Non-finite result rejection (§4.5) — `evaluateExpression()` now throws
+      `"Expression evaluates to Infinity: divide by zero or invalid math"`
+      (or `NaN`) instead of silently returning a non-finite value.
+      **Additionally found and fixed while implementing this**: the inline
+      guided-form hint (`ParamTokenHint` in `SchemaField.jsx`) and
+      `DynamicArgsForm.validate()` both only ever checked whether a field's
+      *entire raw text* was itself a bare token/expression — which is never
+      true for an array-typed field like `location`/`dimensions`, since
+      that field's raw text is JSON-array syntax (`[0, 0, "${h} / 0"]`)
+      containing an expression as one element, not an expression itself.
+      This meant a divide-by-zero (or undefined-param) inside a
+      `location`/`dimensions` array silently passed guided-form validation
+      before this fix and only surfaced at dispatch time. New shared
+      `lib/expr.js` helpers (`collectStringLeaves`, `candidateStringsForField`)
+      parse the field's JSON and check every string element individually;
+      both `ParamTokenHint` and `DynamicArgsForm.validate()` now use them.
+      Verified end-to-end: typed `[0, 0, "${box_height} / 0"]` into
+      `create_cube`'s location field in the guided edit modal — inline hint
+      showed the exact error message live, and clicking "Apply Changes"
+      was correctly blocked (modal stayed open).
+- [x] Parametric expression linting in JSON mode (§6.5) — new
+      `lib/jsonExprLinter.js`, a second CodeMirror `linter()` source
+      alongside the JSON-syntax one (§6.4), same lint gutter. Reports
+      undefined param refs, expression syntax errors, and non-finite
+      results as inline diagnostics anchored to their exact position.
+      **Real user-reported bug in the first version, fixed same day**: the
+      v1 implementation scanned every double-quoted string in the raw
+      document via regex (not scoped to `commands[].arguments` despite this
+      section's spec always saying so) — `looksLikeExpression()`'s loose
+      heuristic ("has an operator char and a digit or `${...}`") matched
+      ordinary prose in `description` fields (e.g. `"location.z = box_height
+      / 2 (computed live)"` — has `/`, `(`, `)`, digits), which then failed
+      to tokenize as math and surfaced as a false-positive red squiggle
+      under plain text — visible in a real screenshot the user sent. Fixed
+      by having the linter parse the JSON and walk only
+      `commands[].arguments` subtrees, locating each candidate string's
+      real source offset via a position-anchored search scoped to its own
+      command (prevents identical strings in different commands from
+      colliding) rather than a blind whole-document scan.
+- [x] Parameters panel in JSON mode (§6.6) — direct consequence of the bug
+      above: the user pointed out that even a genuine undefined-param error
+      in JSON mode had no visible way to fix it without leaving JSON mode
+      entirely (Guided mode's Parameters panel isn't shown there). Docked
+      the same `ParametersPanel` component beside the JSON outline;
+      parameter edits here are immediate (not staged with the JSON text's
+      own explicit-apply model, §6.2) since it's editing the live/applied
+      session's parameters, same as Guided mode always has. Getting the
+      live re-lint-on-param-change working took two attempts:
+      `forceLinting()` from `@codemirror/lint` looked like the obvious API
+      but turned out to be a no-op unless a lint was already
+      internally-scheduled (it only fast-forwards a pending debounce timer,
+      confirmed by reading the library source) — since editing a parameter
+      doesn't touch the document text, no lint was ever pending, so nothing
+      happened. Fixed by dispatching a custom no-op-to-the-document
+      `StateEffect` that the linter's `needsRefresh` config reacts to,
+      which is the correct, documented mechanism for "re-run a linter
+      without a doc change." **Also found and fixed along the way**: the
+      panel's name/value inputs used inline `flex: 40%`/`flex: 1` styles
+      that don't fit a narrow fixed-width sidebar (240px) — the value input
+      was overflowing off-screen, only reachable via horizontal scroll.
+      Refactored to CSS classes so the JSON-mode sidebar can stack
+      name/value vertically without affecting Guided mode's wider (and
+      resizable) sidebar layout. Verified end-to-end with a realistic
+      scenario (load a real session, introduce one genuine undefined-param
+      error into an existing argument, leave everything else untouched):
+      squiggle appeared, adding the parameter via the docked panel cleared
+      it live with no Apply click and no document edit, and description
+      text with `/`, `()`, digits showed zero false positives throughout.
 - [x] Feature branching — implemented per §5.1-5.3 (array-primary, `branches`
       as an opt-in overlay, not a DAG node graph — see §5 for why this
       supersedes the original node/edge framing). New `BranchesPanel` +
@@ -377,6 +704,26 @@ session assets or addon debug code.
       Parameters panel reflected the change; confirmed an out-of-bounds
       branch range and malformed JSON syntax both correctly block Apply with
       an inline error and keep the editor in JSON mode.
+      **Upgraded to CodeMirror 6** (§6.4, same day, post-v1 polish): the
+      plain `<textarea>` was replaced with a real editor —
+      `@codemirror/{state,view,lang-json,lint,commands}` +
+      `@uiw/codemirror-theme-github` (first new dependency this doc's design
+      otherwise avoided, justified since text editing is a solved problem).
+      Gets real syntax highlighting, a lint gutter with live inline
+      syntax-error markers (750ms debounce, no Apply click needed to see
+      them), and theme-aware colors that follow Studio's dark/light toggle
+      without losing document/undo state on swap. The outline panel is
+      unchanged visually; only its jump-to-line implementation now uses
+      CodeMirror's cursor-dispatch + `scrollIntoView` API instead of raw
+      textarea selection math. `validateSessionShape`/`validateBranches`
+      remain a separate Apply-time check, unaffected — CodeMirror's linter
+      only understands generic JSON syntax, not session schema. Verified
+      end-to-end: confirmed real syntax-highlighted tokens rendering,
+      confirmed a live red lint-gutter marker appears while typing invalid
+      JSON (before Apply), confirmed outline click-to-jump still selects the
+      exact matching line, and confirmed the theme toggle swaps the editor's
+      background color live (dark `rgb(13,17,23)` → light `rgb(255,255,255)`)
+      without altering the document text.
 - [x] Retire `session_editor/` (§2) — deleted (2026-07-13) now that Studio has
       full feature parity plus parameters/expressions/branching/JSON-mode it
       never had. `src/server.py`'s `/editor` mount now points at
@@ -408,7 +755,16 @@ session assets or addon debug code.
       separate bars with a visible gap between them (confirming the jump is
       visually distinguishable from a contiguous range), and clicking tick #7
       correctly expanded `create_text (TagLabel)` in the command list.
-- [ ] Fix hardcoded paths (§9), pending sign-off — still open
+      **Extended** (post-v1 polish, same day): the tree is now two-way, not
+      just click-to-jump. It accepts an `activeIndex` prop and highlights
+      that tick (larger radius, ring, success-color fill) whenever a command
+      is expanded from the command list itself, auto-scrolling the tick into
+      view if it's off-screen — previously the tree only drove the list, the
+      list never drove the tree. Verified: expanding command #7 from the
+      list correctly highlighted tick #7 in the tree, and the reverse
+      (clicking a tree tick still correctly expands the matching list card)
+      continued to work.
+- [x] Fix hardcoded paths (§9) — resolved, see §9 for details.
 
 ### Bugs found & fixed during Studio scaffold verification (2026-07-13)
 

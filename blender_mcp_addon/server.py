@@ -45,49 +45,6 @@ class BlenderMCPServer(
         self.last_error = None
         self.timer_handle = None
 
-    def import_and_analyze_reference(self, filepath=None):
-        """Import reference STL and return bounding box and dimensions"""
-        import os
-
-        if not filepath:
-            filepath = "f:/github-proj/blender-mcp-n8n/assets/3DBenchy.stl"
-        if not os.path.exists(filepath):
-            return {"success": False, "error": f"File not found: {filepath}"}
-
-        old_active = bpy.context.view_layer.objects.active
-        old_selected = list(bpy.context.selected_objects)
-
-        bpy.ops.object.select_all(action="DESELECT")
-
-        if hasattr(bpy.ops.wm, "stl_import"):
-            bpy.ops.wm.stl_import(filepath=filepath)
-        else:
-            bpy.ops.import_mesh.stl(filepath=filepath)
-
-        obj = bpy.context.active_object
-        if not obj:
-            return {"success": False, "error": "Failed to import reference model"}
-
-        dimensions = list(obj.dimensions)
-        bound_box = [list(v) for v in obj.bound_box]
-
-        # Keep it or delete it? Let's delete it so we don't pollute the scene.
-        bpy.ops.object.delete()
-
-        for o in old_selected:
-            try:
-                o.select_set(True)
-            except Exception:
-                pass
-        if old_active:
-            bpy.context.view_layer.objects.active = old_active
-
-        return {
-            "success": True,
-            "dimensions": dimensions,
-            "bound_box": bound_box,
-        }
-
     def start_server(self, host=DEFAULT_HOST, port=DEFAULT_PORT):
         if self.running:
             return
@@ -185,7 +142,10 @@ class BlenderMCPServer(
 
     def addon_log(self, msg):
         try:
-            with open("F:\\github-proj\\blender-mcp-n8n\\blender_addon.log", "a") as f:
+            import os
+
+            log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blender_addon.log")
+            with open(log_path, "a") as f:
                 f.write(msg + "\n")
         except Exception:
             pass
@@ -350,8 +310,6 @@ class BlenderMCPServer(
             "sculpt_inflate": self.sculpt_inflate,
             "sculpt_grab": self.sculpt_grab,
             "symmetrize_mesh": self.symmetrize_mesh,
-            # Reference Analysis
-            "import_and_analyze_reference": self.import_and_analyze_reference,
             # History
             "undo": self.undo_action,
             "redo": self.redo_action,

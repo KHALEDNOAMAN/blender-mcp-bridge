@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import './style.css';
 import Header from './components/Header';
+import ActionBar from './components/ActionBar';
 import MetadataPanel from './components/MetadataPanel';
 import ParametersPanel from './components/ParametersPanel';
 import BranchesPanel from './components/BranchesPanel';
 import BranchBuilder from './components/BranchBuilder';
 import CommandTreePanel from './components/CommandTreePanel';
-import PlaybackPanel from './components/PlaybackPanel';
 import CommandList from './components/CommandList';
 import Modal from './components/Modal';
 import DynamicArgsForm from './components/DynamicArgsForm';
@@ -24,6 +24,11 @@ export default function App() {
     const { apiBase, connectionStatus, availableTools, refetchTools } = useConnection();
     const modalApi = useModal();
     const sidebar = useResizableSidebar();
+    const jsonSidebar = useResizableSidebar({ storageKey: 'jsonSidebarWidth', minWidth: 200, maxWidth: 480, defaultWidth: 260 });
+    // §7.3: bottom Command Timeline dock — vertical axis, inverted (dragging
+    // the handle up should grow the dock, which is the opposite sign of a
+    // raw clientY delta since the dock is anchored to the bottom).
+    const timeline = useResizableSidebar({ storageKey: 'timelineHeight', axis: 'vertical', invert: true, minWidth: 100, maxWidth: 400, defaultWidth: 160 });
 
     const [session, setSession] = useState(null);
     const [filter, setFilter] = useState('');
@@ -36,9 +41,10 @@ export default function App() {
     const [branchesCollapsed, setBranchesCollapsed] = useState(() => localStorage.getItem('branchesCollapsed') === 'true');
     const [commandTreeCollapsed, setCommandTreeCollapsed] = useState(() => localStorage.getItem('commandTreeCollapsed') === 'true');
     const [runningBranch, setRunningBranch] = useState(null);
+    const [selectedBranch, setSelectedBranch] = useState(null);
     const [viewMode, setViewMode] = useState('guided'); // 'guided' | 'json' — §6
+    const jsonModeParamsSnapshotRef = useRef(null); // §6.7: restored on Discard
     const [commandsCollapsed, setCommandsCollapsed] = useState(() => localStorage.getItem('commandsCollapsed') === 'true');
-    const [playbackCollapsed, setPlaybackCollapsed] = useState(() => localStorage.getItem('playbackCollapsed') === 'true');
     const [playbackDelay, setPlaybackDelay] = useState(500);
 
     const sessionRef = useRef(session);
@@ -63,6 +69,19 @@ export default function App() {
     const anyExecuted = hasCommands && session.commands.some((c) => c.execution_status === 'success');
     const activeCard = expandedIdx !== null && session && session.commands ? session.commands[expandedIdx] : null;
     const activeExecuted = activeCard && activeCard.execution_status === 'success';
+
+    // Keep the ActionBar's branch dropdown pointed at a valid branch — reset
+    // to the first one whenever branches change and the current selection
+    // no longer exists (deleted, or a new session loaded).
+    useEffect(() => {
+        const names = session && session.branches ? Object.keys(session.branches) : [];
+        if (names.length === 0) {
+            if (selectedBranch !== null) setSelectedBranch(null);
+        } else if (!names.includes(selectedBranch)) {
+            setSelectedBranch(names[0]);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [session && session.branches]);
 
     // --- Command mutation helpers -------------------------------------------------
 
@@ -281,20 +300,42 @@ export default function App() {
 
     const handleToggleViewMode = async () => {
         if (viewMode === 'json') {
-            const discard = await modalApi.confirm('Discard JSON Changes?', 'Switching to Guided view without applying will discard unsaved JSON edits. Proceed?');
+            const discard = await modalApi.confirm('Discard JSON Changes?', 'Switching to Guided view without applying will discard unsaved JSON edits, including any parameter edits made in JSON mode. Proceed?');
             if (!discard) return;
+            // §6.7: restore the parameter snapshot taken on entry — parameter
+            // edits in JSON mode are immediate/live (§6.6), not staged like
+            // the JSON text itself, so leaving without Apply must undo them too.
+            if (jsonModeParamsSnapshotRef.current !== null) {
+                setSession((prev) => (prev ? { ...prev, parameters: jsonModeParamsSnapshotRef.current } : prev));
+            }
+        } else {
+            jsonModeParamsSnapshotRef.current = sessionRef.current?.parameters || {};
         }
         setViewMode((m) => (m === 'guided' ? 'json' : 'guided'));
     };
 
     const handleApplyJson = (parsedSession) => {
-        setSession(parsedSession);
+        // The docked ParametersPanel (§6.6) is the single authoritative
+        // source for `parameters` — it edits session.parameters live and
+        // immediately, never the pending textarea text. The parsed
+        // textarea's OWN "parameters" key is stale the moment you edit the
+        // panel (that's the whole point of it being live), so committing it
+        // wholesale here would silently revert any panel edit made since
+        // JSON mode was opened. Apply takes commands/metadata/branches from
+        // the parsed text as usual, but always keeps the live parameters.
+        jsonModeParamsSnapshotRef.current = null;
+        setSession({ ...parsedSession, parameters: sessionRef.current?.parameters || {} });
         setExpandedIdx(null);
         setFilter('');
         setViewMode('guided');
     };
 
-    const handleDiscardJson = () => setViewMode('guided');
+    const handleDiscardJson = () => {
+        if (jsonModeParamsSnapshotRef.current !== null) {
+            setSession((prev) => (prev ? { ...prev, parameters: jsonModeParamsSnapshotRef.current } : prev));
+        }
+        setViewMode('guided');
+    };
 
     const handleNewSession = async () => {
         if (hasCommands) {
@@ -310,9 +351,11 @@ export default function App() {
         );
         if (!proceed) return;
         const newSession = buildSessionFromTemplate(templateRef.current);
+        jsonModeParamsSnapshotRef.current = null;
         setSession(newSession);
         setExpandedIdx(0);
         setFilter('');
+        setViewMode('guided');
     };
 
     const handleLoadClick = () => fileInputRef.current && fileInputRef.current.click();
@@ -327,9 +370,11 @@ export default function App() {
                 if (loaded.commands) {
                     loaded.commands.forEach((cmd) => { delete cmd.execution_status; });
                 }
+                jsonModeParamsSnapshotRef.current = null;
                 setSession(loaded);
                 setExpandedIdx(0);
                 setFilter('');
+                setViewMode('guided');
             } catch (err) {
                 modalApi.alert('Error', 'Invalid JSON');
             }
@@ -615,11 +660,6 @@ export default function App() {
         localStorage.setItem('commandsCollapsed', next);
         return next;
     });
-    const togglePlayback = () => setPlaybackCollapsed((prev) => {
-        const next = !prev;
-        localStorage.setItem('playbackCollapsed', next);
-        return next;
-    });
     const toggleParameters = () => setParametersCollapsed((prev) => {
         const next = !prev;
         localStorage.setItem('parametersCollapsed', next);
@@ -668,104 +708,118 @@ export default function App() {
                         session={session}
                         onApply={handleApplyJson}
                         onDiscard={handleDiscardJson}
+                        theme={theme}
+                        parameters={(session && session.parameters) || {}}
+                        onParametersChange={handleParametersChange}
+                        sidebarWidth={jsonSidebar.width}
+                        isSidebarDragging={jsonSidebar.isDragging}
+                        onSidebarPointerDown={jsonSidebar.handlePointerDown}
                     />
                 </main>
             ) : (
-            <main>
-                <div className="left-sidebar" style={{ flexBasis: sidebar.width }}>
-                    <MetadataPanel
-                        session={session}
-                        collapsed={metadataCollapsed}
-                        onToggle={toggleMetadata}
-                        onChange={handleMetadataChange}
-                    />
-                    <ParametersPanel
-                        parameters={(session && session.parameters) || {}}
-                        collapsed={parametersCollapsed}
-                        onToggle={toggleParameters}
-                        onChange={handleParametersChange}
-                    />
-                    <BranchesPanel
-                        branches={(session && session.branches) || {}}
-                        collapsed={branchesCollapsed}
-                        onToggle={toggleBranches}
-                        onNewBranch={handleAddBranch}
-                        onRunBranch={runBranch}
-                        onDeleteBranch={handleDeleteBranch}
-                        isPlaying={isPlaying}
-                        runningBranch={runningBranch}
-                    />
-                    <CommandTreePanel
-                        commands={hasCommands ? session.commands : []}
-                        branches={(session && session.branches) || {}}
-                        collapsed={commandTreeCollapsed}
-                        onToggle={toggleCommandTree}
-                        onJumpToCommand={handleJumpToCommand}
-                    />
-                    <PlaybackPanel
-                        collapsed={playbackCollapsed}
-                        onToggle={togglePlayback}
-                        isPlaying={isPlaying}
-                        playAllDisabled={isPlaying || !hasCommands || anyExecuted || hasBranches}
-                        playDisabled={isPlaying || !hasCommands || !!activeExecuted || hasBranches}
-                        playToActiveDisabled={isPlaying || !hasCommands || expandedIdx === null || !!activeExecuted || hasBranches}
-                        hasBranches={hasBranches}
-                        stopDisabled={!isPlaying}
-                        playbackDelay={playbackDelay}
-                        onDelayChange={setPlaybackDelay}
-                        onUndo={handleUndo}
-                        onRedo={handleRedo}
-                        onPlayAll={handlePlayAll}
-                        onPlay={handlePlay}
-                        onPlayToActive={handlePlayToActive}
-                        onStop={handleStop}
-                        onReset={resetExecutionState}
-                        onClearScene={handleClearScene}
-                    />
-                </div>
-
-                <div
-                    className={`sidebar-resize-handle${sidebar.isDragging ? ' dragging' : ''}`}
-                    onPointerDown={sidebar.handlePointerDown}
-                    title="Drag to resize"
+            <div className="guided-body">
+                <ActionBar
+                    isPlaying={isPlaying}
+                    playAllDisabled={isPlaying || !hasCommands || anyExecuted || hasBranches}
+                    playDisabled={isPlaying || !hasCommands || !!activeExecuted || hasBranches}
+                    playToActiveDisabled={isPlaying || !hasCommands || expandedIdx === null || !!activeExecuted || hasBranches}
+                    stopDisabled={!isPlaying}
+                    hasBranches={hasBranches}
+                    branches={(session && session.branches) || {}}
+                    selectedBranch={selectedBranch}
+                    onSelectedBranchChange={setSelectedBranch}
+                    runningBranch={runningBranch}
+                    onRunBranch={runBranch}
+                    playbackDelay={playbackDelay}
+                    onDelayChange={setPlaybackDelay}
+                    onUndo={handleUndo}
+                    onRedo={handleRedo}
+                    onPlayAll={handlePlayAll}
+                    onPlay={handlePlay}
+                    onPlayToActive={handlePlayToActive}
+                    onStop={handleStop}
+                    onReset={resetExecutionState}
+                    onClearScene={handleClearScene}
                 />
 
-                <section id="commandsSection" className={`card glass commands-collapsible${commandsCollapsed ? ' collapsed' : ''}`}>
-                    <div className="commands-header" onClick={toggleCommands} title="Toggle commands list">
-                        <div className="commands-header-left">
-                            <h2>Commands <span className="badge">{filteredCount}</span></h2>
-                        </div>
-                        <span className="commands-chevron">▼</span>
-                    </div>
-                    <div className="commands-body">
-                        <div className="search-bar-container">
-                            <input
-                                type="text"
-                                placeholder="Filter tools..."
-                                spellCheck={false}
-                                className="search-bar"
-                                value={filter}
-                                onChange={(e) => setFilter(e.target.value)}
-                            />
-                        </div>
-
-                        <CommandList
-                            commands={hasCommands ? session.commands : []}
-                            filter={filter}
-                            expandedIdx={expandedIdx}
-                            runningIdx={runningIdx}
-                            onExpand={setExpandedIdx}
-                            onRun={runSingle}
-                            onEdit={handleEditCommand}
-                            onDelete={handleDelete}
-                            onMoveUp={handleMoveUp}
-                            onMoveDown={handleMoveDown}
-                            onDescriptionChange={handleDescriptionChange}
-                            onArgumentsChange={handleArgumentsChange}
+                <main>
+                    <div className="left-sidebar" style={{ flexBasis: sidebar.width }}>
+                        <MetadataPanel
+                            session={session}
+                            collapsed={metadataCollapsed}
+                            onToggle={toggleMetadata}
+                            onChange={handleMetadataChange}
+                        />
+                        <ParametersPanel
+                            parameters={(session && session.parameters) || {}}
+                            collapsed={parametersCollapsed}
+                            onToggle={toggleParameters}
+                            onChange={handleParametersChange}
+                        />
+                        <BranchesPanel
+                            branches={(session && session.branches) || {}}
+                            collapsed={branchesCollapsed}
+                            onToggle={toggleBranches}
+                            onNewBranch={handleAddBranch}
+                            onDeleteBranch={handleDeleteBranch}
                         />
                     </div>
-                </section>
-            </main>
+
+                    <div
+                        className={`sidebar-resize-handle${sidebar.isDragging ? ' dragging' : ''}`}
+                        onPointerDown={sidebar.handlePointerDown}
+                        title="Drag to resize"
+                    />
+
+                    <section id="commandsSection" className={`card glass commands-collapsible${commandsCollapsed ? ' collapsed' : ''}`}>
+                        <div className="commands-header" onClick={toggleCommands} title="Toggle commands list">
+                            <div className="commands-header-left">
+                                <h2>Commands <span className="badge">{filteredCount}</span></h2>
+                            </div>
+                            <span className="commands-chevron">▼</span>
+                        </div>
+                        <div className="commands-body">
+                            <div className="search-bar-container">
+                                <input
+                                    type="text"
+                                    placeholder="Filter tools..."
+                                    spellCheck={false}
+                                    className="search-bar"
+                                    value={filter}
+                                    onChange={(e) => setFilter(e.target.value)}
+                                />
+                            </div>
+
+                            <CommandList
+                                commands={hasCommands ? session.commands : []}
+                                filter={filter}
+                                expandedIdx={expandedIdx}
+                                runningIdx={runningIdx}
+                                onExpand={setExpandedIdx}
+                                onRun={runSingle}
+                                onEdit={handleEditCommand}
+                                onDelete={handleDelete}
+                                onMoveUp={handleMoveUp}
+                                onMoveDown={handleMoveDown}
+                                onDescriptionChange={handleDescriptionChange}
+                                onArgumentsChange={handleArgumentsChange}
+                            />
+                        </div>
+                    </section>
+                </main>
+
+                <CommandTreePanel
+                    commands={hasCommands ? session.commands : []}
+                    branches={(session && session.branches) || {}}
+                    collapsed={commandTreeCollapsed}
+                    onToggle={toggleCommandTree}
+                    onJumpToCommand={handleJumpToCommand}
+                    activeIndex={expandedIdx}
+                    dockHeight={timeline.width}
+                    isResizeDragging={timeline.isDragging}
+                    onResizePointerDown={timeline.handlePointerDown}
+                />
+            </div>
             )}
 
             <footer>

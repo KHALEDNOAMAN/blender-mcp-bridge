@@ -2564,7 +2564,7 @@
       "tool": "export_model",
       "arguments": {
         "object_name": "BenchySmooth",
-        "filepath": "f:/github-proj/blender-mcp-n8n/assets/sh_benchy.stl",
+        "filepath": "sh_benchy.stl",
         "format": "STL"
       },
       "description": "Export the finished SH Benchy - smooth, watertight, engraved, print-ready."

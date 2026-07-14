@@ -1390,11 +1390,69 @@ footer {
     display: flex;
     flex: 1;
     min-height: 0;
+    gap: 0;
+}
+
+.json-editor-sidebar {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
+    min-height: 0;
+    min-width: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.json-editor-sidebar .params-table {
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.params-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.params-row-name {
+    flex: 0 0 40%;
+    min-width: 0;
+}
+
+.params-row-value {
+    flex: 1;
+    min-width: 0;
+}
+
+.params-row-delete {
+    flex: 0 0 auto;
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.params-row-delete:hover {
+    background: var(--danger-color);
+    color: #fff;
+}
+
+/* JSON-mode sidebar is narrower (see .json-editor-sidebar) than Guided
+   mode's — shrink the name/value split further so all three (name, value,
+   delete) still fit on one row instead of wrapping/stacking. */
+.json-editor-sidebar .params-row-name {
+    flex-basis: 34%;
+}
+
+.json-editor-sidebar .params-row-name,
+.json-editor-sidebar .params-row-value {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.5rem;
 }
 
 .json-outline {
-    flex: 0 0 220px;
+    flex: 0 0 auto;
+    max-height: 45%;
     overflow-y: auto;
     background: var(--input-bg);
     border: 1px solid var(--glass-border);
@@ -1449,25 +1507,28 @@ footer {
     white-space: nowrap;
 }
 
-.json-session-textarea {
+.json-codemirror-host {
     flex: 1;
     min-width: 0;
-    background: var(--input-bg);
+    display: flex;
     border: 1px solid var(--glass-border);
     border-radius: 8px;
-    padding: 0.75rem;
-    color: var(--text-primary);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    line-height: 1.5;
-    resize: none;
-    overflow: auto;
-    outline: none;
-    white-space: pre;
+    overflow: hidden;
 }
 
-.json-session-textarea:focus {
-    border-color: var(--accent-color);
+.json-codemirror-host .cm-editor {
+    flex: 1;
+    min-width: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+}
+
+.json-codemirror-host .cm-editor.cm-focused {
+    outline: none;
+}
+
+.json-codemirror-host .cm-scroller {
+    overflow: auto;
 }
 
 /* Command tree / branch diagram (§7) */

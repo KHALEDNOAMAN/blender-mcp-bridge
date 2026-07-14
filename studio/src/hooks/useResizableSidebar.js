@@ -1,42 +1,55 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const MIN_WIDTH = 260;
-const MAX_WIDTH = 720;
-const DEFAULT_WIDTH = 380;
-const STORAGE_KEY = 'sidebarWidth';
-
 /**
- * Drag-to-resize the left sidebar (Metadata/Parameters/Branches/Command
- * Tree/Playback column). Width persists to localStorage, same convention as
- * the collapsible-panel state elsewhere in Studio.
+ * Drag-to-resize a panel along one axis. Size persists to localStorage under
+ * `storageKey`, same convention as the collapsible-panel state elsewhere in
+ * Studio. Used for the Guided-view left sidebar (Metadata/Parameters/
+ * Branches/Playback), the JSON-mode sidebar (outline + docked Parameters
+ * panel, §6.6), and the bottom Command Timeline (§7.3, vertical axis) — each
+ * with its own storage key/bounds so resizing one doesn't affect the others.
+ *
+ * `axis: 'horizontal'` (default) drags along clientX and produces a width;
+ * `axis: 'vertical'` drags along clientY and produces a height. The dragged
+ * dimension is still returned as `width` either way — callers on the
+ * vertical axis just read it as a height, keeping one hook/return shape
+ * instead of two near-identical ones.
  */
-export function useResizableSidebar() {
+export function useResizableSidebar({
+    storageKey = 'sidebarWidth',
+    minWidth = 260,
+    maxWidth = 720,
+    defaultWidth = 380,
+    axis = 'horizontal',
+    invert = false,
+} = {}) {
     const [width, setWidth] = useState(() => {
-        const stored = parseInt(localStorage.getItem(STORAGE_KEY), 10);
-        return Number.isFinite(stored) ? Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, stored)) : DEFAULT_WIDTH;
+        const stored = parseInt(localStorage.getItem(storageKey), 10);
+        return Number.isFinite(stored) ? Math.min(maxWidth, Math.max(minWidth, stored)) : defaultWidth;
     });
     const [isDragging, setIsDragging] = useState(false);
-    const startXRef = useRef(0);
+    const startPosRef = useRef(0);
     const startWidthRef = useRef(width);
 
     const handlePointerDown = useCallback((e) => {
-        startXRef.current = e.clientX;
+        startPosRef.current = axis === 'vertical' ? e.clientY : e.clientX;
         startWidthRef.current = width;
         setIsDragging(true);
-    }, [width]);
+    }, [width, axis]);
 
     useEffect(() => {
         if (!isDragging) return;
 
         const handlePointerMove = (e) => {
-            const delta = e.clientX - startXRef.current;
-            const next = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidthRef.current + delta));
+            const pos = axis === 'vertical' ? e.clientY : e.clientX;
+            const rawDelta = pos - startPosRef.current;
+            const delta = invert ? -rawDelta : rawDelta;
+            const next = Math.min(maxWidth, Math.max(minWidth, startWidthRef.current + delta));
             setWidth(next);
         };
         const handlePointerUp = () => {
             setIsDragging(false);
             setWidth((current) => {
-                localStorage.setItem(STORAGE_KEY, String(current));
+                localStorage.setItem(storageKey, String(current));
                 return current;
             });
         };
@@ -47,7 +60,7 @@ export function useResizableSidebar() {
             document.removeEventListener('pointermove', handlePointerMove);
             document.removeEventListener('pointerup', handlePointerUp);
         };
-    }, [isDragging]);
+    }, [isDragging, axis, invert]);
 
     return { width, isDragging, handlePointerDown };
 }

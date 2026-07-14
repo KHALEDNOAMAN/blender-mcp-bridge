@@ -1,9 +1,13 @@
 /**
  * Branches panel — saved feature branches (named ranges over commands[]).
  * See docs/studio_design_v1.md §5. Same collapsible-card pattern as
- * ParametersPanel/MetadataPanel/PlaybackPanel.
+ * ParametersPanel/MetadataPanel.
+ *
+ * §7.4: running a branch moved to the ActionBar's branch dropdown (always
+ * visible, not scrolled away in the sidebar) — this panel is now
+ * create/inspect/delete only, no per-row Run button.
  */
-export default function BranchesPanel({ branches, collapsed, onToggle, onNewBranch, onRunBranch, onDeleteBranch, isPlaying, runningBranch }) {
+export default function BranchesPanel({ branches, collapsed, onToggle, onNewBranch, onDeleteBranch }) {
     const entries = Object.entries(branches || {});
 
     return (
@@ -28,13 +32,6 @@ export default function BranchesPanel({ branches, collapsed, onToggle, onNewBran
                                     {branch.ranges.map(([s, e]) => `#${s + 1}–#${e + 1}`).join(', ')}
                                 </div>
                             </div>
-                            <button
-                                className="btn btn-sm btn-success"
-                                disabled={isPlaying}
-                                onClick={() => onRunBranch(name)}
-                            >
-                                {runningBranch === name ? '▶ Running…' : '▶ Run'}
-                            </button>
                             <button className="btn-icon" title={`Delete branch "${name}"`} onClick={() => onDeleteBranch(name)}>×</button>
                         </div>
                     ))}

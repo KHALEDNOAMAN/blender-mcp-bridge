@@ -1,31 +1,71 @@
 import AutoExpandTextarea from './AutoExpandTextarea';
 import { extractParamName, isParametric } from '../lib/params';
-import { looksLikeExpression, collectParamNames } from '../lib/expr';
+import { looksLikeExpression, collectParamNames, evaluateExpression, candidateStringsForField } from '../lib/expr';
+
+/**
+ * Checks one candidate string for undefined-param / expression-eval
+ * problems. Returns null if it's not parametric or has no problem.
+ */
+function checkOneValue(value, mergedParams) {
+    if (!isParametric(value)) return null;
+    const bareName = extractParamName(value);
+    const refs = bareName !== null ? [bareName] : (looksLikeExpression(value) ? collectParamNames(value) : []);
+    if (refs.length === 0) return null;
+
+    const missing = refs.filter((n) => !(n in mergedParams));
+    if (missing.length > 0) return { missing, refs };
+
+    if (looksLikeExpression(value)) {
+        try {
+            evaluateExpression(value, mergedParams);
+        } catch (err) {
+            return { error: err.message, refs };
+        }
+    }
+    return { ok: true, refs };
+}
 
 /**
  * Inline "create parameter" affordance (design doc §4.1 hybrid model,
- * extended by §4.4 for expressions). Shown under a field whose value is a
- * bare "${name}" token or an arithmetic expression referencing one or more
- * "${name}" tokens, when any referenced name isn't a known parameter yet.
+ * extended by §4.4 for expressions, §4.5 for non-finite results). Shown
+ * under a field whose value is a bare "${name}" token or an arithmetic
+ * expression referencing one or more "${name}" tokens — reports undefined
+ * param refs (with a quick-create action), or an expression syntax/eval
+ * error (divide-by-zero etc.) once every ref is defined but the expression
+ * itself is broken. Also checks INSIDE array/JSON-typed fields (§ fix,
+ * post-v1): the field's raw text (e.g. `[0, 0, "${h} / 0"]`) is parsed as
+ * JSON first when possible so each array element is checked individually,
+ * not just the field's raw text as one whole string.
  */
 function ParamTokenHint({ fieldValue, parameters, pendingParams, onCreateParam }) {
-    if (!isParametric(fieldValue)) return null;
+    const mergedParams = { ...parameters, ...pendingParams };
 
-    const refs = extractParamName(fieldValue) !== null
-        ? [extractParamName(fieldValue)]
-        : (looksLikeExpression(fieldValue) ? collectParamNames(fieldValue) : []);
-    if (refs.length === 0) return null;
+    const results = candidateStringsForField(fieldValue)
+        .map((c) => checkOneValue(c, mergedParams))
+        .filter(Boolean);
+    if (results.length === 0) return null;
 
-    const missing = refs.filter((n) => !(n in parameters) && !(n in pendingParams));
+    const withMissing = results.filter((r) => r.missing);
+    const withError = results.find((r) => r.error);
 
-    if (missing.length === 0) {
+    if (withError) {
         return (
-            <div style={{ fontSize: '0.75em', opacity: 0.6, marginTop: '0.25rem' }}>
-                Uses parameter{refs.length > 1 ? 's' : ''} {refs.map((n) => <code key={n}>{n}</code>).reduce((a, b) => [a, ', ', b])}
+            <div style={{ fontSize: '0.8em', marginTop: '0.25rem', color: 'var(--danger-color)' }}>
+                {withError.error}
             </div>
         );
     }
 
+    if (withMissing.length === 0) {
+        const allRefs = [...new Set(results.flatMap((r) => r.refs))];
+        return (
+            <div style={{ fontSize: '0.75em', opacity: 0.6, marginTop: '0.25rem' }}>
+                Uses parameter{allRefs.length > 1 ? 's' : ''} {allRefs.map((n) => <code key={n}>{n}</code>).reduce((a, b) => [a, ', ', b])}
+            </div>
+        );
+    }
+
+    const missing = [...new Set(withMissing.flatMap((r) => r.missing))];
     return (
         <div style={{ fontSize: '0.8em', marginTop: '0.25rem', color: 'var(--danger-color)' }}>
             Undefined parameter{missing.length > 1 ? 's' : ''}: {missing.map((n) => (
