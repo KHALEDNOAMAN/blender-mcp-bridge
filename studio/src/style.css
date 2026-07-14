@@ -160,19 +160,24 @@ body:has(.sidebar-resize-handle.vertical.dragging) {
 
 /* Action bar: playback transport + branch run, docked below the header,
    always visible regardless of sidebar scroll position (§7.4). */
+/* §7.5: the ActionBar is docked directly under the Command Timeline's
+   title row now (not its own separate card) so it stays reachable even
+   while the timeline body itself is collapsed. */
 .action-bar {
     flex: 0 0 auto;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 0.9rem 1.25rem;
-    margin-bottom: 0;
+    gap: 0.75rem;
+    min-width: 0;
+    padding: 0 1.5rem 0.9rem;
+    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 0.75rem;
 }
 
 .action-bar-right {
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .branch-run-group {
@@ -183,8 +188,8 @@ body:has(.sidebar-resize-handle.vertical.dragging) {
 
 .branch-select {
     width: auto;
-    padding: 0.5rem 2rem 0.5rem 0.8rem;
-    font-size: 0.85rem;
+    padding: 0.35rem 1.8rem 0.35rem 0.7rem;
+    font-size: 0.8rem;
 }
 
 #metadataSection {
@@ -550,6 +555,13 @@ header {
     opacity: 0.35;
     cursor: not-allowed;
     background-color: rgba(128, 128, 128, 0.05);
+    /* Variants like .btn-danger/.btn-success set color: #fff for contrast
+       against their own solid background — but disabled state replaces that
+       background with a near-transparent gray, so white text (at 0.35
+       opacity on top) reads fine on a dark page and is nearly invisible on
+       a light one. Reset to the theme's own text color instead of
+       inheriting the variant's. */
+    color: var(--text-primary) !important;
     border: 1px solid var(--glass-border) !important;
     box-shadow: none;
 }
@@ -1153,7 +1165,12 @@ body.light-theme .modal-overlay {
     gap: 1.2rem;
     /* Removed large negative margin to play nice with testing bar */
     padding: 1.5rem 2.5rem;
-    background: rgba(0, 0, 0, 0.2);
+    /* Was a hardcoded rgba(0,0,0,0.2) tint — read as a subtle darkening on
+       the dark theme's near-black modal background, but as a visible gray
+       block on the light theme's white modal. border-top matches how
+       .modal-testing-bar separates itself from the body above, instead of
+       a background fill. */
+    border-top: 1px solid var(--glass-border);
 }
 
 .selection-grid {
@@ -1618,6 +1635,14 @@ footer {
     padding-top: 6px;
 }
 
+/* §7.5: the clickable title/chevron row (collapse toggle) is separate from
+   the ActionBar row below it — the ActionBar needs to stay visible and
+   interactive regardless of collapsed state, so it can't live inside the
+   click-to-toggle header itself. */
+.command-timeline-titlebar {
+    padding-bottom: 0.5rem;
+}
+
 .command-timeline-dock.collapsed {
     padding-top: 0;
     height: auto !important;
@@ -1662,4 +1687,28 @@ footer {
 
 .command-tree-tick:hover text {
     fill: var(--text-primary);
+}
+
+/* §7.6: collapsed range marker (Excel-style column-group condensing) and
+   the branch bars that trigger it. */
+.command-tree-collapsed-marker rect {
+    transition: stroke 0.15s ease, fill 0.15s ease;
+}
+
+.command-tree-collapsed-marker:hover rect {
+    stroke: var(--accent-color);
+    fill: var(--card-bg);
+}
+
+.command-tree-collapsed-marker:hover text {
+    fill: var(--text-primary);
+}
+
+.command-tree-branch-bar.collapsible {
+    transition: fill-opacity 0.15s ease;
+    cursor: pointer;
+}
+
+.command-tree-branch-bar.collapsible:hover {
+    fill-opacity: 0.55 !important;
 }

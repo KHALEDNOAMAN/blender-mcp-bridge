@@ -1,14 +1,13 @@
 /**
- * Commands actionbar — playback transport + branch selection, docked below
- * the header. See docs/studio_design_v1.md §7.4. Replaces the old
- * PlaybackPanel sidebar card: Undo/Redo, Play All/Play/Play to Active/Stop,
- * Reset/Clear Scene, the delay input, and (new) a branch dropdown all live
- * here now, always visible regardless of what's scrolled in the sidebar.
- *
- * The branch dropdown is select-then-run, not a live filter — running a
- * branch is still the auto-wipe-and-replay behavior from §5.3, unchanged.
- * BranchesPanel (sidebar) keeps create/delete/inspect; this is just "pick
- * one and run it" for the common case.
+ * Command actionbar — playback transport + branch selection. See
+ * docs/studio_design_v1.md §7.4, §7.5. Docked directly under the Command
+ * Timeline's title row (not its own standalone card, and NOT inside the
+ * click-to-collapse title row itself) so transport controls and the branch
+ * dropdown stay reachable and clickable even while the timeline's diagram
+ * body is collapsed — the whole point of moving it here instead of a
+ * separate bar above `main` was that a separate bar disappears the moment
+ * its own card is scrolled or the layout is tight, while this dock is
+ * always on screen.
  */
 export default function ActionBar({
     isPlaying,
@@ -37,15 +36,15 @@ export default function ActionBar({
     const branchNames = Object.keys(branches || {});
 
     return (
-        <div className="action-bar card glass">
+        <div className="action-bar">
             <div className="control-group main-controls">
-                <button className="btn btn-secondary" title="Undo Last Command (Ctrl+Z)" onClick={onUndo}>↶ Undo</button>
-                <button className="btn btn-secondary" title="Redo Last Command (Ctrl+Y)" onClick={onRedo}>↷ Redo</button>
+                <button className="btn btn-secondary btn-sm" title="Undo Last Command (Ctrl+Z)" onClick={onUndo}>↶ Undo</button>
+                <button className="btn btn-secondary btn-sm" title="Redo Last Command (Ctrl+Y)" onClick={onRedo}>↷ Redo</button>
                 <div className="vr"></div>
-                <button className="btn btn-success" disabled={playAllDisabled} title={hasBranches ? branchNote : 'Play All Commands (Space)'} onClick={onPlayAll}>▶ Play All</button>
-                <button className="btn btn-success" disabled={playDisabled} title={hasBranches ? branchNote : 'Play from Active (Ctrl+Enter)'} onClick={onPlay}>▶ Play</button>
-                <button className="btn btn-success" disabled={playToActiveDisabled} title={hasBranches ? branchNote : 'Play up to Active Command'} onClick={onPlayToActive}>▶ Play to Active</button>
-                <button className="btn btn-danger" disabled={stopDisabled} title="Stop Playback (Esc)" onClick={onStop}>⏹ Stop</button>
+                <button className="btn btn-success btn-sm" disabled={playAllDisabled} title={hasBranches ? branchNote : 'Play All Commands (Space)'} onClick={onPlayAll}>▶ Play All</button>
+                <button className="btn btn-success btn-sm" disabled={playDisabled} title={hasBranches ? branchNote : 'Play from Active (Ctrl+Enter)'} onClick={onPlay}>▶ Play</button>
+                <button className="btn btn-success btn-sm" disabled={playToActiveDisabled} title={hasBranches ? branchNote : 'Play up to Active Command'} onClick={onPlayToActive}>▶ Play to Active</button>
+                <button className="btn btn-danger btn-sm" disabled={stopDisabled} title="Stop Playback (Esc)" onClick={onStop}>⏹ Stop</button>
                 <div className="vr"></div>
                 <button className="btn btn-secondary btn-sm" title="Re-enable all Run buttons (Alt+R)" onClick={onReset}>↺ Reset</button>
                 <button className="btn btn-danger btn-sm" title="Delete all objects in Blender scene" onClick={onClearScene}>🗑 Clear</button>

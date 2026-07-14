@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import './style.css';
 import Header from './components/Header';
-import ActionBar from './components/ActionBar';
 import MetadataPanel from './components/MetadataPanel';
 import ParametersPanel from './components/ParametersPanel';
 import BranchesPanel from './components/BranchesPanel';
@@ -718,30 +717,6 @@ export default function App() {
                 </main>
             ) : (
             <div className="guided-body">
-                <ActionBar
-                    isPlaying={isPlaying}
-                    playAllDisabled={isPlaying || !hasCommands || anyExecuted || hasBranches}
-                    playDisabled={isPlaying || !hasCommands || !!activeExecuted || hasBranches}
-                    playToActiveDisabled={isPlaying || !hasCommands || expandedIdx === null || !!activeExecuted || hasBranches}
-                    stopDisabled={!isPlaying}
-                    hasBranches={hasBranches}
-                    branches={(session && session.branches) || {}}
-                    selectedBranch={selectedBranch}
-                    onSelectedBranchChange={setSelectedBranch}
-                    runningBranch={runningBranch}
-                    onRunBranch={runBranch}
-                    playbackDelay={playbackDelay}
-                    onDelayChange={setPlaybackDelay}
-                    onUndo={handleUndo}
-                    onRedo={handleRedo}
-                    onPlayAll={handlePlayAll}
-                    onPlay={handlePlay}
-                    onPlayToActive={handlePlayToActive}
-                    onStop={handleStop}
-                    onReset={resetExecutionState}
-                    onClearScene={handleClearScene}
-                />
-
                 <main>
                     <div className="left-sidebar" style={{ flexBasis: sidebar.width }}>
                         <MetadataPanel
@@ -818,6 +793,29 @@ export default function App() {
                     dockHeight={timeline.width}
                     isResizeDragging={timeline.isDragging}
                     onResizePointerDown={timeline.handlePointerDown}
+                    actionBarProps={{
+                        isPlaying,
+                        playAllDisabled: isPlaying || !hasCommands || anyExecuted || hasBranches,
+                        playDisabled: isPlaying || !hasCommands || !!activeExecuted || hasBranches,
+                        playToActiveDisabled: isPlaying || !hasCommands || expandedIdx === null || !!activeExecuted || hasBranches,
+                        stopDisabled: !isPlaying,
+                        hasBranches,
+                        branches: (session && session.branches) || {},
+                        selectedBranch,
+                        onSelectedBranchChange: setSelectedBranch,
+                        runningBranch,
+                        onRunBranch: runBranch,
+                        playbackDelay,
+                        onDelayChange: setPlaybackDelay,
+                        onUndo: handleUndo,
+                        onRedo: handleRedo,
+                        onPlayAll: handlePlayAll,
+                        onPlay: handlePlay,
+                        onPlayToActive: handlePlayToActive,
+                        onStop: handleStop,
+                        onReset: resetExecutionState,
+                        onClearScene: handleClearScene,
+                    }}
                 />
             </div>
             )}

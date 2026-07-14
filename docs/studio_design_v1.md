@@ -606,6 +606,108 @@ in scrollable sidebar cards where they could be scrolled out of view.
   delete only); switching to JSON mode confirmed both the ActionBar and the
   Command Timeline are absent there, and switching back restores them.
 
+### 7.5 ActionBar merged into the Command Timeline dock
+
+Follow-up user request, immediately after §7.4 shipped: fold the standalone
+ActionBar into the Command Timeline instead of keeping it as its own card
+above `main`. Motivation stated directly — the goal is that "even with the
+command timeline collapsed, we can still select the branches if it exists
+and can play pause etc," i.e. transport controls should live somewhere that
+can never itself scroll out of view or get hidden, which a separate card
+above `main` doesn't guarantee once other panels grow.
+
+- `CommandTreePanel` now renders three stacked regions instead of the old
+  header+body pair: a slim click-to-collapse title row
+  (`.command-timeline-titlebar`, "Command Timeline" + chevron, `onClick`
+  toggles `collapsed` same as before), a permanent `ActionBar` row
+  immediately below it, then the collapsible SVG diagram
+  (`.metadata-body`, still governed by `collapsed`). The standalone
+  `<ActionBar>` render between `Header` and `main` in `App.jsx` was removed;
+  `App.jsx` now passes one `actionBarProps` object into `CommandTreePanel`,
+  which spreads it onto the embedded `<ActionBar>`.
+- Critical ordering point: the ActionBar row is a **sibling** of the
+  collapsible body, not a child of the clickable title row. An earlier
+  attempt nested it inside `.metadata-header` itself (so title, ActionBar,
+  and chevron were all one `onClick`-to-toggle flex row) — that broke
+  immediately, since every click on a transport button or the branch
+  `<select>` also toggled `collapsed` via event bubbling to the header's own
+  `onClick`. Pulling the ActionBar out to its own row below the title
+  (rendered unconditionally, ignoring `collapsed`) fixed it without needing
+  `stopPropagation` on every individual control.
+- Bug found and fixed during this restructuring: the first nested-in-header
+  layout also wrapped the chevron onto its own line below the ActionBar
+  once the ActionBar's own internal content wrapped (narrow window), because
+  the header row had `flex-wrap: wrap` and three flex children (title,
+  ActionBar, chevron) with the ActionBar being the one most likely to need
+  two rows. Splitting the title/chevron into their own dedicated row (no
+  wrapping needed — just two short items) resolved this as a side effect of
+  the same restructuring, not a separate patch.
+- Verified end-to-end with Playwright: clicking a transport button (Reset)
+  no longer collapses the timeline; collapsing the timeline via the
+  title row leaves the ActionBar (all transport buttons + populated branch
+  dropdown) visibly present and interactive; selecting a different branch
+  while collapsed correctly updates the dropdown's value without
+  re-expanding the timeline; a branch-free session correctly hides the
+  branch dropdown/run group entirely while still showing the rest of the
+  ActionBar (delay input shifts right via the row's `space-between`); JSON
+  mode still renders neither the ActionBar nor the Command Timeline at all.
+
+### 7.6 Collapsible command ranges (Excel-style column grouping)
+
+User request, prompted by a session with a large branch spanning many
+commands: let a range of commands condense into one marker, click-triggered
+from a branch's range bar, the same way Excel lets you collapse a group of
+columns/rows.
+
+- **Collapse scope is global, not per-row.** The spine and every branch row
+  share the same tick x-positions (`xForIndex(idx)` was one function for the
+  whole diagram) — a range can't collapse for one branch's bar while
+  staying expanded on the spine or another branch's row, because they're
+  literally the same horizontal coordinates. So `collapsedRanges` is one
+  shared piece of state for the whole diagram: clicking ANY branch's range
+  bar (or the resulting marker, to re-expand) collapses/expands that range
+  everywhere at once. This was a real design fork (asked and confirmed
+  before implementing, not assumed) — the alternative of only allowing
+  collapse where every visible branch treats the range as one uninterrupted
+  block was rejected as too conservative (wouldn't even fire on the
+  motivating screenshot, where branch B splits #4-6 from #7-9 through the
+  middle of what branch A treats as one block).
+- **Data model**: `collapsedRanges` is local `useState` in `CommandTreePanel`
+  — a view preference, not session data. Not persisted, resets on
+  reload/new session load. `mergeRanges()` normalizes overlapping/adjacent
+  collapse requests into disjoint ranges so collapsing two touching branch
+  bars produces one contiguous marker instead of a 1-command sliver of
+  normal ticks wedged between two markers.
+- **Rendering model**: `buildSegments(commandCount, collapsedRanges)` walks
+  command indices 0..N-1 and produces an ordered list of segments — each
+  either a single command tick or one collapsed marker standing in for a
+  whole range. X-positions (`segmentCenterX`) are computed per-segment, not
+  per-command-index, so a collapsed marker (wider, `COLLAPSED_SEGMENT_WIDTH`
+  = 56px) doesn't just visually shrink — the commands after it actually
+  shift left, closing the gap.
+- **Marker click re-expands**; a single-command range (`start === end`) is
+  not collapsible (nothing to condense) — its bar renders without the
+  `.collapsible` class/cursor and its click handler is a no-op guard, not
+  just a disabled style.
+- Bug found and fixed during implementation: a branch's range bar uses
+  `xForIndex(start)`/`xForIndex(end)` to know where to draw — when a
+  branch's own full range collapsed onto itself (the exact case in the
+  screenshot that prompted this: Feature A's range IS #1-3, and #1-3 gets
+  collapsed), both endpoints resolved to the same collapsed marker's
+  *center* x, so the bar rendered as a near-zero-width sliver dot instead of
+  spanning the marker. Fixed by adding `xStartForIndex`/`xEndForIndex`,
+  which return the marker's left/right *edge* when an endpoint lands inside
+  a collapsed segment (matching a single tick's center otherwise, unchanged
+  behavior for the non-collapsed case).
+- Verified with Playwright against `assets/branch_test_session.json`:
+  collapsing Feature A's #1-3 bar drops the tick count from 10 to 7 (3 ticks
+  replaced by 1 marker), the marker labels correctly as "#1–#3", and Feature
+  A's own bar now spans the full marker width instead of collapsing to a
+  dot; clicking the marker re-expands back to exactly 10 ticks; collapsing
+  two independent non-adjacent ranges at once (#1-3 and #7-10, leaving #4-6
+  as normal ticks between them) renders two markers with no bar reporting a
+  negative or zero width across any branch row.
+
 ## 8. Non-goals / explicitly deferred
 
 - WASM browser→localhost bridge: dropped. Plain fetch/WebSocket to the local MCP
