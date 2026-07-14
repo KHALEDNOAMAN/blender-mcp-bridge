@@ -64,6 +64,18 @@ body {
     overflow: hidden;
 }
 
+/* §7.4: guided view is now Header -> ActionBar -> main (sidebar + commands)
+   -> Command Timeline dock, stacked in a column so the timeline can sit as a
+   full-width strip below everything else instead of living in the sidebar. */
+.guided-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow: hidden;
+    min-height: 0;
+}
+
 main {
     flex: 1;
     display: flex;
@@ -115,6 +127,64 @@ body:has(.sidebar-resize-handle.dragging) {
 .sidebar-resize-handle:hover::after,
 .sidebar-resize-handle.dragging::after {
     background: var(--accent-color);
+}
+
+/* §7.3: vertical variant for the Command Timeline dock's top edge — same
+   handle, rotated axis (row-resize cursor, horizontal bar instead of a
+   vertical one, sits along the top of the dock instead of to the side of
+   the sidebar). */
+.sidebar-resize-handle.vertical {
+    flex: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    margin-right: 0;
+    cursor: row-resize;
+    z-index: 1;
+}
+
+.sidebar-resize-handle.vertical::after {
+    top: 2px;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 2px;
+}
+
+body:has(.sidebar-resize-handle.vertical.dragging) {
+    cursor: row-resize;
+}
+
+/* Action bar: playback transport + branch run, docked below the header,
+   always visible regardless of sidebar scroll position (§7.4). */
+.action-bar {
+    flex: 0 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1.25rem;
+    margin-bottom: 0;
+}
+
+.action-bar-right {
+    gap: 1rem;
+}
+
+.branch-run-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.branch-select {
+    width: auto;
+    padding: 0.5rem 2rem 0.5rem 0.8rem;
+    font-size: 0.85rem;
 }
 
 #metadataSection {
@@ -1532,6 +1602,40 @@ footer {
 }
 
 /* Command tree / branch diagram (§7) */
+
+/* §7.3: the timeline dock sits full-width below `main`, resizable via the
+   `.vertical` handle on its top edge (needs `position: relative` as that
+   handle's positioning context) — its body must fill the resized height
+   and let the SVG scroll internally, overriding metadata-body's normal
+   fixed max-height/collapse-only-driven sizing. */
+.command-timeline-dock {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    padding-top: 6px;
+}
+
+.command-timeline-dock.collapsed {
+    padding-top: 0;
+    height: auto !important;
+}
+
+.command-timeline-dock .metadata-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-height: none;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.command-timeline-dock .command-tree-scroll {
+    flex: 1;
+    min-height: 0;
+}
 
 .command-tree-scroll {
     overflow-x: auto;

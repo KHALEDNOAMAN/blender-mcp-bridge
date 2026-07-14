@@ -1,7 +1,7 @@
 /**
  * Global Parameters panel — declare-first store for ${name} tokens used in
  * command arguments. See docs/studio_design_v1.md §4.
- * Same collapsible-card pattern as MetadataPanel/PlaybackPanel.
+ * Same collapsible-card pattern as MetadataPanel/BranchesPanel.
  */
 export default function ParametersPanel({ parameters, collapsed, onToggle, onChange }) {
     const entries = Object.entries(parameters || {});

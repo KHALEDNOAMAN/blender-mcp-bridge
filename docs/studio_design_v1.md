@@ -531,6 +531,81 @@ what Blender will draw.
   `CommandList`, same interaction as the JSON outline's click-to-jump (§6).
 - No branches defined → just the plain numbered spine, no brackets.
 
+### 7.3 Moved to a bottom dock: "Command Timeline"
+
+User request: move the Command Tree out of the sidebar and turn it into a
+persistent bottom strip — the "command timeline" — since it's inherently a
+horizontal, full-width diagram and was cramped living in a narrow, vertically
+scrolled sidebar column alongside Metadata/Parameters/Branches.
+
+- `CommandTreePanel` (component name unchanged, header text now "Command
+  Timeline") moved out of `.left-sidebar` to sit below `main` (sidebar +
+  Commands list), full width, inside a new `.guided-body` column wrapper
+  (Header → ActionBar → `main` → Command Timeline). Still collapsible via
+  the same chevron-header pattern as every other panel; collapsing it
+  shrinks it back to just the header strip (`height: auto !important`
+  overrides the resized height while collapsed).
+- Resizable vertically via a new `.vertical` variant of the existing
+  `.sidebar-resize-handle` (§6.8's horizontal handle, rotated: `row-resize`
+  cursor, horizontal bar instead of vertical, drag along `clientY` instead
+  of `clientX`). Rather than duplicate `useResizableSidebar`, the hook
+  gained an `axis: 'horizontal' | 'vertical'` option (reads `clientX` or
+  `clientY`) and an `invert` option — the timeline is anchored to the
+  bottom, so dragging the handle *up* must *grow* it, the opposite sign of
+  a raw pointer-delta on that axis. Own storage key (`timelineHeight`,
+  100–400px bounds, default 160px), independent of the two horizontal
+  sidebars' widths.
+- Bug found during verification: the resize handle initially sat at
+  `top: -6px` (just outside the dock's own box) so it could be positioned
+  flush against the card above with no visual gap — but the dock has
+  `overflow: hidden` (needed to clip the SVG when the dock is shorter than
+  its content), which also clipped the handle from hit-testing. Clicks at
+  that position fell through to `.guided-body` behind it instead of
+  starting a drag. Fixed by moving the handle to `top: 0` (just inside the
+  dock's own top edge, `z-index: 1` above the header) and adding
+  `padding-top: 6px` to the dock so the header isn't visually flush under
+  the handle. Verified: dragging the handle up 80px grew the dock from
+  160px to 243px measured via `getBoundingClientRect()`, and the extra
+  height correctly revealed all three branch rows in a session that
+  previously needed to scroll to see them.
+- `.metadata-body`'s normal `max-height: 400px` (§ ordinary collapsible
+  panels) is overridden for this dock specifically (`.command-timeline-dock
+  .metadata-body { max-height: none; flex: 1; }`) so the SVG's scroll
+  container actually fills whatever height the drag handle sets, instead of
+  being capped at a fixed value regardless of the dock's real height.
+
+### 7.4 New ActionBar: playback transport + branch run, docked below the header
+
+User request: consolidate all playback controls (previously their own
+`PlaybackPanel` sidebar card) plus a way to pick-and-run a branch into one
+always-visible bar at the top of the guided view, instead of controls living
+in scrollable sidebar cards where they could be scrolled out of view.
+
+- New `ActionBar` component, rendered between `Header` and `main` (guided
+  view only — JSON mode has its own Apply/Discard actions and no playback/
+  branch semantics apply to raw JSON editing, so the bar doesn't render
+  there at all).
+- `PlaybackPanel.jsx` retired entirely (deleted, not just unused) — Undo/
+  Redo, Play All/Play/Play to Active/Stop, Reset/Clear Scene, and the delay
+  input all moved into `ActionBar` verbatim (same handlers, same
+  disabled-state logic keyed off `isPlaying`/`hasBranches`/etc., §5.3's
+  "branches disable raw linear playback" rule unchanged).
+- Branch running moved from `BranchesPanel`'s old per-row Run button to a
+  dropdown (`<select>` of branch names) + single "Run Branch" button in the
+  ActionBar's right-hand group. `BranchesPanel` keeps create/inspect/delete
+  only now — it's no longer where you actually run one, just where you
+  manage the set. The dropdown auto-selects the first branch whenever the
+  branch set changes and the current selection no longer exists (branch
+  deleted, or a new/different session loaded), so it's never stuck pointing
+  at a stale name.
+- Verified end-to-end with Playwright against a real branching session
+  (`assets/branch_test_session.json`, 3 branches): ActionBar renders with
+  all transport buttons plus a populated branch dropdown showing all three
+  branch names; selecting a different branch updates the dropdown's value;
+  `BranchesPanel`'s rows confirmed to have zero Run buttons left (create/
+  delete only); switching to JSON mode confirmed both the ActionBar and the
+  Command Timeline are absent there, and switching back restores them.
+
 ## 8. Non-goals / explicitly deferred
 
 - WASM browser→localhost bridge: dropped. Plain fetch/WebSocket to the local MCP
