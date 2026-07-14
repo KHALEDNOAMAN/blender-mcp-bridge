@@ -3,8 +3,7 @@
 Studio is the visual editor for inspecting, editing, and replaying Blender MCP
 session recordings — a Vite + React app that talks directly to the MCP Bridge
 Server over HTTP. See the [top-level README](../README.md#studio-visual-editor)
-for setup, usage, and the session JSON format, and
-[`docs/studio_design_v1.md`](../docs/studio_design_v1.md) for the full design spec.
+for setup, usage, and the session JSON format.
 
 ## Development
 

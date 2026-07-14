@@ -114,8 +114,8 @@ Sessions are stored as JSON files containing metadata (name, description) and a 
 of command objects (tool name, arguments). Studio sessions may also include optional
 `parameters` (global, parametric values referenced from command arguments via
 `${name}` tokens, including arithmetic expressions) and `branches` (named, jumpable
-subsets of the command list) — see [`docs/studio_design_v1.md`](docs/studio_design_v1.md)
-for the full spec. Plain linear sessions with neither key work exactly as before.
+subsets of the command list). Plain linear sessions with neither key work exactly
+as before.
 
 ### Studio (Visual Editor)
 Studio is the built-in visual editor for inspecting, editing, and replaying your

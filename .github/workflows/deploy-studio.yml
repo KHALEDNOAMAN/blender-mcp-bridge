@@ -1,10 +1,10 @@
 name: Deploy Studio to GitHub Pages
 
 # Publishes Studio (studio/) as a static demo site — no Blender bridge is
-# reachable there, so it always launches in Demo Mode (docs/studio_design_v1.md
-# §9). This is separate from Studio's other deploy target, the bridge server's
-# own /editor/ mount (src/server.py), which needs a different Vite `base` path
-# — see studio/vite.config.js for how the two are distinguished.
+# reachable there, so it always launches in Demo Mode. This is separate from
+# Studio's other deploy target, the bridge server's own /editor/ mount
+# (src/server.py), which needs a different Vite `base` path — see
+# studio/vite.config.js for how the two are distinguished.
 on:
   push:
     branches: ["main"]
