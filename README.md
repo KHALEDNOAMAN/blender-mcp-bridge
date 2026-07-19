@@ -213,13 +213,24 @@ was designed almost entirely through this panel — including the print-design f
 
 **[Live demo on GitHub Pages](https://seehiong.github.io/blender-mcp-n8n/)** —
 auto-deployed by [`.github/workflows/deploy-studio.yml`](.github/workflows/deploy-studio.yml)
-on every push to `main` that touches `studio/`. There's no Bridge Server to reach
-from a Pages-hosted page, so the demo link always launches in Demo Mode.
+on every push to `main` that touches `studio/`.
 
-Running Studio anywhere else (locally, or your own bridge that happens to be down)
-behaves differently on purpose: the header shows **"Offline"** and a
-**"▶ Try Demo Mode"** button — demo mode is opt-in there, never automatic, so a
-genuinely offline bridge is never silently mistaken for a working connection.
+> [!NOTE]
+> **The connection check always runs in *your* browser, against `localhost` —
+> never against the page author's machine.** Studio's connection probe
+> (`studio/src/lib/api.js`) always targets `http://localhost:8008` (then `:8000`),
+> regardless of where the Studio page itself is hosted. So:
+> - If **you** have your own Bridge Server running locally, the hosted Pages demo
+>   will genuinely connect to it and drive **your own** Blender instance — hosting
+>   the UI once on Pages doesn't require running it locally too.
+> - If you **don't** have a bridge running, the header shows **"Offline"** and a
+>   **"▶ Try Demo Mode"** button appears. Demo mode is always opt-in, never
+>   automatic — a genuinely offline bridge is never silently mistaken for a
+>   working connection.
+>
+> Either way, no one visiting the Pages demo can ever reach *another visitor's*
+> Blender instance — the browser only ever talks to `localhost` on the machine
+> it's running on.
 
 Either way, once in Demo Mode:
 - Loads a static tool catalog (`studio/src/lib/demoTools.js`) so the guided forms,

@@ -41,7 +41,12 @@ export default function App() {
     // §7.3: bottom Command Timeline dock — vertical axis, inverted (dragging
     // the handle up should grow the dock, which is the opposite sign of a
     // raw clientY delta since the dock is anchored to the bottom).
-    const timeline = useResizableSidebar({ storageKey: 'timelineHeight', axis: 'vertical', invert: true, minWidth: 100, maxWidth: 400, defaultWidth: 160 });
+    // min/default must fit title bar + ActionBar + the SVG diagram (~98px with
+    // 2 branch rows) — the old 100/160 values crushed the diagram to just its
+    // scrollbar on any browser with fresh localStorage, which looked like a
+    // rendering bug. The hook clamps stored values on load, so stale
+    // too-small heights persisted in existing browsers self-heal to >= min.
+    const timeline = useResizableSidebar({ storageKey: 'timelineHeight', axis: 'vertical', invert: true, minWidth: 220, maxWidth: 520, defaultWidth: 300 });
 
     const [session, setSession] = useState(null);
     const [filter, setFilter] = useState('');

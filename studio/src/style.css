@@ -158,6 +158,29 @@ body:has(.sidebar-resize-handle.vertical.dragging) {
     cursor: row-resize;
 }
 
+/* Visible grab affordance for the dock divider: a centered grip pill on top
+   of the full-width line, so the resizable edge is discoverable instead of
+   an invisible 6px strip. */
+.sidebar-resize-handle.vertical::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--text-secondary);
+    opacity: 0.5;
+    transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.sidebar-resize-handle.vertical:hover::before,
+.sidebar-resize-handle.vertical.dragging::before {
+    background: var(--accent-color);
+    opacity: 1;
+}
+
 /* Action bar: playback transport + branch run, docked below the header,
    always visible regardless of sidebar scroll position (§7.4). */
 /* §7.5: the ActionBar is docked directly under the Command Timeline's
@@ -1694,7 +1717,10 @@ footer {
 
 .command-timeline-dock .command-tree-scroll {
     flex: 1;
-    min-height: 0;
+    /* Never let flexbox crush the diagram to just its scrollbar: the SVG is
+       ~98px tall with two branch rows. Combined with the dock's raised
+       min-height this keeps ticks visible even at minimum dock size. */
+    min-height: 110px;
 }
 
 .command-tree-scroll {
