@@ -1,3 +1,5 @@
+# tests/scenarios/modules/row_operators.py
+
 from tests.utils.mcp_client import MCPClient
 
 

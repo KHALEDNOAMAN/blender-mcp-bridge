@@ -7,7 +7,7 @@ def get_transform_tools() -> list[types.Tool]:
     return [
         types.Tool(
             name="duplicate_object",
-            description="POWER TIP: Use this tool to rename, move, and remove modifiers in ONE call! This is much faster than using multiple tools. Best for duplicating floors, slabs, or windows that need immediate placement and cleanup.",
+            description="Duplicate an object — can also rename, move, and strip modifiers in the SAME call; prefer that over separate follow-up calls.",
             inputSchema={
                 "type": "object",
                 "properties": {

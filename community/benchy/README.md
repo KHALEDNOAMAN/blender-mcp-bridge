@@ -60,3 +60,46 @@ verified watertight before export.
 
 ![SH Benchy Printed](assets/images/sh_benchy_printed.jpeg)
 *The final printed SH Benchy — photo coming after the first print!*
+
+## Branch: `sail_rig` — A Decorative Square-Rig Sail
+
+A second, display-oriented build on top of the same hull: a two-sail square rig
+(mast, yard, boom, lower spar, main + second sail with a sculpted cloth billow),
+designed and refined through the [AI Assistant panel](../../README.md) with
+live viewport screenshots for self-verification. Every fix — from a floating
+sail to overhanging spar tips — was driven by an actual slicer test, not a guess.
+
+```bash
+python -m src.main play community/benchy/session.json --branch sail_rig
+```
+
+(Or run the `sail_rig` branch directly from Blender Studio.) This exports a
+second STL, `sh_benchy_sail.stl` — the merged hull + rig, solidified,
+voxel-remeshed, decimated, and watertight-checked, same as the classic export.
+
+![Benchy Sail Rig](assets/images/sh_benchy_sail.png)  
+*The two-sail rig — mast planted in the cabin roof, forward of the chimney*
+
+### Lessons From Making It Print Support-Free
+
+- **Horizontal round bars always overhang.** A cylindrical spar's underside is
+  a 90° overhang along its whole length — no amount of bracing underneath
+  fixes it, since the slicer still trees up to fill the gaps between braces.
+  Fix: build spars with a **diamond cross-section** (`vertices=4`, rotated
+  90° so a corner points down) — the two 45° facets read as self-supporting.
+- **Bar tips must land inside a supporting sheet.** A spar tip protruding even
+  2–3mm past the sail it's attached to becomes a floating island. Tips are
+  sized flush with (or slightly recessed into) their sail.
+- **Vertical is always safe.** Where a bracing structure kept getting flagged
+  no matter the angle, switching to plain vertical posts (equally spaced,
+  ≤6mm apart to stay within bridging limits) resolved it immediately.
+- **Thin decorative sheets need real thickness before export** — the sails
+  are zero-thickness cloth shapes until a `SOLIDIFY` pass (1.0mm) is applied,
+  then joined into the hull and voxel-remeshed into one watertight body.
+- **Simplify before export.** The merged, remeshed body easily exceeds 1M
+  triangles, which most slicers flag. A `DECIMATE` pass (ratio 0.35) brings
+  it back under budget while preserving the engraved bottom text far better
+  than a coarser remesh would.
+
+![Slicer preview, no supports needed](assets/images/sh_benchy_sail_printed.jpeg)
+*Final slice — auto-supports found nothing to flag*

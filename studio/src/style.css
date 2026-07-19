@@ -1747,3 +1747,210 @@ footer {
 .command-tree-branch-bar.collapsible:hover {
     fill-opacity: 0.55 !important;
 }
+/* ── AI Assistant drawer ─────────────────────────────────────────────── */
+
+.assistant-panel {
+    position: fixed;
+    top: 90px;
+    right: 16px;
+    bottom: 60px;
+    width: 520px; /* default; inline style (drag-resizable) overrides */
+    max-width: 92vw;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    gap: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.assistant-resize-handle {
+    position: absolute;
+    left: -3px;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    cursor: ew-resize;
+    z-index: 1;
+}
+
+.assistant-resize-handle:hover {
+    background: var(--accent-color);
+    opacity: 0.4;
+    border-radius: 4px;
+}
+
+.assistant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.assistant-header h2 {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.assistant-header-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.assistant-header-actions .btn-small {
+    padding: 2px 8px;
+    font-size: 0.75rem;
+}
+
+.assistant-config {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.assistant-config .form-select {
+    flex: 1;
+    min-width: 120px;
+}
+
+.assistant-key-input {
+    width: 100%;
+}
+
+.assistant-field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.assistant-field > label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.assistant-field-hint {
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.assistant-key-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.assistant-key-row .assistant-key-input {
+    flex: 1;
+    width: auto;
+}
+
+.assistant-key-row .btn-small {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.assistant-transcript {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+}
+
+.assistant-empty {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    padding: 16px 8px;
+    text-align: center;
+}
+
+.assistant-msg {
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.45;
+}
+
+.assistant-msg.user {
+    background: var(--accent-secondary);
+    color: #fff;
+    align-self: flex-end;
+    max-width: 90%;
+}
+
+.assistant-msg.assistant {
+    background: var(--glass-border);
+    align-self: flex-start;
+    max-width: 95%;
+}
+
+.assistant-msg.error {
+    background: rgba(248, 81, 73, 0.15);
+    border: 1px solid rgba(248, 81, 73, 0.5);
+    color: var(--text-primary);
+}
+
+.assistant-msg.thinking {
+    color: var(--text-secondary);
+    font-style: italic;
+    background: none;
+    padding: 2px 10px;
+}
+
+.assistant-tool {
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    font-size: 0.78rem;
+}
+
+.assistant-tool.error {
+    border-color: rgba(248, 81, 73, 0.6);
+}
+
+.assistant-tool summary {
+    cursor: pointer;
+    padding: 5px 8px;
+    color: var(--text-secondary);
+    user-select: none;
+}
+
+.assistant-tool pre {
+    margin: 0;
+    padding: 6px 8px;
+    overflow-x: auto;
+    font-size: 0.72rem;
+    border-top: 1px solid var(--glass-border);
+    max-height: 160px;
+    overflow-y: auto;
+}
+
+.assistant-input-row {
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+}
+
+.assistant-input {
+    flex: 1;
+    resize: none;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    min-height: 64px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.assistant-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}

@@ -2,7 +2,7 @@
   "metadata": {
     "name": "SH Benchy - Measured Recreation",
     "model": "claude-fable-5",
-    "description": "A complete 3DBenchy recreation built purely from measurements of the reference STL and the official brochure specs (60.0 x 31.0 x 48.0mm), across 51 iterations: 9-ring measured hull loft (spoon bow, upright bulwark, uniform 2.6mm rail, raked transom), stepped deck with 45-degree ramp, trapezium cabin with arches, aligned windows and unified 1.2mm double frames, helm with recessed wheel, trapezoid roof at the measured 5.5 degrees, chimney to exactly 48.00mm, hawsepipe eyes, rod holder and prop-shaft socket. The session then runs the full print pipeline: bake booleans, subdivide the hull, join, voxel-remesh at 0.15mm, smooth, re-drill the bores, engrave SH BENCHY into the flat bottom, verify watertightness, and export sh_benchy.stl.",
+    "description": "A complete 3DBenchy recreation built purely from measurements of the reference STL and the official brochure specs (60.0 x 31.0 x 48.0mm), across 51 iterations: 9-ring measured hull loft (spoon bow, upright bulwark, uniform 2.6mm rail, raked transom), stepped deck with 45-degree ramp, trapezium cabin with arches, aligned windows and unified 1.2mm double frames, helm with recessed wheel, trapezoid roof at the measured 5.5 degrees, chimney to exactly 48.00mm, hawsepipe eyes, rod holder and prop-shaft socket. The session then runs the full print pipeline: bake booleans, subdivide the hull, join, voxel-remesh at 0.15mm, smooth, re-drill the bores, engrave SH BENCHY into the flat bottom, verify watertightness, and export sh_benchy.stl. Includes a 'sail_rig' branch: a decorative square-rig mast, yard, boom and a sculpted trapezoid fabric sail mounted forward of the chimney (skips the STL export).",
     "documentation_url": ""
   },
   "commands": [
@@ -2554,6 +2554,22 @@
       "description": "Bake the final bores and the engraving into the mesh."
     },
     {
+      "tool": "apply_modifier",
+      "arguments": {
+        "object_name": "BenchySmooth",
+        "modifier_type": "DECIMATE",
+        "ratio": 0.35
+      },
+      "description": "Reduce triangle count below slicer's 1M warning (collapse keeps engraved text)"
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "BenchySmooth"
+      },
+      "description": ""
+    },
+    {
       "tool": "check_mesh_for_printing",
       "arguments": {
         "object_name": "BenchySmooth"
@@ -2568,6 +2584,878 @@
         "format": "STL"
       },
       "description": "Export the finished SH Benchy - smooth, watertight, engraved, print-ready."
+    },
+    {
+      "tool": "create_collection",
+      "arguments": {
+        "name": "Benchy_Sail"
+      },
+      "description": "Rig lives in its own collection"
+    },
+    {
+      "tool": "create_cylinder",
+      "arguments": {
+        "name": "Mast",
+        "collection": "Benchy_Sail",
+        "location": [
+          5,
+          0,
+          56.75
+        ],
+        "radius": 1.2,
+        "depth": 38.5,
+        "vertices": 24
+      },
+      "description": "Mast: planted in cabin roof up to z=76"
+    },
+    {
+      "tool": "create_cylinder",
+      "arguments": {
+        "name": "Yard",
+        "collection": "Benchy_Sail",
+        "location": [
+          5,
+          0,
+          72
+        ],
+        "rotation": [
+          90,
+          0,
+          0
+        ],
+        "radius": 1.1,
+        "depth": 31,
+        "vertices": 4
+      },
+      "description": "Yard (top spar)"
+    },
+    {
+      "tool": "create_cylinder",
+      "arguments": {
+        "name": "Boom",
+        "collection": "Benchy_Sail",
+        "location": [
+          5,
+          0,
+          52
+        ],
+        "rotation": [
+          90,
+          0,
+          0
+        ],
+        "radius": 1.1,
+        "depth": 25,
+        "vertices": 4
+      },
+      "description": "Boom (middle spar)"
+    },
+    {
+      "tool": "create_cylinder",
+      "arguments": {
+        "name": "LowerSpar",
+        "collection": "Benchy_Sail",
+        "location": [
+          5,
+          0,
+          45
+        ],
+        "rotation": [
+          90,
+          0,
+          0
+        ],
+        "radius": 1.0,
+        "depth": 23,
+        "vertices": 4
+      },
+      "description": "Lower spar above the cabin roof"
+    },
+    {
+      "tool": "create_polygon",
+      "arguments": {
+        "name": "Sail",
+        "location": [
+          0,
+          0,
+          0
+        ],
+        "vertices": [
+          [
+            6,
+            -11.0,
+            52.0
+          ],
+          [
+            6,
+            -8.8,
+            52.0
+          ],
+          [
+            6,
+            -6.6,
+            52.0
+          ],
+          [
+            6,
+            -4.4,
+            52.0
+          ],
+          [
+            6,
+            -2.2,
+            52.0
+          ],
+          [
+            6,
+            0.0,
+            52.0
+          ],
+          [
+            6,
+            2.2,
+            52.0
+          ],
+          [
+            6,
+            4.4,
+            52.0
+          ],
+          [
+            6,
+            6.6,
+            52.0
+          ],
+          [
+            6,
+            8.8,
+            52.0
+          ],
+          [
+            6,
+            11.0,
+            52.0
+          ],
+          [
+            6,
+            11.3,
+            54.0
+          ],
+          [
+            6,
+            11.6,
+            56.0
+          ],
+          [
+            6,
+            11.9,
+            58.0
+          ],
+          [
+            6,
+            12.2,
+            60.0
+          ],
+          [
+            6,
+            12.5,
+            62.0
+          ],
+          [
+            6,
+            12.8,
+            64.0
+          ],
+          [
+            6,
+            13.1,
+            66.0
+          ],
+          [
+            6,
+            13.4,
+            68.0
+          ],
+          [
+            6,
+            13.7,
+            70.0
+          ],
+          [
+            6,
+            14.0,
+            72.0
+          ],
+          [
+            6,
+            11.2,
+            72.0
+          ],
+          [
+            6,
+            8.4,
+            72.0
+          ],
+          [
+            6,
+            5.6,
+            72.0
+          ],
+          [
+            6,
+            2.8,
+            72.0
+          ],
+          [
+            6,
+            0.0,
+            72.0
+          ],
+          [
+            6,
+            -2.8,
+            72.0
+          ],
+          [
+            6,
+            -5.6,
+            72.0
+          ],
+          [
+            6,
+            -8.4,
+            72.0
+          ],
+          [
+            6,
+            -11.2,
+            72.0
+          ],
+          [
+            6,
+            -14.0,
+            72.0
+          ],
+          [
+            6,
+            -13.7,
+            70.0
+          ],
+          [
+            6,
+            -13.4,
+            68.0
+          ],
+          [
+            6,
+            -13.1,
+            66.0
+          ],
+          [
+            6,
+            -12.8,
+            64.0
+          ],
+          [
+            6,
+            -12.5,
+            62.0
+          ],
+          [
+            6,
+            -12.2,
+            60.0
+          ],
+          [
+            6,
+            -11.9,
+            58.0
+          ],
+          [
+            6,
+            -11.6,
+            56.0
+          ],
+          [
+            6,
+            -11.3,
+            54.0
+          ]
+        ],
+        "collection": "Benchy_Sail"
+      },
+      "description": "Sail: trapezoid with dense boundary (corners survive subdivision)"
+    },
+    {
+      "tool": "apply_modifier",
+      "arguments": {
+        "object_name": "Sail",
+        "modifier_type": "SUBSURF",
+        "levels": 3,
+        "render_levels": 3
+      },
+      "description": ""
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "Sail"
+      },
+      "description": ""
+    },
+    {
+      "tool": "enter_sculpt_mode",
+      "arguments": {
+        "object_name": "Sail"
+      },
+      "description": ""
+    },
+    {
+      "tool": "sculpt_grab",
+      "arguments": {
+        "object_name": "Sail",
+        "location": [
+          6,
+          -7,
+          61
+        ],
+        "offset": [
+          2.5,
+          0.3,
+          0
+        ],
+        "radius": 6
+      },
+      "description": ""
+    },
+    {
+      "tool": "sculpt_grab",
+      "arguments": {
+        "object_name": "Sail",
+        "location": [
+          6,
+          0,
+          61
+        ],
+        "offset": [
+          3.2,
+          0,
+          0
+        ],
+        "radius": 7
+      },
+      "description": ""
+    },
+    {
+      "tool": "sculpt_grab",
+      "arguments": {
+        "object_name": "Sail",
+        "location": [
+          6,
+          7,
+          61
+        ],
+        "offset": [
+          2.5,
+          -0.3,
+          0
+        ],
+        "radius": 6
+      },
+      "description": ""
+    },
+    {
+      "tool": "sculpt_inflate",
+      "arguments": {
+        "object_name": "Sail",
+        "distance": 0.12
+      },
+      "description": ""
+    },
+    {
+      "tool": "apply_sculpt_smooth",
+      "arguments": {
+        "object_name": "Sail",
+        "factor": 0.25,
+        "iterations": 1
+      },
+      "description": ""
+    },
+    {
+      "tool": "exit_sculpt_mode",
+      "arguments": {},
+      "description": ""
+    },
+    {
+      "tool": "create_polygon",
+      "arguments": {
+        "name": "SecondSail",
+        "location": [
+          0,
+          0,
+          0
+        ],
+        "vertices": [
+          [
+            6,
+            -10.0,
+            45.5
+          ],
+          [
+            6,
+            -7.5,
+            45.5
+          ],
+          [
+            6,
+            -5.0,
+            45.5
+          ],
+          [
+            6,
+            -2.5,
+            45.5
+          ],
+          [
+            6,
+            0.0,
+            45.5
+          ],
+          [
+            6,
+            2.5,
+            45.5
+          ],
+          [
+            6,
+            5.0,
+            45.5
+          ],
+          [
+            6,
+            7.5,
+            45.5
+          ],
+          [
+            6,
+            10.0,
+            45.5
+          ],
+          [
+            6,
+            10.125,
+            46.312
+          ],
+          [
+            6,
+            10.25,
+            47.125
+          ],
+          [
+            6,
+            10.375,
+            47.938
+          ],
+          [
+            6,
+            10.5,
+            48.75
+          ],
+          [
+            6,
+            10.625,
+            49.562
+          ],
+          [
+            6,
+            10.75,
+            50.375
+          ],
+          [
+            6,
+            10.875,
+            51.188
+          ],
+          [
+            6,
+            11.0,
+            52.0
+          ],
+          [
+            6,
+            8.25,
+            52.0
+          ],
+          [
+            6,
+            5.5,
+            52.0
+          ],
+          [
+            6,
+            2.75,
+            52.0
+          ],
+          [
+            6,
+            0.0,
+            52.0
+          ],
+          [
+            6,
+            -2.75,
+            52.0
+          ],
+          [
+            6,
+            -5.5,
+            52.0
+          ],
+          [
+            6,
+            -8.25,
+            52.0
+          ],
+          [
+            6,
+            -11.0,
+            52.0
+          ],
+          [
+            6,
+            -10.875,
+            51.188
+          ],
+          [
+            6,
+            -10.75,
+            50.375
+          ],
+          [
+            6,
+            -10.625,
+            49.562
+          ],
+          [
+            6,
+            -10.5,
+            48.75
+          ],
+          [
+            6,
+            -10.375,
+            47.938
+          ],
+          [
+            6,
+            -10.25,
+            47.125
+          ],
+          [
+            6,
+            -10.125,
+            46.312
+          ]
+        ],
+        "collection": "Benchy_Sail"
+      },
+      "description": "SecondSail: trapezoid with dense boundary (corners survive subdivision)"
+    },
+    {
+      "tool": "apply_modifier",
+      "arguments": {
+        "object_name": "SecondSail",
+        "modifier_type": "SUBSURF",
+        "levels": 3,
+        "render_levels": 3
+      },
+      "description": ""
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "SecondSail"
+      },
+      "description": ""
+    },
+    {
+      "tool": "enter_sculpt_mode",
+      "arguments": {
+        "object_name": "SecondSail"
+      },
+      "description": ""
+    },
+    {
+      "tool": "sculpt_grab",
+      "arguments": {
+        "object_name": "SecondSail",
+        "location": [
+          6,
+          0,
+          48.5
+        ],
+        "offset": [
+          1.8,
+          0,
+          0
+        ],
+        "radius": 5
+      },
+      "description": ""
+    },
+    {
+      "tool": "sculpt_inflate",
+      "arguments": {
+        "object_name": "SecondSail",
+        "distance": 0.08
+      },
+      "description": ""
+    },
+    {
+      "tool": "apply_sculpt_smooth",
+      "arguments": {
+        "object_name": "SecondSail",
+        "factor": 0.25,
+        "iterations": 1
+      },
+      "description": ""
+    },
+    {
+      "tool": "exit_sculpt_mode",
+      "arguments": {},
+      "description": ""
+    },
+    {
+      "tool": "create_material",
+      "arguments": {
+        "name": "Fabric_Sail",
+        "base_color": "#F5F0E1",
+        "roughness": 0.95,
+        "object_names": [
+          "Sail",
+          "SecondSail"
+        ]
+      },
+      "description": ""
+    },
+    {
+      "tool": "create_material",
+      "arguments": {
+        "name": "Wood_Mast",
+        "base_color": "#8B5A2B",
+        "roughness": 0.7,
+        "object_names": [
+          "Mast",
+          "Yard",
+          "Boom",
+          "LowerSpar"
+        ]
+      },
+      "description": ""
+    },
+    {
+      "tool": "set_view",
+      "arguments": {
+        "mode": "ISO"
+      },
+      "description": "Frame the result"
+    },
+    {
+      "tool": "create_cylinder",
+      "description": "Vertical support post, embedded roof-to-spar (zero overhang)",
+      "arguments": {
+        "name": "SparPost1",
+        "collection": "Benchy_Sail",
+        "location": [
+          5,
+          -9,
+          41.1
+        ],
+        "radius": 0.8,
+        "depth": 8.2,
+        "vertices": 16
+      }
+    },
+    {
+      "tool": "create_cylinder",
+      "description": "Vertical support post, embedded roof-to-spar (zero overhang)",
+      "arguments": {
+        "name": "SparPost2",
+        "collection": "Benchy_Sail",
+        "location": [
+          5,
+          -3,
+          41.1
+        ],
+        "radius": 0.8,
+        "depth": 8.2,
+        "vertices": 16
+      }
+    },
+    {
+      "tool": "create_cylinder",
+      "description": "Vertical support post, embedded roof-to-spar (zero overhang)",
+      "arguments": {
+        "name": "SparPost3",
+        "collection": "Benchy_Sail",
+        "location": [
+          5,
+          3,
+          41.1
+        ],
+        "radius": 0.8,
+        "depth": 8.2,
+        "vertices": 16
+      }
+    },
+    {
+      "tool": "create_cylinder",
+      "description": "Vertical support post, embedded roof-to-spar (zero overhang)",
+      "arguments": {
+        "name": "SparPost4",
+        "collection": "Benchy_Sail",
+        "location": [
+          5,
+          9,
+          41.1
+        ],
+        "radius": 0.8,
+        "depth": 8.2,
+        "vertices": 16
+      }
+    },
+    {
+      "tool": "apply_modifier",
+      "arguments": {
+        "object_name": "Sail",
+        "modifier_type": "SOLIDIFY",
+        "thickness": 1.0
+      },
+      "description": "Give the cloth sheets printable thickness"
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "Sail"
+      },
+      "description": ""
+    },
+    {
+      "tool": "apply_modifier",
+      "arguments": {
+        "object_name": "SecondSail",
+        "modifier_type": "SOLIDIFY",
+        "thickness": 1.0
+      },
+      "description": ""
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "SecondSail"
+      },
+      "description": ""
+    },
+    {
+      "tool": "join_objects",
+      "arguments": {
+        "object_names": [
+          "BenchySmooth",
+          "Mast",
+          "Yard",
+          "Boom",
+          "LowerSpar",
+          "Sail",
+          "SecondSail",
+          "SparPost1",
+          "SparPost2",
+          "SparPost3",
+          "SparPost4"
+        ],
+        "active_object": "BenchySmooth",
+        "new_name": "BenchySail"
+      },
+      "description": "Merge hull + rig into one body"
+    },
+    {
+      "tool": "apply_voxel_remesh",
+      "arguments": {
+        "object_name": "BenchySail",
+        "voxel_size": 0.15,
+        "adaptivity": 0.0,
+        "clean_geometry": true
+      },
+      "description": "Fuse everything into a single watertight skin"
+    },
+    {
+      "tool": "apply_sculpt_smooth",
+      "arguments": {
+        "object_name": "BenchySail",
+        "iterations": 2,
+        "factor": 0.4
+      },
+      "description": "Soften remesh artifacts and sail shading"
+    },
+    {
+      "tool": "apply_modifier",
+      "arguments": {
+        "object_name": "BenchySail",
+        "modifier_type": "DECIMATE",
+        "ratio": 0.35
+      },
+      "description": "Reduce triangle count below slicer's 1M warning (collapse keeps detail)"
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "BenchySail"
+      },
+      "description": ""
+    },
+    {
+      "tool": "repair_mesh",
+      "arguments": {
+        "object_name": "BenchySail"
+      },
+      "description": ""
+    },
+    {
+      "tool": "check_mesh_for_printing",
+      "arguments": {
+        "object_name": "BenchySail"
+      },
+      "description": "Watertight gate \u2014 must pass before export"
+    },
+    {
+      "tool": "export_model",
+      "arguments": {
+        "object_name": "BenchySail",
+        "filepath": "sh_benchy_sail.stl",
+        "format": "STL"
+      },
+      "description": ""
     }
-  ]
+  ],
+  "branches": {
+    "classic": {
+      "ranges": [
+        [
+          0,
+          99
+        ]
+      ]
+    },
+    "sail_rig": {
+      "ranges": [
+        [
+          0,
+          98
+        ],
+        [
+          100,
+          141
+        ]
+      ]
+    }
+  }
 }

@@ -8,7 +8,7 @@ This guide explains how to run the integration test suite for the Blender MCP ad
 2.  **MCP Bridge Server**: Ensure the Python bridge is running (`python -m src.main`).
 3.  **Dependencies**: Install the required Python packages:
     ```bash
-    pip install -r requirements.txt
+    uv sync
     ```
 
 ## Running Tests
@@ -41,6 +41,8 @@ python tests/run_integration.py run --scenario filament_tag
     -   **Row 3 (Collections)**: Collection hierarchies and visibility.
     -   **Row 4 (Operators)**: Boolean operations (Union, Difference, Intersect).
     -   **Row 5 (Transforms)**: Move, Rotate, Scale, Duplicate, Batch operations.
+    -   **Row 6 (Systems)**: MEP component runs (pipes, cable trays) with system-type
+        color coding, fittings, and support spacing.
 3.  **Captures** the scene state to `tests/benchmarks/grid_last_run.json`.
 
 #### Arch Scenario

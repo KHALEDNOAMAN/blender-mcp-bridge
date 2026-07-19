@@ -114,7 +114,7 @@ def get_sculpting_tools() -> list[types.Tool]:
         types.Tool(
             name="sculpt_grab",
             description=(
-                "Move vertices near a 3D location by an offset vector, simulating Blender's Grab sculpt brush. "
+                "Grab-brush style sculpt: move vertices near a 3D location by an offset vector. "
                 "Uses smooth cosine falloff: vertices at the center move the full offset, "
                 "vertices at the radius edge are barely moved. "
                 "Use this to pull a boat bow into a point, push in dents, raise terrain hills, etc."

@@ -643,9 +643,8 @@ class ModelingPrimitives:
                           (e.g. text glyphs: outer contour + counters).
         engrave_depth:    depth of the engraved recess from the top face.
         """
-        import mathutils
-        from mathutils import Vector
-        from mathutils.geometry import tessellate_polygon
+        from mathutils import Vector  # type: ignore
+        from mathutils.geometry import tessellate_polygon  # type: ignore
 
         holes = holes or []
         circle_holes = circle_holes or []
@@ -657,7 +656,11 @@ class ModelingPrimitives:
                 p = (float(p[0]), float(p[1]))
                 if not out or abs(p[0] - out[-1][0]) > eps or abs(p[1] - out[-1][1]) > eps:
                     out.append(p)
-            while len(out) > 2 and abs(out[0][0] - out[-1][0]) <= eps and abs(out[0][1] - out[-1][1]) <= eps:
+            while (
+                len(out) > 2
+                and abs(out[0][0] - out[-1][0]) <= eps
+                and abs(out[0][1] - out[-1][1]) <= eps
+            ):
                 out.pop()
             return out
 
@@ -683,15 +686,17 @@ class ModelingPrimitives:
             eng.append(
                 {
                     "outer": jitter(clean(r["outer"]), ("eo", k)),
-                    "holes": [jitter(clean(h), ("eh", k, j)) for j, h in enumerate(r.get("holes", []))],
+                    "holes": [
+                        jitter(clean(h), ("eh", k, j)) for j, h in enumerate(r.get("holes", []))
+                    ],
                 }
             )
 
         z_top = float(thickness)
         z_floor = z_top - float(engrave_depth)
 
-        verts = []          # (x, y, z)
-        faces = []          # index tuples
+        verts = []  # (x, y, z)
+        faces = []  # index tuples
 
         def add_ring(loop, z):
             base = len(verts)
@@ -736,8 +741,8 @@ class ModelingPrimitives:
             + [i for (_, o_t, _) in eng_rings for i in o_t],
         )
         # engrave counter islands (top face) and engrave floors
-        for r, (o_f, o_t, c_pairs) in zip(eng, eng_rings):
-            for c_loop, (c_f, c_t) in zip(r["holes"], c_pairs):
+        for r, (o_f, _o_t, c_pairs) in zip(eng, eng_rings, strict=True):
+            for c_loop, (_c_f, c_t) in zip(r["holes"], c_pairs, strict=True):
                 add_cap([c_loop], c_t)
             add_cap([r["outer"]] + r["holes"], o_f + [i for c_f, _ in c_pairs for i in c_f])
         # walls
@@ -758,7 +763,8 @@ class ModelingPrimitives:
         obj.location = location
 
         # consistent outward normals
-        import bmesh
+        import bmesh  # type: ignore
+
         bm = bmesh.new()
         bm.from_mesh(mesh)
         bmesh.ops.recalc_face_normals(bm, faces=bm.faces)

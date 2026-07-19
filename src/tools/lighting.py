@@ -35,6 +35,35 @@ def get_lighting_tools() -> list[types.Tool]:
             },
         ),
         types.Tool(
+            name="configure_light",
+            description="Modify an existing light's properties (energy, color, rotation, angle, size).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "light_name": {"type": "string"},
+                    "energy": {"type": "number"},
+                    "color": {
+                        "type": "string",
+                        "description": "Hex color string (e.g., '#FF9900')",
+                    },
+                    "rotation": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Euler rotation in degrees [x, y, z]",
+                    },
+                    "angle": {
+                        "type": "number",
+                        "description": "For SUN: angular diameter in degrees",
+                    },
+                    "size": {
+                        "type": "number",
+                        "description": "For AREA: size of the light",
+                    },
+                },
+                "required": ["light_name"],
+            },
+        ),
+        types.Tool(
             name="set_world_background",
             description="Set the world background to a solid color, a procedural sky, or an HDRI environment image.",
             inputSchema={

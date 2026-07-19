@@ -89,12 +89,90 @@ class SceneTools:
             "message": f"Distance ({mode}): {dist:.4f}",
         }
 
-    def get_viewport_screenshot(self, max_size=800):
-        """Capture viewport screenshot (placeholder for now as it needs context)"""
-        # In a real addon, this would use bpy.ops.view3d.screenshot
-        # For MCP, we might need a different approach or return a notice
+    def get_viewport_screenshot(self, max_size=800, filepath=None):
+        """Capture the 3D viewport to a PNG. Works from the socket-server timer by
+        overriding the context onto an open VIEW_3D area; falls back to an OpenGL
+        viewport render, then a Workbench camera render when no window exists."""
+        import os
+        import tempfile
+
+        if not filepath:
+            assets_dir = os.environ.get("BLENDER_ASSETS_DIR")
+            base = os.path.join(assets_dir, "screenshots") if assets_dir else tempfile.gettempdir()
+            os.makedirs(base, exist_ok=True)
+            filepath = os.path.join(base, "viewport.png")
+        elif not os.path.isabs(filepath):
+            assets_dir = os.environ.get("BLENDER_ASSETS_DIR")
+            if assets_dir:
+                filepath = os.path.join(assets_dir, filepath)
+
+        # Find an open 3D viewport to capture
+        win = area = region = None
+        for w in bpy.context.window_manager.windows:
+            for a in w.screen.areas:
+                if a.type == "VIEW_3D":
+                    win, area = w, a
+                    region = next((r for r in a.regions if r.type == "WINDOW"), None)
+                    break
+            if area:
+                break
+
+        method = None
+        if area and region:
+            try:
+                with bpy.context.temp_override(window=win, area=area, region=region):
+                    bpy.ops.screen.screenshot_area(filepath=filepath)
+                method = "viewport"
+            except Exception:
+                method = None
+            if method is None:
+                # Some builds refuse screenshot_area from a timer — OpenGL render
+                # of the same viewport is the next best thing.
+                try:
+                    with bpy.context.temp_override(window=win, area=area, region=region):
+                        prev_path = bpy.context.scene.render.filepath
+                        bpy.context.scene.render.filepath = filepath
+                        bpy.ops.render.opengl(write_still=True, view_context=True)
+                        bpy.context.scene.render.filepath = prev_path
+                    method = "opengl"
+                except Exception:
+                    method = None
+
+        if method is None:
+            # Headless fallback: quick Workbench render through the scene camera.
+            scene = bpy.context.scene
+            if scene.camera is None:
+                return {
+                    "success": False,
+                    "error": "No 3D viewport window and no scene camera — create a camera "
+                    "(create_camera + camera_look_at) and retry, or use render_frame.",
+                }
+            prev_engine = scene.render.engine
+            prev_path = scene.render.filepath
+            try:
+                scene.render.engine = "BLENDER_WORKBENCH"
+                scene.render.filepath = filepath
+                bpy.ops.render.render(write_still=True)
+                method = "workbench_render"
+            finally:
+                scene.render.engine = prev_engine
+                scene.render.filepath = prev_path
+
+        # Downscale in place so payloads stay small
+        try:
+            img = bpy.data.images.load(filepath)
+            w, h = img.size
+            if max(w, h) > max_size:
+                scale = max_size / max(w, h)
+                img.scale(int(w * scale), int(h * scale))
+                img.save_render(filepath)
+            bpy.data.images.remove(img)
+        except Exception:
+            pass  # keep the full-size capture if resizing fails
+
         return {
             "success": True,
-            "message": "Screenshot captured (Simulated)",
-            "notice": "Viewport capture requires active window context",
+            "filepath": filepath.replace("\\", "/"),
+            "method": method,
+            "message": f"Screenshot ({method}) saved to {filepath}",
         }

@@ -1,3 +1,5 @@
+# tests/utils/stateful_mcp_client.py
+
 import asyncio
 import json
 import threading
@@ -5,6 +7,7 @@ from typing import Any
 
 from mcp.client.session import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
+from mcp.types import TextContent
 
 from src.config import settings
 
@@ -62,8 +65,9 @@ class StatefulMCPClient:
                     try:
                         result = await session.call_tool(name, args or {})
                         # Parse content
-                        if result.content and hasattr(result.content[0], "text"):
-                            raw_text = result.content[0].text
+                        first = result.content[0] if result.content else None
+                        if isinstance(first, TextContent):
+                            raw_text = first.text
                             if not raw_text or not raw_text.strip():
                                 future.set_result(
                                     {

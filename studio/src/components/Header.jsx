@@ -19,6 +19,8 @@ export default function Header({
     onToggleDemoMode,
     communitySessions,
     onLoadCommunitySession,
+    assistantOpen,
+    onToggleAssistant,
 }) {
     // §9: demo mode is a distinct badge state, never folded into
     // connected/error — going offline must never silently look like
@@ -87,6 +89,13 @@ export default function Header({
                         ))}
                     </select>
                 )}
+                <button
+                    className={`btn ${assistantOpen ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={onToggleAssistant}
+                    title="Toggle the AI Assistant panel"
+                >
+                    🤖 Assistant
+                </button>
                 <button className="btn btn-success" onClick={onAddCommand}>+ New Command</button>
                 <button className="btn btn-secondary" disabled={saveDisabled} onClick={onSave}>Export JSON</button>
             </div>

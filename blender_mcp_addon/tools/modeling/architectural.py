@@ -486,8 +486,9 @@ class ModelingArchitectural:
             ),
         }
 
-    def set_view(self, mode="TOP", **kwargs):
-        """Switch viewport view (best effort)"""
+    def set_view(self, mode="TOP", frame=True, **kwargs):
+        """Switch viewport view (best effort). frame=True zooms to fit all
+        objects so follow-up screenshots actually show the scene."""
         valid_modes = ["TOP", "ISO", "FRONT", "SIDE"]
         if mode not in valid_modes:
             return {
@@ -546,6 +547,12 @@ class ModelingArchitectural:
                                         angle=math.radians(-45),
                                         type="ORBITUP",
                                     )
+                            if frame:
+                                if hasattr(bpy.context, "temp_override"):
+                                    with bpy.context.temp_override(**override):
+                                        bpy.ops.view3d.view_all(center=False)
+                                else:
+                                    bpy.ops.view3d.view_all(override, center=False)
                             break
                         except Exception as e:
                             return {

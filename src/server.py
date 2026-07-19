@@ -17,6 +17,7 @@ from starlette.responses import Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
+from .assistant import chat_endpoint, providers_endpoint, upload_endpoint
 from .config import settings
 from .connection import blender, logger
 from .sessions import SessionRecorder
@@ -205,7 +206,7 @@ async def mcp_asgi(scope, receive, send):
 
 async def root_redirect(request):
     return Response(
-        "Blender MCP Server is running. Access /editor/ for Studio.",
+        "Blender MCP Server is running. Access /studio/ for Studio.",
         media_type="text/plain",
     )
 
@@ -225,20 +226,33 @@ async def studio_not_built(request):
 
 # Studio's build output (studio/dist) is gitignored and only exists after
 # `npm run build` — guard the mount so a missing build doesn't crash startup,
-# it just serves a helpful message at /editor instead.
+# it just serves a helpful message at /studio instead.
 STUDIO_DIST = "studio/dist"
-_editor_route = (
-    Mount("/editor", StaticFiles(directory=STUDIO_DIST, html=True), name="editor")
+_studio_route = (
+    Mount("/studio", StaticFiles(directory=STUDIO_DIST, html=True), name="studio")
     if os.path.isdir(STUDIO_DIST)
-    else Route("/editor", studio_not_built)
+    else Route("/studio", studio_not_built)
 )
+
+
+async def _editor_redirect(request):
+    """Legacy path: /editor moved to /studio."""
+    from starlette.responses import RedirectResponse
+
+    return RedirectResponse(url="/studio/", status_code=301)
+
 
 # Create the Starlette app
 starlette_app = Starlette(
     routes=[
         Route("/", root_redirect),
+        Route("/assistant/providers", providers_endpoint, methods=["GET"]),
+        Route("/assistant/chat", chat_endpoint, methods=["POST"]),
+        Route("/assistant/upload", upload_endpoint, methods=["POST"]),
         Mount("/mcp", app=mcp_asgi),
-        _editor_route,
+        _studio_route,
+        Route("/editor", _editor_redirect),
+        Route("/editor/{path:path}", _editor_redirect),
     ],
     lifespan=lifespan,
 )

@@ -7,7 +7,7 @@ def get_selection_tools() -> list[types.Tool]:
     return [
         types.Tool(
             name="select_objects",
-            description="[WORKFLOW WARNING] Avoid using this for sequential 'Select -> Assign' workflows as it increases API turns and hits rate limits. Many tools (like 'create_material') now accept object names directly.",
+            description="Select objects by name. AVOID select-then-assign workflows: most tools (e.g. create_material) accept object names directly in one call.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -26,7 +26,7 @@ def get_selection_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="select_by_pattern",
-            description="[WORKFLOW WARNING] Avoid using this for sequential 'Select -> Assign' workflows. Instead, use the 'pattern' parameter directly in tools like 'create_material', 'assign_material', or 'batch_transform' to complete the task in ONE TURN and avoid rate limits.",
+            description="Select objects by name pattern. AVOID select-then-assign workflows: pass 'pattern' directly to create_material / assign_material / batch_transform instead, in one call.",
             inputSchema={
                 "type": "object",
                 "properties": {

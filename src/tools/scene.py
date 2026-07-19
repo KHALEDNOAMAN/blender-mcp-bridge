@@ -47,9 +47,4 @@ def get_scene_tools() -> list[types.Tool]:
                 },
             },
         ),
-        types.Tool(
-            name="get_debug_info",
-            description="Get diagnostic information about the server.",
-            inputSchema={"type": "object", "properties": {}},
-        ),
     ]

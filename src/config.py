@@ -22,9 +22,9 @@ class Config:
             os.getenv("BLENDER_ADDON_HOST") or os.getenv("BLENDER_MCP_HOST") or "127.0.0.1"
         )
 
-        # Naming: BLENDER_ADDON_PORT (Strict) -> BLENDER_MCP_PORT (Previous) -> 8585 (Default)
+        # Naming: BLENDER_ADDON_PORT (Strict) -> BLENDER_MCP_PORT (Previous) -> 8888 (Default)
         self.addon_port = int(
-            os.getenv("BLENDER_ADDON_PORT") or os.getenv("BLENDER_MCP_PORT") or "8585"
+            os.getenv("BLENDER_ADDON_PORT") or os.getenv("BLENDER_MCP_PORT") or "8888"
         )
 
         # 3. Assets

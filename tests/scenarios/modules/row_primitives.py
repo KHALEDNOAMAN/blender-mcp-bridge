@@ -1,3 +1,7 @@
+# tests/scenarios/modules/row_primitives.py
+
+from typing import Any
+
 from tests.utils.mcp_client import MCPClient
 
 
@@ -7,7 +11,7 @@ def create_primitives_row(client: MCPClient, y_offset: float = 0.0):
     collection_name = "PRIM_BASIC"
     client.call_tool("create_collection", {"name": collection_name})
 
-    primitives = [
+    primitives: list[tuple[str, dict[str, Any], str]] = [
         ("create_cube", {"size": 2.0}, "Cube"),
         ("create_cylinder", {"radius": 1.0, "depth": 2.0}, "Cylinder"),
         ("create_icosphere", {"radius": 1.0}, "IcoSphere"),

@@ -11,6 +11,7 @@ import Modal from './components/Modal';
 import DynamicArgsForm from './components/DynamicArgsForm';
 import NewSessionDialog from './components/NewSessionDialog';
 import JsonSessionEditor from './components/JsonSessionEditor';
+import AssistantPanel from './components/AssistantPanel';
 import { useModal } from './hooks/useModal';
 import { useResizableSidebar } from './hooks/useResizableSidebar';
 import { useConnection } from './hooks/useConnection';
@@ -62,6 +63,13 @@ export default function App() {
     // scripts/sync-community-sessions.mjs generates at
     // public/community/index.json (build-time copy of community/*/session.json).
     const [communitySessions, setCommunitySessions] = useState([]);
+    // AI Assistant drawer — chat panel driving Blender via /assistant/* on the bridge.
+    const [assistantOpen, setAssistantOpen] = useState(() => localStorage.getItem('assistantOpen') === 'true');
+    const toggleAssistant = () => setAssistantOpen((prev) => {
+        const next = !prev;
+        localStorage.setItem('assistantOpen', next);
+        return next;
+    });
 
     const sessionRef = useRef(session);
     sessionRef.current = session;
@@ -775,6 +783,8 @@ export default function App() {
                 onToggleDemoMode={demoMode ? exitDemoMode : enterDemoMode}
                 communitySessions={communitySessions}
                 onLoadCommunitySession={handleLoadCommunitySession}
+                assistantOpen={assistantOpen}
+                onToggleAssistant={toggleAssistant}
             />
 
             {viewMode === 'json' ? (
@@ -894,6 +904,15 @@ export default function App() {
                     }}
                 />
             </div>
+            )}
+
+            {assistantOpen && (
+                <AssistantPanel
+                    apiBase={apiBase}
+                    connected={connectionStatus.connected}
+                    demoMode={demoMode}
+                    onClose={toggleAssistant}
+                />
             )}
 
             <footer>

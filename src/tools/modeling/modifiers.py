@@ -17,7 +17,7 @@ def get_modifier_tools() -> list[types.Tool]:
                     },
                     "modifier_type": {
                         "type": "string",
-                        "description": "ARRAY, SOLIDIFY, BEVEL, MIRROR, SUBSURF, WIREFRAME, SMOOTH, BOOLEAN, etc.",
+                        "description": "ARRAY, SOLIDIFY, BEVEL, MIRROR, SUBSURF, WIREFRAME, SMOOTH, BOOLEAN, DECIMATE, etc.",
                     },
                     "name": {
                         "type": "string",
@@ -55,6 +55,14 @@ def get_modifier_tools() -> list[types.Tool]:
                         "description": "For SOLIDIFY, WIREFRAME",
                     },
                     "offset": {"type": "number", "description": "For SOLIDIFY"},
+                    "ratio": {
+                        "type": "number",
+                        "description": "For DECIMATE (collapse): keep this fraction of faces, e.g. 0.35",
+                    },
+                    "decimate_type": {
+                        "type": "string",
+                        "description": "For DECIMATE: COLLAPSE (default), UNSUBDIV, or DISSOLVE",
+                    },
                     "width": {"type": "number", "description": "For BEVEL"},
                     "segments": {"type": "integer", "description": "For BEVEL"},
                     "use_clamp_overlap": {
@@ -150,13 +158,13 @@ def get_modifier_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="boolean_operation",
-            description="""Perform a boolean operation between objects or collections.
-GUIDANCE:
-- Use 'SLICE' to cut a hole AND keep the resulting piece as a new object.
-- Use operand_type='COLLECTION' to use all objects in a collection as cutters at once.
-- CRITICAL: object_a must NOT be in collection object_b. Submitting an object's own collection as a cutter will result in self-subtraction (object disappearing).
-- 'EXACT' solver is recommended for most operations.
-- The cutter is automatically hidden from viewport and render by default.""",
+            description=(
+                "Boolean operation between objects or collections. SLICE cuts a hole AND keeps "
+                "the piece as a new object; operand_type='COLLECTION' uses all objects in a "
+                "collection as cutters. CRITICAL: object_a must NOT be inside collection "
+                "object_b (self-subtraction deletes it). Prefer the 'EXACT' solver. The cutter "
+                "is auto-hidden."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {

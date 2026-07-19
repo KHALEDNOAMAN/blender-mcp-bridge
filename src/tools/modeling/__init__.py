@@ -3,6 +3,7 @@
 from mcp import types
 
 from .architectural import get_architectural_tools
+from .curves import get_curve_tools
 from .modifiers import get_modifier_tools
 from .operators import get_operator_tools
 from .primitives import get_primitive_tools
@@ -15,6 +16,7 @@ def get_modeling_tools() -> list[types.Tool]:
     """Returns all modeling-related tools"""
     tools = []
     tools.extend(get_primitive_tools())
+    tools.extend(get_curve_tools())
     tools.extend(get_modifier_tools())
     tools.extend(get_transform_tools())
     tools.extend(get_selection_tools())

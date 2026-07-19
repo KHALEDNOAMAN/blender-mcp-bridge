@@ -354,14 +354,55 @@ def get_primitive_tools() -> list[types.Tool]:
             },
         ),
         types.Tool(
+            name="create_primitive",
+            description="Generic primitive creator: one call for cube, cylinder, sphere, icosphere, torus, plane, or cone. Prefer the dedicated create_* tools when they exist; this is the parametric catch-all.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "cube",
+                            "cylinder",
+                            "sphere",
+                            "icosphere",
+                            "torus",
+                            "plane",
+                            "cone",
+                        ],
+                    },
+                    "location": {"type": "array", "items": {"type": "number"}},
+                    "scale": {"type": "array", "items": {"type": "number"}},
+                    "rotation": {
+                        "type": "array",
+                        "items": {"type": "number"},
+                        "description": "Euler rotation in degrees [x, y, z]",
+                    },
+                    "name": {"type": "string"},
+                    "collection": {"type": "string"},
+                    "size": {"type": "number", "description": "cube/plane edge size"},
+                    "radius": {
+                        "type": "number",
+                        "description": "cylinder/sphere/icosphere/cone radius",
+                    },
+                    "depth": {"type": "number", "description": "cylinder/cone height"},
+                    "vertices": {
+                        "type": "integer",
+                        "description": "cylinder/cone circle resolution",
+                    },
+                    "subdivisions": {"type": "integer", "description": "icosphere subdivisions"},
+                },
+                "required": ["type", "location"],
+            },
+        ),
+        types.Tool(
             name="create_watertight_plate",
             description=(
                 "Build a WATERTIGHT extruded plate from a 2D outline with through-holes and "
-                "engraved (recessed) regions - all in one indexed mesh, no boolean operations. "
-                "Use this instead of create_polygon + boolean_operation for printable flat parts "
-                "with holes or text: boolean cutouts routinely produce non-manifold meshes that "
-                "slicers silently repair (deleting the holes/text). Returns is_watertight and "
-                "non_manifold_edges in the payload - success is false if the mesh is not watertight."
+                "engraved regions in one mesh, no booleans. Use INSTEAD of create_polygon + "
+                "boolean_operation for printable flat parts with holes/text (boolean cutouts "
+                "often go non-manifold and slicers silently delete them). Returns is_watertight; "
+                "success is false if not watertight."
             ),
             inputSchema={
                 "type": "object",
@@ -435,7 +476,7 @@ def get_primitive_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="create_polygon",
-            description="Create a flat polygon mesh from exact vertex coordinates, then optionally extrude for thickness. Perfect for trapezoids, triangles, or any custom flat shape where you need precise control over each corner position.",
+            description="Create a flat polygon mesh from exact vertex coordinates, optionally extruded for thickness. For custom flat shapes needing precise corner positions.",
             inputSchema={
                 "type": "object",
                 "properties": {

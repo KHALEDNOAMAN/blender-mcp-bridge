@@ -145,7 +145,7 @@ before deploying:
 npm run preview
 ```
 
-Once built, the Bridge Server also serves Studio directly at **`http://localhost:8008/editor/`**
+Once built, the Bridge Server also serves Studio directly at **`http://localhost:8008/studio/`**
 (no separate `npm run dev` needed) — if `studio/dist/` doesn't exist yet, that route
 returns a short message with the build command instead of failing.
 
@@ -180,6 +180,60 @@ In Studio you can:
   with many commands.
 - **Export JSON** to save your changes to a new file.
 
+### AI Assistant Panel (n8n-free Alternative)
+
+Studio also includes a standalone **AI Assistant** — a resizable chat drawer (toggle
+with the header's 🤖 button) that lets you drive Blender with natural language,
+without setting up n8n at all. It talks directly to an LLM provider through the
+Bridge Server's `/assistant/*` endpoints, using the same MCP tool set as everything
+else in this project.
+
+- **Multi-provider**: switch between **Anthropic (Claude)**, **Google (Gemini)**, and
+  **OpenRouter** (which unlocks most open models, including free ones) via a dropdown.
+  Custom model IDs can be saved per provider and persist across restarts.
+- **API keys**: read from the Bridge's environment by default; a key pasted into the
+  panel (stored only in your browser) overrides it — useful when the bridge host has
+  no key configured, or when experimenting with a different provider.
+- **Load STL**: upload a model file directly from the panel; it's saved under
+  `BLENDER_ASSETS_DIR/uploads/` and imported into the scene automatically.
+- **Vision-verified agent loop**: when a tool call produces a screenshot or render,
+  the image is attached to the conversation (in each provider's native image format),
+  so the model can actually *see* the result of its own edits — catching floating or
+  misaligned geometry that numeric verification alone would miss. Models without
+  vision support get a graceful fallback to numeric-only verification.
+- **Recordable**: like every other client, assistant-driven tool calls flow through
+  the same session recorder (`serve --record`), so an AI conversation produces a
+  replayable `session.json`.
+
+The community [Benchy sail rig](community/benchy/README.md#branch-sail_rig--a-decorative-square-rig-sail)
+was designed almost entirely through this panel — including the print-design fixes
+(diamond-profile spars, flush bar tips) discovered by looking at real slicer output.
+
+### Demo Mode (No Bridge Required)
+
+**[Live demo on GitHub Pages](https://seehiong.github.io/blender-mcp-n8n/)** —
+auto-deployed by [`.github/workflows/deploy-studio.yml`](.github/workflows/deploy-studio.yml)
+on every push to `main` that touches `studio/`. There's no Bridge Server to reach
+from a Pages-hosted page, so the demo link always launches in Demo Mode.
+
+Running Studio anywhere else (locally, or your own bridge that happens to be down)
+behaves differently on purpose: the header shows **"Offline"** and a
+**"▶ Try Demo Mode"** button — demo mode is opt-in there, never automatic, so a
+genuinely offline bridge is never silently mistaken for a working connection.
+
+Either way, once in Demo Mode:
+- Loads a static tool catalog (`studio/src/lib/demoTools.js`) so the guided forms,
+  schema validation, and the **+ New Command** / **Edit Command** modals all work
+  normally.
+- Simulates tool execution and playback (`studio/src/lib/demoApi.js`) instead of
+  calling a real bridge — good for exploring the session editor, branches, and the
+  Command Timeline with any of the [community sample sessions](community/README.md).
+
+What demo mode **doesn't** do: it can't talk to Blender, so nothing is actually
+rendered or exported, and the **AI Assistant panel is disabled** while it's active
+(it needs a live bridge and a real model API to do anything meaningful). Exit demo
+mode any time with the header's "✕ Exit Demo" button.
+
 ### 3. Configure n8n Workflow
 
 ![n8n Design](docs/images/blender-mcp-for-n8n.png)
@@ -204,146 +258,24 @@ If you modify the addon code or the MCP server logic, follow these steps to ensu
 
 ## Available Tools
 
-The server exposes **70+ Blender tools** across several categories:
+The server exposes **93 Blender tools** — the full reference with descriptions and
+parameters lives in [docs/tools.md](docs/tools.md) (auto-generated from the tool
+schemas; regenerate with `uv run python scripts/gen_tools_doc.py`, which also fails
+loudly if the bridge schemas and the addon dispatch table ever drift apart).
 
-### Inspection
-| Tool | Explanation |
-|---|---|
-| `get_scene_info` | Get information about the current Blender scene (objects, collections, etc.). |
-| `get_object_info` | Get detailed information about a specific object. |
-| `get_viewport_screenshot` | Capture a screenshot of the 3D viewport. |
-| `get_distance` | Measure the distance between two objects. |
-| `get_debug_info` | Get diagnostic information about the MCP server. |
-
-### Collections
-| Tool | Explanation |
-|---|---|
-| `create_collection` | Create a new collection in the scene. |
-| `set_active_collection` | Set the active collection for new objects. |
-| `move_to_collection` | Move objects to a specific collection. |
-| `get_collections` | Get the hierarchy of all collections in the scene. |
-| `remove_collection` | Delete a collection and optionally its contents. |
-| `duplicate_collection` | Duplicate an entire collection hierarchy. |
-| `set_collection_visibility`| Toggle visibility of a collection in viewport/render. |
-
-### Modeling
-| Tool | Explanation |
-|---|---|
-| `create_cube` | Create/update a cube mesh. |
-| `create_cylinder` | Create/update a cylinder mesh. |
-| `create_icosphere` | Create/update an Ico sphere mesh. |
-| `create_sphere` | Create/update a UV sphere mesh. |
-| `create_torus` | Create/update a torus mesh. |
-| `create_plane` | Create/update a plane mesh. |
-| `create_text` | Create/update a 3D text object. |
-| `create_empty` | Create an Empty object for reference or rigging. |
-| `apply_modifier` | Add and configure a modifier (ARRAY, SOLIDIFY, BEVEL, etc.). |
-| `remove_modifier` | Remove a modifier from an object. |
-| `copy_modifier` | Copy a modifier from a source object to targets. |
-| `boolean_operation` | Perform INTERSECT, UNION, or DIFFERENCE between objects. |
-| `duplicate_object` | Duplicate an object with optional transformations. |
-| `duplicate_selection` | Duplicate all currently selected objects. |
-| `transform_object` | Transform an existing object (location, rotation, scale). |
-| `set_object_dimensions` | Set exact dimensions for an object in meters. |
-| `batch_transform` | Transform multiple existing objects at once. |
-| `select_objects` | Select multiple objects by name. |
-| `select_by_pattern` | Select objects matching a glob pattern (e.g., 'Facade_Fin*'). |
-| `select_by_collection` | Select all objects within a specific collection. |
-| `invert_mesh_selection` | Invert the current mesh element selection (vertices, edges, faces). |
-| `circular_array` | Create objects arranged in a radial pattern with optional collection targeting and immediate joining. |
-| `join_objects` | Join multiple objects into a single mesh. TIP: Use after `select_by_pattern`. |
-| `create_and_array` | Create a primitive and apply a linear array modifier in one step. |
-| `random_distribute` | Randomly distribute copies of an object with deterministic seed support. |
-| `extrude_mesh` | Extrude mesh geometry (vertices/edges/faces) with normal filtering. |
-| `inset_faces` | Inset faces of a mesh (great for creating walls from floors). |
-| `shear_mesh` | Shear mesh geometry along an axis (useful for sloped roofs). |
-| `delete_object` | Delete object(s) by name or pattern (e.g. 'Test_*'). |
-| `set_object_visibility`| Quickly hide/show objects to look inside Shells or isolate items. |
-
-### Architectural Modeling
-| Tool | Explanation |
-|---|---|
-| `build_room_shell` | PRIMARY TOOL: Create a full building shell (floor, walls, ceiling) from vertices in one call. |
-| `build_wall_segment` | Create solid interior partition walls with specified thickness. |
-| `build_wall_with_door` | Create interior walls with clean door apertures (no booleans). |
-| `set_view` | Switch viewport (TOP, ISO, FRONT, SIDE) for precision drafting. |
-| `build_column` | Create structural columns, optionally merged (union) with walls. |
-
-### MEP (Systems) Engineering
-| Tool | Explanation |
-|---|---|
-| `build_pipe_run` | Create color-coded pipe segments (WATER, CHILLER, FIRE, etc.) with optional auto-fittings. |
-| `build_cable_tray` | Create electrical containment runs (LADDER, TROUGH) with automated supports. |
-| `add_tray_support` | Move existing supports or add new ones (TRAPEZE, CANTILEVER, WALL) to tray runs. |
-| `add_auto_cable_drops` | Automatically generate smooth Bezier cable drops from trays to racks/equipment beneath. |
-
-### 3D Printing (Validation & Repair)
-| Tool | Explanation |
-|---|---|
-| `set_scene_units` | Set scene units and scale (e.g., metric millimeters) crucial for 3D slicers. |
-| `check_mesh_for_printing` | Analyze mesh topology for non-manifold edges, holes, and degenerate geometry. |
-| `repair_mesh` | Automated, non-destructive mesh repair (merge vertices, fill holes, recalculate normals). |
-| `apply_voxel_remesh` | Fuse overlapping parts into a single manifold volume using voxel remeshing. |
-| `apply_sculpt_smooth` | Smooth mesh geometry with sculpt-mode brush for organic cleanup. |
-| `apply_transforms` | Bake location/rotation/scale transforms into mesh data (required before boolean ops). |
-| `apply_all_modifiers` | Apply all pending modifiers on an object and convert to clean mesh. |
-| `convert_to_mesh` | Convert FONT/Curve objects (e.g. text) to editable mesh geometry. |
-| `export_model` | Export objects or selections to standard 3D print formats (STL or 3MF). |
-
-### Sculpting
-| Tool | Explanation |
-|---|---|
-| `enter_sculpt_mode` / `exit_sculpt_mode` | Switch an object into/out of Sculpt Mode. |
-| `set_dyntopo` | Enable/configure Dynamic Topology for adaptive detail while sculpting. |
-| `sculpt_inflate` | Inflate/deflate a mesh along vertex normals; optional world-space Z mask to protect a flat base. |
-| `sculpt_grab` | Simulate the Grab brush — pull vertices near a world-space point by an offset, with cosine falloff. |
-| `symmetrize_mesh` | Mirror one half of a mesh onto the other across an axis, in Sculpt Mode. |
-
-### Materials
-| Tool | Explanation |
-|---|---|
-| `create_material` | **POWER TOOL**: Create PBR materials and assign to `pattern` or `collection` in ONE call. |
-| `assign_material` | Assign existing materials to bulk objects/collections without selection turns. |
-| `set_material_properties` | Modify color, metallic, roughness, and emission of existing materials. |
-| `add_shader_node` | Add procedural or image-based nodes to a material tree. |
-| `connect_shader_nodes` | Link nodes to build complex custom shaders. |
-| `assign_builtin_texture` | Apply noise, voronoi, or wave textures to a material. |
-| `assign_texture_map` | Apply an image texture directly to a material map. |
-| `set_world_background` | Set scene background (color, HDRI, sky texture). |
-
-### Animation
-| Tool | Explanation |
-|---|---|
-| `set_keyframe` | Set a keyframe for an object property at a specific frame. |
-| `get_keyframes` | Get all keyframes for an object. |
-| `set_timeline_range` | Set the start, end, and current playback frames. |
-| `play_animation` | Start or stop animation playback. |
-
-### Rendering
-| Tool | Explanation |
-|---|---|
-| `configure_render_settings` | Set render engine, samples, and resolution. |
-| `render_frame` | Render the current frame to a file. |
-| `render_animation` | Render an animation sequence to a directory. |
-
-### Camera
-| Tool | Explanation |
-|---|---|
-| `create_camera` | Create a new camera in the scene. |
-| `set_active_camera` | Set the active camera for the viewport and rendering. |
-| `camera_look_at` | Point a camera at a target location. |
-
-### Lighting
-| Tool | Explanation |
-|---|---|
-| `create_light` | Create POINT, SUN, SPOT, or AREA lights. |
-| `configure_light` | Update light properties like energy, color, and size. |
-
-### History
-| Tool | Explanation |
-|---|---|
-| `undo` | Undo the last Blender action. |
-| `redo` | Redo the last undone Blender action. |
+| Category | Tools | Highlights |
+|---|---|---|
+| Modeling | 47 | primitives, booleans, modifiers, `create_curve` 2D drafting (lines + true arcs), `create_watertight_plate`, room shells |
+| Materials | 7 | PBR materials, hex colors, texture assignment |
+| Collections | 7 | create/move/organize collections |
+| Sculpting | 7 | brush-based sculpt strokes and remeshing |
+| 3D-Print Preparation | 6 | `check_mesh_for_printing`, `repair_mesh`, voxel remesh, import STL/OBJ/FBX, export STL/3MF |
+| Scene & Diagnostics | 4 | scene/object info, viewport screenshots, distances |
+| Animation | 4 | keyframes, playback range |
+| Lighting & World | 3 | lights, light editing, HDRI/sky/color world background |
+| Camera | 3 | cameras, look-at, active camera |
+| Rendering | 3 | engine setup, frame renders |
+| History / Undo | 2 | undo / redo |
 
 ## Example Usage in n8n
 
@@ -406,17 +338,6 @@ To prevent n8n or LLM "Too many requests" errors, follow these **Stateless Power
 ### 3. Bulk creation
 If you need 10 objects, don't create them one-by-one. Use `create_and_array` or `duplicate_object` with `count`.
 
-## Configuration
-
-Set environment variables in `.env`:
-
-```
-BLENDER_MCP_HOST=127.0.0.1
-BLENDER_MCP_PORT=8585
-BLENDER_ASSETS_DIR=C:/path/to/your/assets
-
-```
-
 ## Architecture & Technical Design
 
 This project uses a modular `src/` structure to ensure maintainability:
@@ -425,11 +346,12 @@ This project uses a modular `src/` structure to ensure maintainability:
 graph TD
     A[main.py] --> B[server.py]
     B --> C[tools/ package]
-    C --> D[modeling.py]
+    C --> D[modeling/ package]
     C --> E[scene.py]
     C --> F[materials.py]
     B --> G[connection.py]
     B --> I[sessions.py]
+    B --> J[assistant.py]
     G --> H[Blender]
 ```
 

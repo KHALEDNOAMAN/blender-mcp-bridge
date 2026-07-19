@@ -25,4 +25,4 @@ npm run lint      # oxlint
 ```
 
 Once built, the Bridge Server also serves Studio directly at
-`http://localhost:8008/editor/`.
+`http://localhost:8008/studio/`.

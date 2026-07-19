@@ -65,6 +65,11 @@ class ModelingModifiers:
                 mod.thickness = kwargs["thickness"]
             if "use_replace_original" in kwargs:
                 mod.use_replace = kwargs["use_replace_original"]
+        elif modifier_type == "DECIMATE":
+            if "ratio" in kwargs:
+                mod.ratio = kwargs["ratio"]
+            if "decimate_type" in kwargs:
+                mod.decimate_type = kwargs["decimate_type"]
         elif modifier_type == "SMOOTH":
             if "factor" in kwargs:
                 mod.factor = kwargs["factor"]

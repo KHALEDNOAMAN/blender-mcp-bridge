@@ -171,7 +171,14 @@ class BlenderMCPServer(
                         if (
                             cmd_type
                             and not cmd_type.startswith("get_")
-                            and cmd_type not in ["undo", "redo", "render_frame", "render_animation"]
+                            and cmd_type
+                            not in [
+                                "undo",
+                                "redo",
+                                "render_frame",
+                                "render_animation",
+                                "extract_sketch",
+                            ]
                         ):
                             try:
                                 bpy.ops.ed.undo_push(message=f"MCP: {cmd_type}")
@@ -235,6 +242,8 @@ class BlenderMCPServer(
             "create_empty": self.create_empty,
             "create_polygon": self.create_polygon,
             "create_watertight_plate": self.create_watertight_plate,
+            "create_curve": self.create_curve,
+            "extract_sketch": self.extract_sketch,
             "duplicate_object": self.duplicate_object,
             "duplicate_selection": self.duplicate_selection,
             "create_and_array": self.create_and_array,

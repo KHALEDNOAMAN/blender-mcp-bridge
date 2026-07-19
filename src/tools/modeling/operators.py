@@ -58,7 +58,7 @@ def get_operator_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="join_objects",
-            description="POWER TIP: Use this after 'select_by_pattern' to merge many repetitive objects into one! If 'object_names' is omitted, it joins all currently selected objects. Highly recommended for cleaning up fins, windows, or structural repetitive elements.",
+            description="Merge multiple objects into one (pass object_names, or omit to join the current selection). Good for consolidating repetitive elements like fins or windows.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -156,7 +156,7 @@ def get_operator_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="random_distribute",
-            description="Randomly distribute copies of an object within a ring or volume. PRO TIP: Distribution occurs around the 'center' parameter or the source object's location if center is omitted (not necessarily the world origin).",
+            description="Randomly distribute copies of an object within a ring or volume, centred on 'center' (or the source object's location if omitted — not the world origin).",
             inputSchema={
                 "type": "object",
                 "properties": {

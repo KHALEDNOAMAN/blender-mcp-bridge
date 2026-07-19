@@ -34,5 +34,5 @@ DEFAULT_HOST = (
     os.environ.get("BLENDER_ADDON_HOST") or os.environ.get("BLENDER_MCP_HOST") or "0.0.0.0"
 )
 DEFAULT_PORT = int(
-    os.environ.get("BLENDER_ADDON_PORT") or os.environ.get("BLENDER_MCP_PORT") or 8585
+    os.environ.get("BLENDER_ADDON_PORT") or os.environ.get("BLENDER_MCP_PORT") or 8888
 )

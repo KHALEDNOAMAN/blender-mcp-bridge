@@ -8,12 +8,10 @@ def get_architectural_tools() -> list[types.Tool]:
         types.Tool(
             name="build_room_shell",
             description=(
-                "PRIMARY TOOL for building a 3D architectural shell from a 2D floor plan. "
-                "Use this for the ENTIRE BUILDING OUTER PERIMETER (one call). "
-                "Caller supplies explicit [x,y] vertex positions in order around the perimeter. "
-                "Creates three separate named objects: {name}_Floor, {name}_Walls, {name}_Ceiling. "
-                "PRO TIP: After this call, use build_wall_segment and build_wall_with_door "
-                "to add interior partition walls. Do NOT call this per room — call it once for the whole building."
+                "PRIMARY TOOL for a 3D architectural shell from a 2D floor plan: call ONCE for "
+                "the whole building outer perimeter (ordered [x,y] vertices), never per room. "
+                "Creates {name}_Floor, {name}_Walls, {name}_Ceiling. Then add interior "
+                "partitions with build_wall_segment / build_wall_with_door."
             ),
             inputSchema={
                 "type": "object",
@@ -124,11 +122,9 @@ def get_architectural_tools() -> list[types.Tool]:
         types.Tool(
             name="build_wall_segment",
             description=(
-                "Create a plain interior partition wall (single flat quad face, no door). "
-                "Use for solid dividers between rooms that share no opening. "
-                "The wall is a zero-thickness surface from floor (Z=0) to ceiling height. "
-                "WORKFLOW: build_room_shell (outer shell) → build_wall_segment (solid partitions) "
-                "→ build_wall_with_door (partitions with openings)."
+                "Plain interior partition wall (no door): a surface from floor Z=0 to ceiling "
+                "height. Workflow: build_room_shell first, then this for solid partitions, "
+                "build_wall_with_door for partitions with openings."
             ),
             inputSchema={
                 "type": "object",
@@ -165,10 +161,8 @@ def get_architectural_tools() -> list[types.Tool]:
         types.Tool(
             name="build_wall_with_door",
             description=(
-                "Create an interior wall segment with a door opening — pure vertex/face construction, no booleans. "
-                "The wall is built from 3 faces: left panel (full height), lintel above door, right panel (full height). "
-                "The door aperture is absent geometry (open space). "
-                "Door is centred by default; pass door_offset to place it off-centre."
+                "Interior wall with a door opening (open aperture, no booleans). Door is "
+                "centred by default; pass door_offset to place it off-centre."
             ),
             inputSchema={
                 "type": "object",
