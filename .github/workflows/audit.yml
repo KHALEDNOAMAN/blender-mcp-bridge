@@ -31,7 +31,10 @@ jobs:
 
       - name: "Export requirements for audit"
         # pip-audit works best against a flat requirements list
-        run: uv export --no-dev --format requirements-txt > /tmp/requirements.txt
+        # --no-emit-project drops the `-e .` self-reference: every other line
+        # carries --hash, which puts pip in hash-checking mode, and an editable
+        # install has no single file to hash.
+        run: uv export --no-dev --no-emit-project --format requirements-txt > /tmp/requirements.txt
 
       - name: "Run pip-audit"
         run: uvx pip-audit -r /tmp/requirements.txt

@@ -1,0 +1,46 @@
+name: Publish Python Package to PyPI
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/blender-mcp-bridge
+    permissions:
+      id-token: write  # Required for Trusted Publishing / OIDC
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: "Set up uv"
+      uses: astral-sh/setup-uv@v4
+      with:
+        version: "latest"
+        enable-cache: true
+
+    - name: Install Dependencies
+      run: uv sync --group dev
+
+    - name: Run Unit Tests
+      run: uv run pytest tests/ -q
+
+    - name: "Sync the bundled design rules"
+      # The wheel ships its own copy so an installed package answers a design
+      # question with no repo present; a stale copy silently ships old rules.
+      run: |
+        uv run python scripts/sync_design_rules.py
+        git diff --exit-code -- blender_mcp_bridge/data/design-rules.json \
+          || (echo "::error::bundled design-rules.json is stale; run scripts/sync_design_rules.py and commit" && exit 1)
+
+    - name: Build package
+      run: uv build
+
+    - name: Publish package to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1

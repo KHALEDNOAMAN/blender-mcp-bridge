@@ -1,7 +1,7 @@
 # Design Rules from print-kb
 
 `data/design-rules.json` holds 3D-printing design rules extracted from video
-sources by [`print-kb`](../../print-kb), a sibling project. This document is the
+sources by [`print-kb`](https://github.com/seehiong/print-kb), a sibling project. This document is the
 handoff: what the file contains, how it got there, and what to build on it.
 
 **Nothing here depends on print-kb at runtime.** The file is self-contained JSON.
