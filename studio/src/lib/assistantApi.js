@@ -1,3 +1,5 @@
+// studio/src/lib/api.js
+
 // AI Assistant API client — talks to the bridge's /assistant/* endpoints.
 // The chat endpoint streams NDJSON events ({type: text|tool_call|tool_result|error|done}).
 

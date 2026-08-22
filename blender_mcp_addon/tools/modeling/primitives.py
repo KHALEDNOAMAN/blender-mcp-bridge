@@ -1,6 +1,7 @@
 # blender_mcp_addon/tools/modeling/primitives.py
 
 import math
+import os
 
 import bpy  # type: ignore
 
@@ -163,6 +164,8 @@ class ModelingPrimitives:
         rotation=None,
         align_x="LEFT",
         collection=None,
+        font=None,
+        offset=None,
         **kwargs,
     ):
         """Create 3D text (FONT object)"""
@@ -183,6 +186,31 @@ class ModelingPrimitives:
         obj.data.size = size
         obj.data.extrude = extrude
         obj.data.align_x = align_x
+
+        # Optional typeface. Blender's built-in font is a thin sans with no
+        # bold variant, so a real bold needs an actual .ttf loaded here.
+        if font:
+            font_path = font
+            if not os.path.isabs(font_path):
+                # Bare names like "arialbd.ttf" resolve against the OS font dir.
+                for base in (
+                    os.path.join(os.environ.get("WINDIR", "C:\\Windows"), "Fonts"),
+                    "/usr/share/fonts",
+                    "/Library/Fonts",
+                ):
+                    candidate = os.path.join(base, font_path)
+                    if os.path.exists(candidate):
+                        font_path = candidate
+                        break
+            if not os.path.exists(font_path):
+                raise ValueError(f"Font not found: {font}")
+            obj.data.font = bpy.data.fonts.load(font_path, check_existing=True)
+
+        # Fattens the glyph outline in place -- this is faux-bold, and it is
+        # what makes a legend read on a printed part. Applied on top of
+        # whatever typeface is in use.
+        if offset is not None:
+            obj.data.offset = offset
 
         if rotation is not None:
             obj.rotation_euler = [math.radians(r) for r in rotation]
@@ -580,9 +608,18 @@ class ModelingPrimitives:
             # A zero scale component (e.g. flat axis of a plane) would
             # collapse all vertices to a point, destroying the mesh.
             if all(abs(s) > 1e-6 for s in obj.scale):
+                # transform_apply(scale=True) on this Blender build has been
+                # observed to also bake the object's LOCATION into the mesh
+                # data while leaving obj.location unchanged - net effect: the
+                # object ends up positioned at 2x its intended location. Zero
+                # location before the apply (so nothing extra gets baked in)
+                # and restore it after.
+                saved_location = tuple(obj.location)
+                obj.location = (0.0, 0.0, 0.0)
                 bpy.context.view_layer.objects.active = obj
                 obj.select_set(True)
                 bpy.ops.object.transform_apply(scale=True)
+                obj.location = saved_location
 
         # ── ROTATION  (applied AFTER dimensions) ──
         if rotation is not None:

@@ -1,3 +1,5 @@
+// studio/src/lib/sessionTemplates.js
+
 // Ported from app.js newSessionBtn handler — exact same command payloads
 // (minus created_at/timestamp, removed as unused metadata — see docs/studio_design_v1.md).
 

@@ -3,13 +3,16 @@ name: Deploy Studio to GitHub Pages
 # Publishes Studio (studio/) as a static demo site — no Blender bridge is
 # reachable there, so it always launches in Demo Mode. This is separate from
 # Studio's other deploy target, the bridge server's own /editor/ mount
-# (src/server.py), which needs a different Vite `base` path — see
+# (blender_mcp_bridge/server.py), which needs a different Vite `base` path — see
 # studio/vite.config.js for how the two are distinguished.
 on:
   push:
     branches: ["main"]
     paths:
       - "studio/**"
+      # demoTools.js is generated from the bridge's tool definitions
+      # (gen-demo-tools.mjs), so a tool schema change must redeploy Studio too.
+      - "blender_mcp_bridge/tools/**"
       - ".github/workflows/deploy-studio.yml"
   workflow_dispatch:
 
@@ -36,11 +39,36 @@ jobs:
           cache: "npm"
           cache-dependency-path: studio/package-lock.json
 
+      - name: "Set up Python"
+        # Needed by gen-demo-tools.mjs, which regenerates Studio's demo-mode
+        # tool catalog from blender_mcp_bridge/tools/. Without an interpreter the script
+        # warns and falls back to the committed snapshot, which would silently
+        # ship a stale catalog — so install the deps it imports too.
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: "Install MCP (for tool-schema generation)"
+        run: pip install mcp
+
       - name: "Install dependencies"
         working-directory: studio
         run: npm ci
 
-      - name: "Build (base path = /blender-mcp-n8n/)"
+      - name: "Check demoTools.js is not stale"
+        # The build regenerates it anyway, so this never blocks the deploy —
+        # it surfaces a committed snapshot that has drifted from blender_mcp_bridge/tools/,
+        # which is otherwise invisible (a missing tool renders an empty form
+        # rather than an error).
+        working-directory: studio
+        run: |
+          npm run gen-demo-tools
+          if ! git diff --quiet -- src/lib/demoTools.js; then
+            echo "::warning::demoTools.js was stale; regenerated. Run 'npm run gen-demo-tools' and commit."
+            git diff --stat -- src/lib/demoTools.js
+          fi
+
+      - name: "Build (base path = /blender-mcp-bridge/)"
         working-directory: studio
         env:
           STUDIO_DEPLOY_TARGET: pages

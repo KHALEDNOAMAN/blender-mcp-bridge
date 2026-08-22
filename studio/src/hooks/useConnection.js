@@ -1,7 +1,17 @@
+// studio/src/hooks/useConnection.js
+
 import { useEffect, useRef, useState } from 'react';
 import { checkConnection, fetchTools } from '../lib/api';
 import { API_BASE_DEFAULT } from '../lib/toolCategories';
 import { DEMO_TOOLS } from '../lib/demoTools';
+import { CONTROL_TOOLS } from '../lib/controlTools';
+
+// Client-side control-flow constructs (for_each) are not in the bridge's
+// tools/list nor the demo snapshot, but must appear in the tool catalog so
+// the schema-driven forms can render and edit them. Merged here — the single
+// place every consumer of availableTools reads from — rather than at each
+// call site, so live and demo mode behave identically.
+const withControlTools = (tools) => [...CONTROL_TOOLS, ...tools];
 
 /**
  * Ported from session_editor/api.js polling behavior
@@ -32,7 +42,7 @@ export function useConnection() {
             setLabel(res.port ? `Connected (${res.port})` : 'Connected');
             setDemoMode(false);
             const tools = await fetchTools(res.apiBase);
-            if (tools) setAvailableTools(tools);
+            if (tools) setAvailableTools(withControlTools(tools));
         } else {
             setConnected(false);
             setErrored(true);
@@ -49,7 +59,7 @@ export function useConnection() {
 
     const refetchTools = async () => {
         const tools = await fetchTools(apiBaseRef.current);
-        if (tools) setAvailableTools(tools);
+        if (tools) setAvailableTools(withControlTools(tools));
         return tools;
     };
 
@@ -59,7 +69,7 @@ export function useConnection() {
     // playback.
     const enterDemoMode = () => {
         setDemoMode(true);
-        setAvailableTools(DEMO_TOOLS);
+        setAvailableTools(withControlTools(DEMO_TOOLS));
     };
     const exitDemoMode = () => {
         setDemoMode(false);

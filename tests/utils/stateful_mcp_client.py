@@ -9,7 +9,7 @@ from mcp.client.session import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 from mcp.types import TextContent
 
-from src.config import settings
+from blender_mcp_bridge.config import settings
 
 
 class StatefulMCPClient:

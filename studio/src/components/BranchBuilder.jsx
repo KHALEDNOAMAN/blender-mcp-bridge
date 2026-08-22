@@ -1,3 +1,5 @@
+// studio/src/components/BranchBuilder.jsx
+
 import { useEffect, useState } from 'react';
 
 /**

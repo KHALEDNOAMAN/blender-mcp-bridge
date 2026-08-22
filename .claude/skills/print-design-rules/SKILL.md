@@ -1,0 +1,117 @@
+---
+name: print-design-rules
+description: Apply 3D-printing design rules when modelling geometry in Blender that will be printed — overhang limits, wall thickness, clearances between mating parts, hole sizing, fillets and chamfers, print-in-place gaps, part orientation. Use BEFORE generating or modifying geometry intended for FDM printing, and when reviewing a model for printability. Triggers on "3d print", "printable", "FDM", "overhang", "wall thickness", "clearance", "tolerance", "snap fit", "print in place", "will this print".
+---
+
+# Design rules for printable geometry
+
+Rules extracted from 11 video sources, each citing the video and second it came
+from. Live in `data/design-rules.json` — 111 rules, of which 17 carry a number a
+source actually stated and 36 more take a conventional default.
+
+**Consult these while modelling, not after.** Every constraint below is cheap to
+honour in CAD and expensive to discover from a failed print.
+
+## The attested numbers
+
+These are the values a source stated on camera. Prefer them over anything else.
+
+| constraint | value | note |
+|---|---|---|
+| Unsupported overhang | **45–50°** | five sources agree; steeper needs support |
+| Minimum wall | **1 mm**, or 2× nozzle width | below this the slicer drops it |
+| Vertical minimum thickness | **1 mm** | for reliability and strength |
+| Hole oversize (pin fit) | **0.25 mm** larger than the pin | FDM holes print undersized |
+| Hole tolerance (fasteners) | **0.2 mm** | standard hardware |
+| Mating faces | **0.1 mm** | two printed parts, tight |
+| Tight print-in-place joint | **0.125 mm** gap | |
+| Looser / less precise printer | **0.2–0.25 mm** | |
+| Shrink-prone materials | up to **0.5 mm** | ABS, ASA, nylon |
+| Clearance offset on inner face | **0.5 mm** | |
+| Pin tip | **45° chamfer**, not a fillet | a chamfer holds constant overhang; a fillet goes from vertical to horizontal |
+| Micro-feature slots | **0.2 mm** | |
+| Taper from build plate | **5–10 mm** | instead of a sudden transition |
+
+## Querying the full set
+
+The table above is the measured core. For anything else, read the file:
+
+```python
+import json
+from pathlib import Path
+
+RULES = json.loads(Path("data/design-rules.json").read_text(encoding="utf-8"))["rules"]
+
+def design_rules(keyword="", topic="", measured_only=False, limit=20):
+    hits = [
+        r for r in RULES
+        if (not topic or r["topic"] == topic)
+        and (not keyword or keyword.lower() in r["rule"].lower())
+        and (not measured_only or r["value_source"] == "source")
+    ]
+    hits.sort(key=lambda r: {"source": 0, "default": 1, "none": 2}[r["value_source"]])
+    return hits[:limit]
+```
+
+Rules arrive sorted with attested values first, so `[:n]` gives the most useful
+ones without further ranking.
+
+Topics: `modeling` (80), `tolerances` (19), `orientation` (6), `supports` (5),
+`materials` (1), `slicer` (1).
+
+## Reading a rule
+
+```json
+{
+  "rule": "Make the hole about 0.25 mm larger than the pin…",
+  "value": { "low": 0.25, "high": 0.25, "unit": "mm", "is_range": false },
+  "value_source": "source",
+  "stated_as": "0.25 mm",
+  "source": { "title": "…", "url": "…&t=1110s", "timestamp": "18:30",
+              "timestamp_unverified": false }
+}
+```
+
+`value_source` decides how much weight a rule carries:
+
+- **`source`** — the video stated this number. Apply it and cite it.
+- **`default`** — a conventional FDM value filled in because the source stated
+  none. Safe to apply, but say so: it is an assumption, not a claim from the
+  video.
+- **`none`** — the rule is true but dimensionless ("add more volume for
+  strength"). Apply the intent; pick your own number.
+
+`timestamp_unverified: true` means the citation could not be matched back to the
+captions. The rule text is still reliable; do not present that timestamp as
+precise.
+
+## Applying them in Blender
+
+Units are millimetres. Check the scene scale before treating a value as literal.
+
+- **Overhangs** — check face normals against the Z axis. Anything leaning more
+  than 45–50° from vertical needs support or a redesign. A chamfer at exactly 45°
+  is self-supporting; a fillet is not, because its tangent goes to horizontal.
+- **Walls** — `solidify` thickness and any extrude depth should clear 1 mm. Two
+  perimeters at a 0.4 mm nozzle is 0.8 mm, so 1 mm is the practical floor.
+- **Holes** — model them oversized by the tolerance, not at nominal diameter.
+  A 3 mm pin wants a 3.25 mm hole.
+- **Print-in-place** — the gap between moving parts is the whole design. Below
+  one nozzle width the layers fuse and the mechanism seizes solid.
+- **Orientation** — layer lines are the weak axis. Orient so load runs along
+  layers rather than across them.
+
+## When rules conflict
+
+Sources disagree, and the file preserves that rather than averaging it — one
+video says 45°, another 50°. Take the conservative value unless the part has
+slack, and mention that the range exists rather than presenting one number as
+settled.
+
+## Keeping the file current
+
+Generated by the sibling [`print-kb`](../../../print-kb) project, which writes it
+here directly via `PRINT_KB_EXPORT_PATH`. If it looks stale, run `print-kb
+status` there — it flags derived files older than the newest extraction.
+
+Full schema and integration notes: [`docs/design-rules.md`](../../../docs/design-rules.md).

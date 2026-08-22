@@ -4,9 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "presync-community": "node scripts/sync-community-sessions.mjs",
-    "dev": "npm run presync-community && vite",
-    "build": "npm run presync-community && vite build",
+    "sync-community": "node scripts/sync-community-sessions.mjs",
+    "gen-demo-tools": "node scripts/gen-demo-tools.mjs",
+    "prebuild-assets": "npm run sync-community && npm run gen-demo-tools",
+    "dev": "npm run prebuild-assets && vite",
+    "build": "npm run prebuild-assets && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
@@ -20,7 +22,8 @@
     "@uiw/codemirror-theme-github": "^4.25.11",
     "codemirror": "^6.0.2",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

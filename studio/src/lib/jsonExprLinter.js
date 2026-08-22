@@ -1,3 +1,5 @@
+// studio/src/lib/jsonExprLinter.js
+
 // Parametric expression linter for the JSON editor — see docs/studio_design_v1.md §6.5.
 // A second CodeMirror lint source alongside the plain JSON-syntax linter,
 // same lint gutter. Scoped to commands[].arguments values ONLY — NOT a

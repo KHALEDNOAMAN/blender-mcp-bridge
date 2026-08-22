@@ -1,3 +1,5 @@
+// studio/src/components/MetadataPanel.jsx
+
 /**
  * Ported from index.html #metadataSection + app.js metadata field bindings.
  */

@@ -1,54 +1,26 @@
-# Community Projects
+# Examples
 
-Welcome to the Blender MCP community! This folder is a space for users to share their creative works, recorded sessions, and documentation.
+Two recorded builds, kept here so you can see what the bridge actually does
+without leaving the repo. Each is a `session.json` that replays on a fresh
+Blender scene:
 
-> [!IMPORTANT]
-> **Core Philosophy**: A session should replay successfully on a fresh Blender file. This ensures your contribution is portable and works for everyone.
-
-## How to Share Your Project
-
-Before uploading, you need to export a clean recording of your build. Follow this 3-step pipeline:
-
-### 1) Record a Session
-
-Start the MCP server in recording mode:
+| project | what it shows |
+|---|---|
+| [`cable_comb`](cable_comb/) | a two-part pin joint built to measured 3D-printing design rules |
+| [`stackable_bin`](stackable_bin/) | a parametric bin that nests into the one below it |
 
 ```bash
-python -m src.main serve --record my_session.json --name "My Project"
+# with the bridge running and Blender open
+blender-mcp-bridge play community/cable_comb/session.json
 ```
 
-Then build your scene using n8n or your AI agent as usual. Every modeling command will automatically be saved. When finished, stop the server — your `session.json` is ready.
+## The rest of the gallery
 
-> [!TIP]
-> Record only the final successful build. Avoid recording failed experiments to keep sessions clean.
+The full collection — benchy, architectural scenes, the modular profile rack,
+the Y-zipper teardown and more — lives in its own repository:
 
-### 2. Clean the Recording (Recommended)
+**[blender-mcp-community](https://github.com/seehiong/blender-mcp-community)**
 
-Large or messy sessions make playback slow for others. Use Studio to tidy it:
-
-1.  Run the Bridge Server, then open `http://localhost:8008/studio/` (or `cd studio && npm run dev` for hot-reload).
-2.  **Load** your `session.json`.
-3.  **Delete** mistakes or unnecessary commands.
-4.  **Export JSON** to save the cleaned file.
-
-This keeps the community gallery fast and reliable.
-
-### 3) Upload Your Project
-
-Create a new folder in `community/` with the following structure:
-
-```text
-community/your_project/
-├── README.md           # Instructions and documentation
-├── session.json        # The cleaned MCP session
-└── assets/
-    └── images/        # screenshots, renders, etc.
-```
-
-Then open a **Pull Request** 🚀
-
----
-
-## Scaling Up
-
-As the community grows, we may transition from a folder-based structure to an indexed gallery (e.g., a database-backed catalog such as Firestore) to better showcase projects.
+It is separate because the models are heavy and the server is not: 100+ STLs
+worth of history that nobody installing the bridge should have to download.
+Contributions go there.

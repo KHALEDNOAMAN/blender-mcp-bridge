@@ -1,3 +1,5 @@
+// studio/src/components/JsonSessionEditor.jsx
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { EditorState, StateEffect } from '@codemirror/state';
 import { EditorView, keymap } from '@codemirror/view';
@@ -105,7 +107,7 @@ function buildExtensions(theme, parametersRef, onDocChanged) {
 }
 
 export default function JsonSessionEditor({
-    session, onApply, onDiscard, theme, parameters, onParametersChange,
+    session, onApply, onDiscard, theme, parameters, parameterUi, onParametersChange,
     sidebarWidth, isSidebarDragging, onSidebarPointerDown,
 }) {
     const initialText = useMemo(
@@ -268,6 +270,7 @@ export default function JsonSessionEditor({
                         parameters={parameters || {}}
                         collapsed={paramsCollapsed}
                         onToggle={toggleParamsCollapsed}
+                        parameterUi={parameterUi}
                         onChange={onParametersChange}
                     />
                 </div>

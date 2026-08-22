@@ -1,9 +1,13 @@
+// studio/src/components/ParametersPanel.jsx
+
 /**
  * Global Parameters panel — declare-first store for ${name} tokens used in
  * command arguments. See docs/studio_design_v1.md §4.
  * Same collapsible-card pattern as MetadataPanel/BranchesPanel.
  */
-export default function ParametersPanel({ parameters, collapsed, onToggle, onChange }) {
+import ParameterControl from './ParameterControl';
+
+export default function ParametersPanel({ parameters, parameterUi, collapsed, onToggle, onChange }) {
     const entries = Object.entries(parameters || {});
 
     const handleNameChange = (oldName, newName) => {
@@ -47,31 +51,68 @@ export default function ParametersPanel({ parameters, collapsed, onToggle, onCha
                             argument and create it inline.
                         </p>
                     )}
-                    {entries.map(([name, value]) => (
-                        <div className="params-row" key={name}>
-                            <input
-                                type="text"
-                                className="params-row-name"
-                                defaultValue={name}
-                                spellCheck={false}
-                                onBlur={(e) => handleNameChange(name, e.target.value.trim())}
-                                title="Parameter name"
-                            />
-                            <input
-                                type="text"
-                                className="params-row-value"
-                                value={value}
-                                spellCheck={false}
-                                onChange={(e) => handleValueChange(name, e.target.value)}
-                                title="Parameter value"
-                            />
-                            <button
-                                className="btn-icon params-row-delete"
-                                title={`Delete parameter "${name}"`}
-                                onClick={() => handleDelete(name)}
-                            >×</button>
-                        </div>
-                    ))}
+                    {entries.map(([name, value]) => {
+                        const ui = (parameterUi || {})[name];
+                        // Typed controls (slider/checkbox/select) get a STACKED
+                        // row: label line on top, full-width control beneath.
+                        // The sidebar is only ~250px, so the old single-line
+                        // layout left a slider about 60px wide once the name
+                        // field, number box and delete button had taken their
+                        // share. Plain text params keep the compact inline row.
+                        const stacked = ui && ['slider', 'checkbox', 'select'].includes(ui.type);
+                        if (stacked) {
+                            return (
+                                <div className="params-row params-row-stacked" key={name}>
+                                    <div className="params-row-head">
+                                        <input
+                                            type="text"
+                                            className="params-row-name-stacked"
+                                            size={1}
+                                            defaultValue={name}
+                                            spellCheck={false}
+                                            onBlur={(e) => handleNameChange(name, e.target.value.trim())}
+                                            title={ui.label || name}
+                                        />
+                                        {ui.label && <span className="params-row-label">{ui.label}</span>}
+                                        <button
+                                            className="btn-icon params-row-delete"
+                                            title={`Delete parameter "${name}"`}
+                                            onClick={() => handleDelete(name)}
+                                        >×</button>
+                                    </div>
+                                    <ParameterControl
+                                        name={name}
+                                        value={value}
+                                        ui={ui}
+                                        onChange={(v) => handleValueChange(name, v)}
+                                    />
+                                </div>
+                            );
+                        }
+                        return (
+                            <div className="params-row" key={name}>
+                                <input
+                                    type="text"
+                                    className="params-row-name"
+                                    defaultValue={name}
+                                    spellCheck={false}
+                                    onBlur={(e) => handleNameChange(name, e.target.value.trim())}
+                                    title="Parameter name"
+                                />
+                                <ParameterControl
+                                    name={name}
+                                    value={value}
+                                    ui={ui}
+                                    onChange={(v) => handleValueChange(name, v)}
+                                />
+                                <button
+                                    className="btn-icon params-row-delete"
+                                    title={`Delete parameter "${name}"`}
+                                    onClick={() => handleDelete(name)}
+                                >×</button>
+                            </div>
+                        );
+                    })}
                 </div>
                 <button className="btn btn-secondary btn-sm" onClick={handleAdd}>+ Add Parameter</button>
             </div>

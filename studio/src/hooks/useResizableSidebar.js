@@ -1,3 +1,5 @@
+// studio/src/hooks/useResizableSidebar.js
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**

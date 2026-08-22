@@ -1,3 +1,5 @@
+// studio/src/components/AutoExpandTextarea.jsx
+
 import { useEffect, useRef } from 'react';
 import { updateTextareaHeight } from '../lib/uiUtils';
 

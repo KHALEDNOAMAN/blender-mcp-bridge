@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+// studio/src/App.jsx
+
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import './style.css';
 import Header from './components/Header';
 import MetadataPanel from './components/MetadataPanel';
 import ParametersPanel from './components/ParametersPanel';
+import ViewsPanel from './components/ViewsPanel';
 import BranchesPanel from './components/BranchesPanel';
 import BranchBuilder from './components/BranchBuilder';
 import CommandTreePanel from './components/CommandTreePanel';
@@ -10,9 +13,17 @@ import CommandList from './components/CommandList';
 import Modal from './components/Modal';
 import DynamicArgsForm from './components/DynamicArgsForm';
 import NewSessionDialog from './components/NewSessionDialog';
-import JsonSessionEditor from './components/JsonSessionEditor';
 import AssistantPanel from './components/AssistantPanel';
+
+// Code-split the two heaviest dependencies out of the entry bundle. Both are
+// behind a toggle (STL viewer / JSON view), so a user who never opens them
+// never downloads them:
+//   ModelViewer       -> three (~25MB on disk, the bulk of the bundle)
+//   JsonSessionEditor -> codemirror + @codemirror/* (~2.8MB on disk)
+const ModelViewer = lazy(() => import('./components/ModelViewer'));
+const JsonSessionEditor = lazy(() => import('./components/JsonSessionEditor'));
 import { useModal } from './hooks/useModal';
+import { usePersistentToggle } from './hooks/usePersistentToggle';
 import { useResizableSidebar } from './hooks/useResizableSidebar';
 import { useConnection } from './hooks/useConnection';
 import { runCommand } from './lib/api';
@@ -20,6 +31,7 @@ import { simulateCommand } from './lib/demoApi';
 import { buildSessionFromTemplate } from './lib/sessionTemplates';
 import { resolveArgsObject } from './lib/params';
 import { validateBranches, validateSessionShape } from './lib/sessionValidation';
+import { expandForEachLoops } from './lib/forEach';
 
 export default function App() {
     const {
@@ -54,27 +66,30 @@ export default function App() {
     const [runningIdx, setRunningIdx] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark-theme');
-    const [metadataCollapsed, setMetadataCollapsed] = useState(() => localStorage.getItem('metadataCollapsed') !== 'false');
-    const [parametersCollapsed, setParametersCollapsed] = useState(() => localStorage.getItem('parametersCollapsed') === 'true');
-    const [branchesCollapsed, setBranchesCollapsed] = useState(() => localStorage.getItem('branchesCollapsed') === 'true');
-    const [commandTreeCollapsed, setCommandTreeCollapsed] = useState(() => localStorage.getItem('commandTreeCollapsed') === 'true');
+    // Collapsible panels: localStorage-backed booleans. Note metadata defaults
+    // to COLLAPSED (true) while the rest default to expanded.
+    const [metadataCollapsed, toggleMetadata] = usePersistentToggle('metadataCollapsed', true);
+    const [parametersCollapsed, toggleParameters] = usePersistentToggle('parametersCollapsed');
+    const [mainTab, setMainTabState] = useState(() => localStorage.getItem('mainTab') || 'commands');
+    const setMainTab = (t) => { localStorage.setItem('mainTab', t); setMainTabState(t); };
+    const [branchesCollapsed, toggleBranches] = usePersistentToggle('branchesCollapsed');
+    const [commandTreeCollapsed, toggleCommandTree] = usePersistentToggle('commandTreeCollapsed');
     const [runningBranch, setRunningBranch] = useState(null);
     const [selectedBranch, setSelectedBranch] = useState(null);
+    // Reactive mirror of fileHandleRef.current?.name — the ref alone can't
+    // drive a re-render, so the Save button label/title (in-place vs.
+    // download) needs this alongside it.
+    const [openFileName, setOpenFileName] = useState(null);
     const [viewMode, setViewMode] = useState('guided'); // 'guided' | 'json' — §6
     const jsonModeParamsSnapshotRef = useRef(null); // §6.7: restored on Discard
-    const [commandsCollapsed, setCommandsCollapsed] = useState(() => localStorage.getItem('commandsCollapsed') === 'true');
+    const [commandsCollapsed, toggleCommands] = usePersistentToggle('commandsCollapsed');
     const [playbackDelay, setPlaybackDelay] = useState(500);
     // §10: community sample sessions, fetched once from the manifest
     // scripts/sync-community-sessions.mjs generates at
     // public/community/index.json (build-time copy of community/*/session.json).
     const [communitySessions, setCommunitySessions] = useState([]);
     // AI Assistant drawer — chat panel driving Blender via /assistant/* on the bridge.
-    const [assistantOpen, setAssistantOpen] = useState(() => localStorage.getItem('assistantOpen') === 'true');
-    const toggleAssistant = () => setAssistantOpen((prev) => {
-        const next = !prev;
-        localStorage.setItem('assistantOpen', next);
-        return next;
-    });
+    const [assistantOpen, toggleAssistant] = usePersistentToggle('assistantOpen');
 
     const sessionRef = useRef(session);
     sessionRef.current = session;
@@ -86,6 +101,21 @@ export default function App() {
     playbackDelayRef.current = playbackDelay;
     const stopRequestedRef = useRef(false);
     const fileInputRef = useRef(null);
+    // File System Access API handle for the currently-open file (Chromium
+    // only — see handleLoadClick/handleSave). null whenever the session came
+    // from the classic <input type="file"> picker, a community sample, or
+    // "New Session" — Save then falls back to a download, same as before.
+    const fileHandleRef = useRef(null);
+    // Best-effort filename to seed the download fallback (community samples,
+    // or File System Access-unsupported browsers) — cosmetic only.
+    const loadedFileNameRef = useRef(null);
+    // Monotonic across every load for the lifetime of the page. Argument-textarea
+    // remount keys must never repeat between sessions: a freshly loaded file has
+    // no _argsRevision, so a per-command `(cmd._argsRevision || 0) + 1` always
+    // yields 1 and a same-index card from the previous session gets reused,
+    // leaving its uncontrolled textarea showing the OLD session's arguments.
+    const argsRevisionSeqRef = useRef(0);
+    const supportsFileSystemAccess = typeof window !== 'undefined' && 'showOpenFilePicker' in window;
 
     // Theme: apply to <body>, matching original body.classList toggling.
     useEffect(() => {
@@ -161,7 +191,7 @@ export default function App() {
 
     // --- Parameter resolution (§4.3: substitute ${name} tokens, then dispatch) ----
 
-    const dispatchCommand = useCallback((tool, args, extraParams = {}) => {
+    const dispatchTool = useCallback((tool, args, extraParams = {}) => {
         const params = { ...(sessionRef.current?.parameters || {}), ...extraParams };
         const { resolved, unresolved, errors } = resolveArgsObject(args, params);
         if (unresolved.size > 0) {
@@ -175,12 +205,39 @@ export default function App() {
         return run(apiBase, tool, resolved);
     }, [apiBase, run]);
 
+    // dispatchCommand takes a full command object (not just tool/args) so it
+    // can see cmd.body — needed for the for_each case below. A for_each
+    // command isn't a real MCP tool; it expands into its body's commands
+    // (see lib/forEach.js) and runs every iteration sequentially, folding
+    // the outcome into ONE result for the card that dispatched it — the
+    // command list shows one card/one status per loop, not one row per
+    // expanded iteration (unlike the CLI's session player, which prints
+    // every expanded command — Studio's UI model is index/card-based, so a
+    // loop expanding to hundreds of rows would break scrubbing/resume).
+    const dispatchCommand = useCallback(async (cmd, extraParams = {}) => {
+        if (cmd.tool !== 'for_each') {
+            return dispatchTool(cmd.tool, cmd.arguments, extraParams);
+        }
+        const params = { ...(sessionRef.current?.parameters || {}), ...extraParams };
+        let expandedBody;
+        try {
+            expandedBody = expandForEachLoops([cmd], params);
+        } catch (err) {
+            return { error: `for_each: ${err.message}` };
+        }
+        for (const bodyCmd of expandedBody) {
+            const res = await dispatchCommand(bodyCmd, extraParams);
+            if (res.error) return res;
+        }
+        return { ok: true, iterationCount: expandedBody.length };
+    }, [dispatchTool]);
+
     // --- Single-card run -----------------------------------------------------------
 
     const runSingle = useCallback(async (idx) => {
         const cmd = sessionRef.current.commands[idx];
         setRunningIdx(idx);
-        const res = await dispatchCommand(cmd.tool, cmd.arguments);
+        const res = await dispatchCommand(cmd);
         setRunningIdx(null);
         if (res.error) {
             markStatus(idx, 'error');
@@ -220,7 +277,7 @@ export default function App() {
             setExpandedIdx(index);
             setRunningIdx(index);
             const cmd = commands[index];
-            const res = await dispatchCommand(cmd.tool, cmd.arguments);
+            const res = await dispatchCommand(cmd);
             setRunningIdx(null);
 
             if (res.error) {
@@ -323,7 +380,7 @@ export default function App() {
             setExpandedIdx(index);
             setRunningIdx(index);
             const cmd = commands[index];
-            const res = await dispatchCommand(cmd.tool, cmd.arguments);
+            const res = await dispatchCommand(cmd);
             setRunningIdx(null);
 
             if (res.error) {
@@ -370,16 +427,21 @@ export default function App() {
     };
 
     const handleApplyJson = (parsedSession) => {
-        // The docked ParametersPanel (§6.6) is the single authoritative
-        // source for `parameters` — it edits session.parameters live and
-        // immediately, never the pending textarea text. The parsed
-        // textarea's OWN "parameters" key is stale the moment you edit the
-        // panel (that's the whole point of it being live), so committing it
-        // wholesale here would silently revert any panel edit made since
-        // JSON mode was opened. Apply takes commands/metadata/branches from
-        // the parsed text as usual, but always keeps the live parameters.
+        // Parameters can be edited two ways while in JSON mode: live via the
+        // docked ParametersPanel (§6.6, takes effect immediately, independent
+        // of Apply), or directly in the JSON text's own "parameters" key
+        // (only takes effect on Apply, like every other field). Both must
+        // actually stick — previously this always discarded a text edit in
+        // favor of whatever was already in memory, so typing a new
+        // "parameters" block by hand and clicking Apply silently reverted it.
+        // The parsed text's "parameters" key wins if present (it's what the
+        // user explicitly asked to apply); otherwise fall back to whatever
+        // the live panel already has, so panel-only edits still work.
         jsonModeParamsSnapshotRef.current = null;
-        setSession({ ...parsedSession, parameters: sessionRef.current?.parameters || {} });
+        setSession({
+            ...parsedSession,
+            parameters: parsedSession.parameters ?? sessionRef.current?.parameters ?? {},
+        });
         setExpandedIdx(null);
         setFilter('');
         setViewMode('guided');
@@ -407,22 +469,71 @@ export default function App() {
         if (!proceed) return;
         const newSession = buildSessionFromTemplate(templateRef.current);
         jsonModeParamsSnapshotRef.current = null;
+        fileHandleRef.current = null; // not tied to any file on disk
+        loadedFileNameRef.current = null;
+        setOpenFileName(null);
         setSession(newSession);
         setExpandedIdx(0);
         setFilter('');
         setViewMode('guided');
     };
 
-    const handleLoadClick = () => fileInputRef.current && fileInputRef.current.click();
+    // On Chromium browsers, showOpenFilePicker() returns a live
+    // FileSystemFileHandle we keep for Save (createWritable() overwrites the
+    // exact file in place — a real editor round-trip, not download-a-copy).
+    // Elsewhere (Firefox/Safari, no File System Access API support) this
+    // falls back to the classic hidden <input type="file"> + FileReader.
+    const handleLoadClick = async () => {
+        if (supportsFileSystemAccess) {
+            let handle;
+            try {
+                [handle] = await window.showOpenFilePicker({
+                    types: [{ description: 'Session JSON', accept: { 'application/json': ['.json'] } }],
+                });
+            } catch (err) {
+                if (err && err.name === 'AbortError') return; // user cancelled the picker
+                modalApi.alert('Load Failed', `Could not open file picker: ${err.message}`);
+                return;
+            }
+            try {
+                const file = await handle.getFile();
+                const text = await file.text();
+                loadSessionObject(JSON.parse(text), file.name, handle);
+            } catch (err) {
+                modalApi.alert('Error', 'Invalid JSON');
+            }
+            return;
+        }
+        fileInputRef.current && fileInputRef.current.click();
+    };
 
-    // Shared by file-picker loads (handleFileSelected) and community-sample
-    // loads (handleLoadCommunitySession) — same reset/normalize steps either
-    // way, just a different source for the raw parsed object.
-    const loadSessionObject = (loaded) => {
+    // Shared by file-picker loads (handleFileSelected/handleLoadClick),
+    // community-sample loads (handleLoadCommunitySession), and "New Session"
+    // — same reset/normalize steps either way, just a different source for
+    // the raw parsed object. `sourceName` seeds the download filename Save
+    // falls back to when there's no live handle; `handle` is the
+    // FileSystemFileHandle Save writes back to in place (Chromium file-picker
+    // loads only — every other source always clears it, so Save never writes
+    // to a stale handle from a previously-open file).
+    const loadSessionObject = (loaded, sourceName = null, handle = null) => {
         if (loaded.commands) {
-            loaded.commands.forEach((cmd) => { delete cmd.execution_status; });
+            // One fresh revision shared by every command in this load. Taken from
+            // a page-lifetime counter rather than each command's own value, which
+            // is absent in a just-parsed file and would restart at 1 every load.
+            const revision = ++argsRevisionSeqRef.current;
+            loaded.commands.forEach((cmd) => {
+                delete cmd.execution_status;
+                // Force each CommandCard's Arguments textarea (an uncontrolled
+                // input keyed on _argsRevision) to remount with this session's
+                // actual data, instead of showing whatever a same-index card
+                // had mounted with from a previously loaded/edited session.
+                cmd._argsRevision = revision;
+            });
         }
         jsonModeParamsSnapshotRef.current = null;
+        loadedFileNameRef.current = sourceName;
+        fileHandleRef.current = handle;
+        setOpenFileName(handle ? handle.name : null);
         setSession(loaded);
         setExpandedIdx(0);
         setFilter('');
@@ -435,7 +546,7 @@ export default function App() {
         const reader = new FileReader();
         reader.onload = (ev) => {
             try {
-                loadSessionObject(JSON.parse(ev.target.result));
+                loadSessionObject(JSON.parse(ev.target.result), file.name); // no handle: classic picker can't write back
             } catch (err) {
                 modalApi.alert('Error', 'Invalid JSON');
             }
@@ -461,19 +572,44 @@ export default function App() {
             const sessionRes = await fetch(`${import.meta.env.BASE_URL}community/${entry.file}`);
             if (!sessionRes.ok) throw new Error(`HTTP ${sessionRes.status}`);
             const loaded = await sessionRes.json();
-            loadSessionObject(loaded);
+            loadSessionObject(loaded, `${entry.id}.json`); // no handle: fetched sample, not a local file
         } catch (err) {
             modalApi.alert('Load Failed', `Could not load community sample: ${err.message}`);
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!session) return;
-        const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
+        const json = JSON.stringify(session, null, 2);
+
+        if (fileHandleRef.current) {
+            try {
+                // Re-request write permission if the browser dropped it (e.g.
+                // after a long idle period) — queryPermission/requestPermission
+                // are part of the File System Access API on the handle itself.
+                if ((await fileHandleRef.current.queryPermission({ mode: 'readwrite' })) !== 'granted') {
+                    const granted = await fileHandleRef.current.requestPermission({ mode: 'readwrite' });
+                    if (granted !== 'granted') throw new Error('Write permission denied');
+                }
+                const writable = await fileHandleRef.current.createWritable();
+                await writable.write(json);
+                await writable.close();
+                modalApi.alert('Saved', `Saved in place to "${fileHandleRef.current.name}".`);
+                return;
+            } catch (err) {
+                modalApi.alert(
+                    'Save Failed',
+                    `Could not write to "${fileHandleRef.current.name}": ${err.message}. Falling back to download.`
+                );
+                // fall through to the download path below
+            }
+        }
+
+        const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'session_edited.json';
+        a.download = loadedFileNameRef.current || 'session_edited.json';
         a.click();
         URL.revokeObjectURL(url);
     };
@@ -551,7 +687,14 @@ export default function App() {
         const doRun = async () => {
             if (!formApiRef.current || !formApiRef.current.validate()) return;
             modalApi.patchTesting({ running: true });
-            const res = await dispatchCommand(cmd.tool, formApiRef.current.getArgs(), formApiRef.current.pendingParams);
+            // Spread `cmd` rather than rebuilding {tool, arguments}: a
+            // for_each carries its template command list on `cmd.body`,
+            // which is not part of `arguments` and would otherwise be lost
+            // here — dispatching a loop with no body to run.
+            const res = await dispatchCommand(
+                { ...cmd, arguments: formApiRef.current.getArgs() },
+                formApiRef.current.pendingParams
+            );
             modalApi.patchTesting({ running: false });
             if (res.error) modalApi.alert('Failed', res.error);
         };
@@ -589,7 +732,13 @@ export default function App() {
                 return { ...prev, parameters: { ...(prev.parameters || {}), ...pendingParams } };
             });
             updateCommands((cmds) => {
-                cmds[idx] = { ...cmds[idx], arguments: newArgs };
+                cmds[idx] = {
+                    ...cmds[idx],
+                    arguments: newArgs,
+                    // Same page-lifetime counter the load path uses, so an edit
+                    // here can never collide with a revision handed out by a load.
+                    _argsRevision: ++argsRevisionSeqRef.current,
+                };
                 return cmds;
             });
         }
@@ -732,33 +881,7 @@ export default function App() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [apiBase]);
 
-    // --- Collapsible panel toggles -------------------------------------------------
-
-    const toggleMetadata = () => setMetadataCollapsed((prev) => {
-        const next = !prev;
-        localStorage.setItem('metadataCollapsed', next);
-        return next;
-    });
-    const toggleCommands = () => setCommandsCollapsed((prev) => {
-        const next = !prev;
-        localStorage.setItem('commandsCollapsed', next);
-        return next;
-    });
-    const toggleParameters = () => setParametersCollapsed((prev) => {
-        const next = !prev;
-        localStorage.setItem('parametersCollapsed', next);
-        return next;
-    });
-    const toggleBranches = () => setBranchesCollapsed((prev) => {
-        const next = !prev;
-        localStorage.setItem('branchesCollapsed', next);
-        return next;
-    });
-    const toggleCommandTree = () => setCommandTreeCollapsed((prev) => {
-        const next = !prev;
-        localStorage.setItem('commandTreeCollapsed', next);
-        return next;
-    });
+    // Collapsible panel toggles now come from usePersistentToggle above.
 
     // Click-to-jump from the tree diagram (§7.2) reuses the same expand
     // interaction as the command list itself.
@@ -780,6 +903,8 @@ export default function App() {
                 onAddCommand={handleAddCommand}
                 onSave={handleSave}
                 saveDisabled={!hasCommands}
+                saveInPlace={!!openFileName}
+                openFileName={openFileName}
                 fileInputRef={fileInputRef}
                 viewMode={viewMode}
                 onToggleViewMode={handleToggleViewMode}
@@ -794,17 +919,20 @@ export default function App() {
 
             {viewMode === 'json' ? (
                 <main>
-                    <JsonSessionEditor
-                        session={session}
-                        onApply={handleApplyJson}
-                        onDiscard={handleDiscardJson}
-                        theme={theme}
-                        parameters={(session && session.parameters) || {}}
-                        onParametersChange={handleParametersChange}
-                        sidebarWidth={jsonSidebar.width}
-                        isSidebarDragging={jsonSidebar.isDragging}
-                        onSidebarPointerDown={jsonSidebar.handlePointerDown}
-                    />
+                    <Suspense fallback={<div className="lazy-loading">Loading editor…</div>}>
+                        <JsonSessionEditor
+                            session={session}
+                            onApply={handleApplyJson}
+                            onDiscard={handleDiscardJson}
+                            theme={theme}
+                            parameters={(session && session.parameters) || {}}
+                            parameterUi={(session && session.parameter_ui) || {}}
+                            onParametersChange={handleParametersChange}
+                            sidebarWidth={jsonSidebar.width}
+                            isSidebarDragging={jsonSidebar.isDragging}
+                            onSidebarPointerDown={jsonSidebar.handlePointerDown}
+                        />
+                    </Suspense>
                 </main>
             ) : (
             <div className="guided-body">
@@ -818,6 +946,7 @@ export default function App() {
                         />
                         <ParametersPanel
                             parameters={(session && session.parameters) || {}}
+                            parameterUi={(session && session.parameter_ui) || {}}
                             collapsed={parametersCollapsed}
                             onToggle={toggleParameters}
                             onChange={handleParametersChange}
@@ -838,38 +967,82 @@ export default function App() {
                     />
 
                     <section id="commandsSection" className={`card glass commands-collapsible${commandsCollapsed ? ' collapsed' : ''}`}>
-                        <div className="commands-header" onClick={toggleCommands} title="Toggle commands list">
-                            <div className="commands-header-left">
-                                <h2>Commands <span className="badge">{filteredCount}</span></h2>
+                        {/* Commands / Views are TABS in the main pane. Views
+                            started life as a sidebar card, but a 130px
+                            thumbnail is too small to inspect a render — out
+                            here they get the full width. */}
+                        <div className="commands-header">
+                            <div className="commands-header-left main-tabs">
+                                <button
+                                    type="button"
+                                    className={`main-tab${mainTab === 'commands' ? ' active' : ''}`}
+                                    onClick={() => setMainTab('commands')}
+                                >
+                                    Commands <span className="badge">{filteredCount}</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`main-tab${mainTab === 'views' ? ' active' : ''}`}
+                                    onClick={() => setMainTab('views')}
+                                >
+                                    Views
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`main-tab${mainTab === 'model' ? ' active' : ''}`}
+                                    onClick={() => setMainTab('model')}
+                                >
+                                    3D
+                                </button>
                             </div>
-                            <span className="commands-chevron">▼</span>
+                            <span
+                                className="commands-chevron"
+                                onClick={toggleCommands}
+                                title="Toggle panel"
+                            >▼</span>
                         </div>
                         <div className="commands-body">
-                            <div className="search-bar-container">
-                                <input
-                                    type="text"
-                                    placeholder="Filter tools..."
-                                    spellCheck={false}
-                                    className="search-bar"
-                                    value={filter}
-                                    onChange={(e) => setFilter(e.target.value)}
-                                />
-                            </div>
+                            {mainTab === 'commands' ? (
+                                <>
+                                    <div className="search-bar-container">
+                                        <input
+                                            type="text"
+                                            placeholder="Filter tools..."
+                                            spellCheck={false}
+                                            className="search-bar"
+                                            value={filter}
+                                            onChange={(e) => setFilter(e.target.value)}
+                                        />
+                                    </div>
 
-                            <CommandList
-                                commands={hasCommands ? session.commands : []}
-                                filter={filter}
-                                expandedIdx={expandedIdx}
-                                runningIdx={runningIdx}
-                                onExpand={setExpandedIdx}
-                                onRun={runSingle}
-                                onEdit={handleEditCommand}
-                                onDelete={handleDelete}
-                                onMoveUp={handleMoveUp}
-                                onMoveDown={handleMoveDown}
-                                onDescriptionChange={handleDescriptionChange}
-                                onArgumentsChange={handleArgumentsChange}
-                            />
+                                    <CommandList
+                                        commands={hasCommands ? session.commands : []}
+                                        filter={filter}
+                                        expandedIdx={expandedIdx}
+                                        runningIdx={runningIdx}
+                                        onExpand={setExpandedIdx}
+                                        onRun={runSingle}
+                                        onEdit={handleEditCommand}
+                                        onDelete={handleDelete}
+                                        onMoveUp={handleMoveUp}
+                                        onMoveDown={handleMoveDown}
+                                        onDescriptionChange={handleDescriptionChange}
+                                        onArgumentsChange={handleArgumentsChange}
+                                    />
+                                </>
+                            ) : mainTab === 'views' ? (
+                                <ViewsPanel
+                                    apiBase={apiBase}
+                                    embedded
+                                    sessionName={session?.metadata?.name}
+                                />
+                            ) : (
+                                <Suspense
+                                    fallback={<div className="lazy-loading">Loading viewer…</div>}
+                                >
+                                    <ModelViewer apiBase={apiBase} session={session} />
+                                </Suspense>
+                            )}
                         </div>
                     </section>
                 </main>

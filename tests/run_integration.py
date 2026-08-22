@@ -12,7 +12,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 # We use direct imports now that sys.path is handled
-from src.config import settings  # noqa: E402
+from blender_mcp_bridge.config import settings  # noqa: E402
 from tests.scenarios.arch_layout import ArchLayoutScenario  # noqa: E402
 from tests.scenarios.filament_tag_layout import FilamentTagLayout  # noqa: E402
 from tests.scenarios.grid_layout import GridLayoutScenario  # noqa: E402
@@ -192,7 +192,7 @@ def verify_results(benchmark_file, last_run_file):
     exit_code = 0
 
     def fuzzy_match(a, b, tol=0.01):
-        if isinstance(a, (list, tuple)):
+        if isinstance(a, list | tuple):
             if len(a) != len(b):
                 return False
             return all(fuzzy_match(x, y, tol) for x, y in zip(a, b, strict=False))

@@ -1,3 +1,5 @@
+// studio/src/components/Header.jsx
+
 /**
  * Ported from index.html <header>.
  */
@@ -11,6 +13,8 @@ export default function Header({
     onAddCommand,
     onSave,
     saveDisabled,
+    saveInPlace,
+    openFileName,
     fileInputRef,
     viewMode,
     onToggleViewMode,
@@ -97,7 +101,14 @@ export default function Header({
                     🤖 Assistant
                 </button>
                 <button className="btn btn-success" onClick={onAddCommand}>+ New Command</button>
-                <button className="btn btn-secondary" disabled={saveDisabled} onClick={onSave}>Export JSON</button>
+                <button
+                    className="btn btn-secondary"
+                    disabled={saveDisabled}
+                    onClick={onSave}
+                    title={saveInPlace ? `Overwrite "${openFileName}" in place` : 'Download a copy — this browser can\'t write back to the original file'}
+                >
+                    {saveInPlace ? `💾 Save "${openFileName}"` : '⬇ Download JSON'}
+                </button>
             </div>
         </header>
     );

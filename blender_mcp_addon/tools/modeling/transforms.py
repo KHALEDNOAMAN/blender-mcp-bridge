@@ -264,13 +264,36 @@ class ModelingTransforms:
     def apply_all_modifiers(self, object_name):
         """Permanently apply all modifiers on an object."""
         obj = get_object(object_name)
+
+        # modifier_apply acts on the SELECTED object, not merely the active one.
+        # Setting the active object alone is not enough: if anything else is
+        # selected, the operator applies to that instead, returns FINISHED and
+        # raises nothing -- so this reported "Applied all modifiers permanently"
+        # while the boolean was still sitting on the object, and the very next
+        # delete_object refused because the target was still referenced.
+        # Must be in OBJECT mode for select_all/modifier_apply to be available.
+        try:
+            if bpy.context.mode != "OBJECT":
+                bpy.ops.object.mode_set(mode="OBJECT")
+        except Exception:
+            pass
+        bpy.ops.object.select_all(action="DESELECT")
+        obj.select_set(True)
         bpy.context.view_layer.objects.active = obj
+
         # Copy names first to avoid list mutation issues during iteration
         mod_names = [mod.name for mod in obj.modifiers]
         failures = []
         for name in mod_names:
             try:
-                bpy.ops.object.modifier_apply(modifier=name)
+                # modifier_apply does NOT raise on refusal -- it returns
+                # {'CANCELLED'} and reports the reason to the info log. Checking
+                # only for an exception therefore treats a refusal as success,
+                # which is how a boolean survived an "Applied all modifiers
+                # permanently" message and blocked the next delete_object.
+                result = bpy.ops.object.modifier_apply(modifier=name)
+                if "FINISHED" not in result:
+                    failures.append(f"'{name}': operator returned {set(result)}")
             except Exception as e:
                 print(f"[MCP] Failed to apply modifier {name} on {object_name}: {e}")
                 failures.append(f"'{name}': {e}")
@@ -282,6 +305,44 @@ class ModelingTransforms:
                 + "; ".join(failures)
                 + ". The object is in a partial state - fix the cause before continuing the pipeline."
             )
+
+        # Verify rather than trust the operator's return value: a modifier that
+        # survives here is the silent-failure case above, and every later step
+        # (delete, export, further booleans) is then working on stale geometry.
+        remaining = [mod.name for mod in obj.modifiers]
+        if remaining:
+            # Last resort: apply the whole evaluated modifier stack in one go by
+            # baking the depsgraph result straight into the mesh. modifier_apply
+            # can report FINISHED yet leave the modifier attached (multi-user
+            # mesh data, or a stack it declines to collapse piecewise); reading
+            # the evaluated mesh sidesteps the operator entirely.
+            try:
+                depsgraph = bpy.context.evaluated_depsgraph_get()
+                eval_obj = obj.evaluated_get(depsgraph)
+                baked = bpy.data.meshes.new_from_object(eval_obj)
+                old_mesh = obj.data
+                obj.data = baked
+                obj.modifiers.clear()
+                if old_mesh.users == 0:
+                    bpy.data.meshes.remove(old_mesh)
+                print(
+                    f"[MCP] modifier_apply left {len(remaining)} modifier(s) on "
+                    f"'{object_name}'; baked the evaluated mesh instead."
+                )
+            except Exception as e:
+                raise ValueError(
+                    f"CRITICAL ERROR: '{object_name}' still carries {len(remaining)} modifier(s) after "
+                    f"apply_all_modifiers: {', '.join(remaining)}, and baking the evaluated mesh "
+                    f"also failed: {e}"
+                ) from e
+
+            still = [mod.name for mod in obj.modifiers]
+            if still:
+                raise ValueError(
+                    f"CRITICAL ERROR: '{object_name}' still carries {len(still)} modifier(s) after "
+                    f"apply_all_modifiers AND an evaluated-mesh bake: {', '.join(still)}."
+                )
+
         return {
             "success": True,
             "message": f"Applied all modifiers permanently on {object_name}",

@@ -1,3 +1,5 @@
+// studio/src/components/NewSessionDialog.jsx
+
 import { useState } from 'react';
 
 /**

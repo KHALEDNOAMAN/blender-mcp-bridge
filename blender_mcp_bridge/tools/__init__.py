@@ -1,0 +1,34 @@
+# blender_mcp_bridge/tools/__init__.py
+
+from mcp import types
+
+from .animation import get_animation_tools
+from .camera import get_camera_tools
+from .collections import get_collection_tools
+from .design_rules import get_design_rule_tools
+from .history import get_history_tools
+from .lighting import get_lighting_tools
+from .materials import get_material_tools
+from .modeling import get_modeling_tools
+from .printing import get_printing_tools
+from .rendering import get_rendering_tools
+from .scene import get_scene_tools
+from .sculpting import get_sculpting_tools
+
+
+def get_mcp_tools() -> list[types.Tool]:
+    """Returns all Blender tools from all modules"""
+    tools = []
+    tools.extend(get_scene_tools())
+    tools.extend(get_collection_tools())
+    tools.extend(get_modeling_tools())
+    tools.extend(get_material_tools())
+    tools.extend(get_lighting_tools())
+    tools.extend(get_camera_tools())
+    tools.extend(get_animation_tools())
+    tools.extend(get_rendering_tools())
+    tools.extend(get_history_tools())
+    tools.extend(get_printing_tools())
+    tools.extend(get_sculpting_tools())
+    tools.extend(get_design_rule_tools())
+    return tools

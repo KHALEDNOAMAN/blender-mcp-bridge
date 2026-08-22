@@ -1,4 +1,6 @@
-import { useRef } from 'react';
+// studio/src/components/CommandCard.jsx
+
+import { memo, useRef } from 'react';
 import AutoExpandTextarea from './AutoExpandTextarea';
 import { stringifyCompact } from '../lib/uiUtils';
 
@@ -31,7 +33,7 @@ function computeDisplayName(cmd) {
  * Ported from session_editor/commands.js renderCommands() (per-card portion)
  * + the #commandTemplate markup in index.html.
  */
-export default function CommandCard({
+const CommandCard = memo(function CommandCard({
     cmd,
     idx,
     isExpanded,
@@ -140,4 +142,7 @@ export default function CommandCard({
             </div>
         </div>
     );
-}
+});
+
+export default CommandCard;
+

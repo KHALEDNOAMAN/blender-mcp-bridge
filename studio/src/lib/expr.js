@@ -1,16 +1,61 @@
+// studio/src/lib/expr.js
+
 // Minimal arithmetic expression evaluator for parametric arg fields.
 // See docs/studio_design_v1.md §4.4. Grammar: numeric literals, ${name}
 // references, + - * / and parens only. Deliberately NOT eval()/Function() —
 // a small hand-written recursive-descent parser instead, so the grammar is
 // safe by construction rather than relying on sandboxing a real JS evaluator.
 //
+// floor/ceil/min/max function calls added to support for_each loop-bound
+// math (see lib/forEach.js) — ported from src/params.py's identical
+// addition. Trig/sqrt/abs added so a session can derive an angle from a
+// parameter (e.g. a chord-to-sweep asin) instead of baking in a literal.
+// Bare identifiers only tokenize as one of these literal
+// function names, NOT a generic \w+ pattern — a generic identifier token
+// would make ordinary strings like "Wall_Bed2-3_Center" look
+// expression-shaped to looksLikeExpression() (digits + a "-" + now-valid
+// identifier tokens = tokenizes cleanly) and wrongly route them into the
+// parser. See studio-expression-heuristic-false-positive memory: same
+// failure class, hit once already fixing looksLikeExpression() itself.
+//
 // Grammar (standard precedence, left-associative):
-//   expr   := term (("+" | "-") term)*
-//   term   := factor (("*" | "/") factor)*
-//   factor := NUMBER | PARAM | "(" expr ")" | ("-" factor)
-//   PARAM  := "${" NAME "}"
+//   expr     := term (("+" | "-") term)*
+//   term     := factor (("*" | "/") factor)*
+//   factor   := NUMBER | PARAM | FUNCCALL | "(" expr ")" | ("-" factor)
+//   funccall := FUNCNAME "(" expr ("," expr)* ")"
+//   PARAM    := "${" NAME "}"
+//   FUNCNAME := "floor" | "ceil" | "min" | "max" | "sin" | "cos"
+//             | "tan" | "asin" | "acos" | "atan" | "atan2" | "sqrt" | "abs"
 
-const TOKEN_RE = /\s*(\$\{[a-zA-Z_][a-zA-Z0-9_]*\}|\d+(?:\.\d+)?|[()+\-*/])/g;
+// Longest-first: the tokenizer alternates these literally, so "asin" must be
+// tried before "sin" or "asin(x)" tokenizes as the name "a" followed by "sin".
+const FUNC_NAMES = [
+    'floor', 'ceil', 'min', 'max',
+    'asin', 'acos', 'atan2', 'atan', 'sqrt', 'sin', 'cos', 'tan', 'abs',
+];
+// Trig works in DEGREES, matching every angle field in the tool surface
+// (rotation, start_deg/end_deg, ...). Keep in lockstep with src/params.py.
+const DEG = Math.PI / 180;
+const FUNCTIONS = {
+    floor: (...a) => Math.floor(a[0]),
+    ceil: (...a) => Math.ceil(a[0]),
+    min: (...a) => Math.min(...a),
+    max: (...a) => Math.max(...a),
+    sin: (...a) => Math.sin(a[0] * DEG),
+    cos: (...a) => Math.cos(a[0] * DEG),
+    tan: (...a) => Math.tan(a[0] * DEG),
+    asin: (...a) => Math.asin(a[0]) / DEG,
+    acos: (...a) => Math.acos(a[0]) / DEG,
+    atan: (...a) => Math.atan(a[0]) / DEG,
+    atan2: (...a) => Math.atan2(a[0], a[1]) / DEG,
+    sqrt: (...a) => Math.sqrt(a[0]),
+    abs: (...a) => Math.abs(a[0]),
+};
+
+const TOKEN_RE = new RegExp(
+    `\\s*(\\$\\{[a-zA-Z_][a-zA-Z0-9_]*\\}|${FUNC_NAMES.join('|')}|\\d+(?:\\.\\d+)?|[()+\\-*/,])`,
+    'g'
+);
 
 function tokenize(source) {
     const tokens = [];
@@ -124,6 +169,26 @@ class Parser {
         if (/^\d/.test(tok)) {
             this.next();
             return parseFloat(tok);
+        }
+        if (FUNC_NAMES.includes(tok)) {
+            this.next();
+            if (this.peek() !== '(') throw new Error(`Expected "(" after function name "${tok}"`);
+            this.next();
+            const args = [this.parseExpr()];
+            while (this.peek() === ',') {
+                this.next();
+                args.push(this.parseExpr());
+            }
+            if (this.next() !== ')') throw new Error('Expected closing ")"');
+            const result = FUNCTIONS[tok](...args);
+            // JS returns NaN rather than throwing for asin/acos outside
+            // [-1,1] and sqrt of a negative. Surface it as an error naming
+            // the offending call, matching src/params.py's ExpressionError,
+            // instead of letting NaN flow into a coordinate.
+            if (Number.isNaN(result) && !args.some(Number.isNaN)) {
+                throw new Error(`${tok}(${args.join(', ')}): argument out of domain`);
+            }
+            return result;
         }
         throw new Error(`Unexpected token: ${tok}`);
     }

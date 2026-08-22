@@ -1,0 +1,2034 @@
+{
+  "metadata": {
+    "name": "Rounded Stackable Storage Bin",
+    "model": "claude-opus-5",
+    "description": "3D-printable rounded stackable parametric storage bin. Rounded-rectangle body with a 45-degree top rim funnel (female receiver) and a 45-degree self-supporting foot taper (male) sized so a bin wedges into the one below and self-centres. The exterior wall is flat: proud ribs were removed because a rib underside is an unsupported overhang -- use slicer fuzzy skin for exterior texture instead. Both tapers use inset_faces, so their corners mitre themselves cleanly on the rounded outline. Fully parametric: bin_width, bin_depth, bin_height, bin_wall, bin_radius, bin_rim_chamfer, bin_foot_chamfer, bin_rib_height, bin_hole_size and per-band vent flags bin_holes_1..3."
+  },
+  "commands": [
+    {
+      "tool": "set_scene_units",
+      "arguments": {
+        "system": "METRIC",
+        "length_unit": "MILLIMETERS",
+        "scale": 0.001
+      },
+      "description": "[BRANCH stackable_bin] [SHARED PREFIX] Set scene to millimeters."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "*"
+      },
+      "description": "[BRANCH stackable_bin] [SHARED PREFIX] Wipe scene."
+    },
+    {
+      "tool": "create_curve",
+      "arguments": {
+        "name": "Bin_Main",
+        "segments": [
+          {
+            "type": "line",
+            "points": [
+              [
+                "(0 + ${bin_radius}) + 0",
+                "(0) + 0"
+              ],
+              [
+                "(0 + ${bin_width} - ${bin_radius}) + 0",
+                "(0) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "(0 + ${bin_width} - ${bin_radius}) + 0",
+              "(0 + ${bin_radius}) + 0"
+            ],
+            "radius": "(${bin_radius}) + 0",
+            "start_deg": -90,
+            "end_deg": 0
+          },
+          {
+            "type": "line",
+            "points": [
+              [
+                "(0 + ${bin_width}) + 0",
+                "(0 + ${bin_radius}) + 0"
+              ],
+              [
+                "(0 + ${bin_width}) + 0",
+                "(0 + ${bin_depth} - ${bin_radius}) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "(0 + ${bin_width} - ${bin_radius}) + 0",
+              "(0 + ${bin_depth} - ${bin_radius}) + 0"
+            ],
+            "radius": "(${bin_radius}) + 0",
+            "start_deg": 0,
+            "end_deg": 90
+          },
+          {
+            "type": "line",
+            "points": [
+              [
+                "(0 + ${bin_width} - ${bin_radius}) + 0",
+                "(0 + ${bin_depth}) + 0"
+              ],
+              [
+                "(0 + ${bin_radius}) + 0",
+                "(0 + ${bin_depth}) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "(0 + ${bin_radius}) + 0",
+              "(0 + ${bin_depth} - ${bin_radius}) + 0"
+            ],
+            "radius": "(${bin_radius}) + 0",
+            "start_deg": 90,
+            "end_deg": 180
+          },
+          {
+            "type": "line",
+            "points": [
+              [
+                "(0) + 0",
+                "(0 + ${bin_depth} - ${bin_radius}) + 0"
+              ],
+              [
+                "(0) + 0",
+                "(0 + ${bin_radius}) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "(0 + ${bin_radius}) + 0",
+              "(0 + ${bin_radius}) + 0"
+            ],
+            "radius": "(${bin_radius}) + 0",
+            "start_deg": 180,
+            "end_deg": 270
+          }
+        ],
+        "cyclic": true,
+        "dimensions": "2D",
+        "fill_mode": "BOTH",
+        "extrude": "(${bin_height} - ${bin_foot_chamfer}) + 0",
+        "resolution_u": 12,
+        "location": [
+          0,
+          0,
+          "(${bin_foot_chamfer}) + 0"
+        ]
+      },
+      "description": "[BRANCH stackable_bin] Step 1: rounded-rectangle body (true arc corners)."
+    },
+    {
+      "tool": "convert_to_mesh",
+      "arguments": {
+        "object_name": "Bin_Main"
+      },
+      "description": "[BRANCH stackable_bin] Mesh Bin_Main."
+    },
+    {
+      "tool": "inset_faces",
+      "arguments": {
+        "object_name": "Bin_Main",
+        "thickness": "(${bin_rim_chamfer}) + 0",
+        "depth": "(0 - ${bin_rim_chamfer}) + 0",
+        "filter_normal": [
+          0,
+          0,
+          1
+        ],
+        "angle_threshold": 0.3
+      },
+      "description": "[BRANCH stackable_bin] Step 2: top rim 45-degree funnel (corners self-mitre)."
+    },
+    {
+      "tool": "inset_faces",
+      "arguments": {
+        "object_name": "Bin_Main",
+        "thickness": "(${bin_foot_chamfer}) + 0",
+        "depth": "(${bin_foot_chamfer}) + 0",
+        "filter_normal": [
+          0,
+          0,
+          -1
+        ],
+        "angle_threshold": 0.3
+      },
+      "description": "[BRANCH stackable_bin] Step 3: bottom foot 45-degree taper (male, self-supporting)."
+    },
+    {
+      "tool": "for_each",
+      "arguments": {
+        "var": "zone_0",
+        "start": "1",
+        "end": "(${bin_holes_1}) + 0",
+        "step": "1"
+      },
+      "body": [
+        {
+          "tool": "for_each",
+          "arguments": {
+            "var": "hr_0",
+            "start": "0",
+            "end": "(floor(((((${bin_height}) * 0.5 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.25 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+            "step": "1"
+          },
+          "body": [
+            {
+              "tool": "for_each",
+              "arguments": {
+                "var": "hx_0",
+                "start": "0",
+                "end": "(floor(((${bin_width}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+                "step": "1"
+              },
+              "body": [
+                {
+                  "tool": "create_cube",
+                  "arguments": {
+                    "name": "C_HoleX_0_${hr_0}_${hx_0}",
+                    "location": [
+                      "((((${bin_width}) - ((floor(((${bin_width}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_width}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hx_0} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0",
+                      "((${bin_depth}) / 2) + 0",
+                      "(((${bin_height}) * 0.25 + (${bin_rib_height}) / 2) + (((((${bin_height}) * 0.5 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.25 + (${bin_rib_height}) / 2)) - ((floor(((((${bin_height}) * 0.5 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.25 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((((${bin_height}) * 0.5 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.25 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hr_0} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0"
+                    ],
+                    "dimensions": [
+                      "(${bin_hole_size}) + 0",
+                      "(${bin_depth} + 40) + 0",
+                      "(${bin_hole_size}) + 0"
+                    ]
+                  },
+                  "description": "[BRANCH stackable_bin] Vent hole zone 0 front/back."
+                },
+                {
+                  "tool": "boolean_operation",
+                  "arguments": {
+                    "object_a": "Bin_Main",
+                    "object_b": "C_HoleX_0_${hr_0}_${hx_0}",
+                    "operation": "DIFFERENCE"
+                  },
+                  "description": "[BRANCH stackable_bin] Cut front/back vent."
+                },
+                {
+                  "tool": "apply_all_modifiers",
+                  "arguments": {
+                    "object_name": "Bin_Main"
+                  },
+                  "description": "[BRANCH stackable_bin] Bake front/back vent."
+                }
+              ]
+            },
+            {
+              "tool": "for_each",
+              "arguments": {
+                "var": "hy_0",
+                "start": "0",
+                "end": "(floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+                "step": "1"
+              },
+              "body": [
+                {
+                  "tool": "for_each",
+                  "arguments": {
+                    "var": "keep_0_hy_0",
+                    "start": "1",
+                    "end": "(max(ceil(min(1, max(0, (max(((((${bin_depth}) - ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hy_0} * ((${bin_hole_size}) + (${bin_hole_gap}))) - (((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))), 0 - (((((${bin_depth}) - ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hy_0} * ((${bin_hole_size}) + (${bin_hole_gap}))) - (((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88)))))) - ((((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 + (${bin_rail_width})) + (${bin_hole_size}) / 2)))), 1 - (ceil(min(1, max(0, ${bin_divider_frac})))))) + 0",
+                    "step": "1"
+                  },
+                  "body": [
+                    {
+                      "tool": "create_cube",
+                      "arguments": {
+                        "name": "C_HoleY_0_${hr_0}_${hy_0}",
+                        "location": [
+                          "((${bin_width}) / 2) + 0",
+                          "((((${bin_depth}) - ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hy_0} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0",
+                          "(((${bin_height}) * 0.25 + (${bin_rib_height}) / 2) + (((((${bin_height}) * 0.5 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.25 + (${bin_rib_height}) / 2)) - ((floor(((((${bin_height}) * 0.5 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.25 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((((${bin_height}) * 0.5 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.25 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hr_0} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0"
+                        ],
+                        "dimensions": [
+                          "(${bin_width} + 40) + 0",
+                          "(${bin_hole_size}) + 0",
+                          "(${bin_hole_size}) + 0"
+                        ]
+                      },
+                      "description": "[BRANCH stackable_bin] Vent hole zone 0 left/right."
+                    },
+                    {
+                      "tool": "boolean_operation",
+                      "arguments": {
+                        "object_a": "Bin_Main",
+                        "object_b": "C_HoleY_0_${hr_0}_${hy_0}",
+                        "operation": "DIFFERENCE"
+                      },
+                      "description": "[BRANCH stackable_bin] Cut left/right vent."
+                    },
+                    {
+                      "tool": "apply_all_modifiers",
+                      "arguments": {
+                        "object_name": "Bin_Main"
+                      },
+                      "description": "[BRANCH stackable_bin] Bake left/right vent."
+                    }
+                  ],
+                  "description": "[BRANCH stackable_bin] Skip vent under the divider rail."
+                }
+              ]
+            }
+          ],
+          "description": "[BRANCH stackable_bin] Vent hole rows, zone 0."
+        }
+      ],
+      "description": "[BRANCH stackable_bin] Vent-hole zone 0 gate (flag=${bin_holes_1})."
+    },
+    {
+      "tool": "for_each",
+      "arguments": {
+        "var": "zone_1",
+        "start": "1",
+        "end": "(${bin_holes_2}) + 0",
+        "step": "1"
+      },
+      "body": [
+        {
+          "tool": "for_each",
+          "arguments": {
+            "var": "hr_1",
+            "start": "0",
+            "end": "(floor(((((${bin_height}) * 0.75 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.5 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+            "step": "1"
+          },
+          "body": [
+            {
+              "tool": "for_each",
+              "arguments": {
+                "var": "hx_1",
+                "start": "0",
+                "end": "(floor(((${bin_width}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+                "step": "1"
+              },
+              "body": [
+                {
+                  "tool": "create_cube",
+                  "arguments": {
+                    "name": "C_HoleX_1_${hr_1}_${hx_1}",
+                    "location": [
+                      "((((${bin_width}) - ((floor(((${bin_width}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_width}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hx_1} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0",
+                      "((${bin_depth}) / 2) + 0",
+                      "(((${bin_height}) * 0.5 + (${bin_rib_height}) / 2) + (((((${bin_height}) * 0.75 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.5 + (${bin_rib_height}) / 2)) - ((floor(((((${bin_height}) * 0.75 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.5 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((((${bin_height}) * 0.75 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.5 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hr_1} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0"
+                    ],
+                    "dimensions": [
+                      "(${bin_hole_size}) + 0",
+                      "(${bin_depth} + 40) + 0",
+                      "(${bin_hole_size}) + 0"
+                    ]
+                  },
+                  "description": "[BRANCH stackable_bin] Vent hole zone 1 front/back."
+                },
+                {
+                  "tool": "boolean_operation",
+                  "arguments": {
+                    "object_a": "Bin_Main",
+                    "object_b": "C_HoleX_1_${hr_1}_${hx_1}",
+                    "operation": "DIFFERENCE"
+                  },
+                  "description": "[BRANCH stackable_bin] Cut front/back vent."
+                },
+                {
+                  "tool": "apply_all_modifiers",
+                  "arguments": {
+                    "object_name": "Bin_Main"
+                  },
+                  "description": "[BRANCH stackable_bin] Bake front/back vent."
+                }
+              ]
+            },
+            {
+              "tool": "for_each",
+              "arguments": {
+                "var": "hy_1",
+                "start": "0",
+                "end": "(floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+                "step": "1"
+              },
+              "body": [
+                {
+                  "tool": "for_each",
+                  "arguments": {
+                    "var": "keep_1_hy_1",
+                    "start": "1",
+                    "end": "(max(ceil(min(1, max(0, (max(((((${bin_depth}) - ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hy_1} * ((${bin_hole_size}) + (${bin_hole_gap}))) - (((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))), 0 - (((((${bin_depth}) - ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hy_1} * ((${bin_hole_size}) + (${bin_hole_gap}))) - (((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88)))))) - ((((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 + (${bin_rail_width})) + (${bin_hole_size}) / 2)))), 1 - (ceil(min(1, max(0, ${bin_divider_frac})))))) + 0",
+                    "step": "1"
+                  },
+                  "body": [
+                    {
+                      "tool": "create_cube",
+                      "arguments": {
+                        "name": "C_HoleY_1_${hr_1}_${hy_1}",
+                        "location": [
+                          "((${bin_width}) / 2) + 0",
+                          "((((${bin_depth}) - ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hy_1} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0",
+                          "(((${bin_height}) * 0.5 + (${bin_rib_height}) / 2) + (((((${bin_height}) * 0.75 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.5 + (${bin_rib_height}) / 2)) - ((floor(((((${bin_height}) * 0.75 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.5 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((((${bin_height}) * 0.75 - (${bin_rib_height}) / 2) - ((${bin_height}) * 0.5 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hr_1} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0"
+                        ],
+                        "dimensions": [
+                          "(${bin_width} + 40) + 0",
+                          "(${bin_hole_size}) + 0",
+                          "(${bin_hole_size}) + 0"
+                        ]
+                      },
+                      "description": "[BRANCH stackable_bin] Vent hole zone 1 left/right."
+                    },
+                    {
+                      "tool": "boolean_operation",
+                      "arguments": {
+                        "object_a": "Bin_Main",
+                        "object_b": "C_HoleY_1_${hr_1}_${hy_1}",
+                        "operation": "DIFFERENCE"
+                      },
+                      "description": "[BRANCH stackable_bin] Cut left/right vent."
+                    },
+                    {
+                      "tool": "apply_all_modifiers",
+                      "arguments": {
+                        "object_name": "Bin_Main"
+                      },
+                      "description": "[BRANCH stackable_bin] Bake left/right vent."
+                    }
+                  ],
+                  "description": "[BRANCH stackable_bin] Skip vent under the divider rail."
+                }
+              ]
+            }
+          ],
+          "description": "[BRANCH stackable_bin] Vent hole rows, zone 1."
+        }
+      ],
+      "description": "[BRANCH stackable_bin] Vent-hole zone 1 gate (flag=${bin_holes_2})."
+    },
+    {
+      "tool": "for_each",
+      "arguments": {
+        "var": "zone_2",
+        "start": "1",
+        "end": "(${bin_holes_3}) + 0",
+        "step": "1"
+      },
+      "body": [
+        {
+          "tool": "for_each",
+          "arguments": {
+            "var": "hr_2",
+            "start": "0",
+            "end": "(floor(((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_height}) * 0.75 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+            "step": "1"
+          },
+          "body": [
+            {
+              "tool": "for_each",
+              "arguments": {
+                "var": "hx_2",
+                "start": "0",
+                "end": "(floor(((${bin_width}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+                "step": "1"
+              },
+              "body": [
+                {
+                  "tool": "create_cube",
+                  "arguments": {
+                    "name": "C_HoleX_2_${hr_2}_${hx_2}",
+                    "location": [
+                      "((((${bin_width}) - ((floor(((${bin_width}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_width}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hx_2} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0",
+                      "((${bin_depth}) / 2) + 0",
+                      "(((${bin_height}) * 0.75 + (${bin_rib_height}) / 2) + (((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_height}) * 0.75 + (${bin_rib_height}) / 2)) - ((floor(((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_height}) * 0.75 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_height}) * 0.75 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hr_2} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0"
+                    ],
+                    "dimensions": [
+                      "(${bin_hole_size}) + 0",
+                      "(${bin_depth} + 40) + 0",
+                      "(${bin_hole_size}) + 0"
+                    ]
+                  },
+                  "description": "[BRANCH stackable_bin] Vent hole zone 2 front/back."
+                },
+                {
+                  "tool": "boolean_operation",
+                  "arguments": {
+                    "object_a": "Bin_Main",
+                    "object_b": "C_HoleX_2_${hr_2}_${hx_2}",
+                    "operation": "DIFFERENCE"
+                  },
+                  "description": "[BRANCH stackable_bin] Cut front/back vent."
+                },
+                {
+                  "tool": "apply_all_modifiers",
+                  "arguments": {
+                    "object_name": "Bin_Main"
+                  },
+                  "description": "[BRANCH stackable_bin] Bake front/back vent."
+                }
+              ]
+            },
+            {
+              "tool": "for_each",
+              "arguments": {
+                "var": "hy_2",
+                "start": "0",
+                "end": "(floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+                "step": "1"
+              },
+              "body": [
+                {
+                  "tool": "for_each",
+                  "arguments": {
+                    "var": "keep_2_hy_2",
+                    "start": "1",
+                    "end": "(max(ceil(min(1, max(0, (max(((((${bin_depth}) - ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hy_2} * ((${bin_hole_size}) + (${bin_hole_gap}))) - (((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))), 0 - (((((${bin_depth}) - ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hy_2} * ((${bin_hole_size}) + (${bin_hole_gap}))) - (((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88)))))) - ((((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 + (${bin_rail_width})) + (${bin_hole_size}) / 2)))), 1 - (ceil(min(1, max(0, ${bin_divider_frac})))))) + 0",
+                    "step": "1"
+                  },
+                  "body": [
+                    {
+                      "tool": "create_cube",
+                      "arguments": {
+                        "name": "C_HoleY_2_${hr_2}_${hy_2}",
+                        "location": [
+                          "((${bin_width}) / 2) + 0",
+                          "((((${bin_depth}) - ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((${bin_depth}) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hy_2} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0",
+                          "(((${bin_height}) * 0.75 + (${bin_rib_height}) / 2) + (((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_height}) * 0.75 + (${bin_rib_height}) / 2)) - ((floor(((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_height}) * 0.75 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_height}) * 0.75 + (${bin_rib_height}) / 2)) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${hr_2} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0"
+                        ],
+                        "dimensions": [
+                          "(${bin_width} + 40) + 0",
+                          "(${bin_hole_size}) + 0",
+                          "(${bin_hole_size}) + 0"
+                        ]
+                      },
+                      "description": "[BRANCH stackable_bin] Vent hole zone 2 left/right."
+                    },
+                    {
+                      "tool": "boolean_operation",
+                      "arguments": {
+                        "object_a": "Bin_Main",
+                        "object_b": "C_HoleY_2_${hr_2}_${hy_2}",
+                        "operation": "DIFFERENCE"
+                      },
+                      "description": "[BRANCH stackable_bin] Cut left/right vent."
+                    },
+                    {
+                      "tool": "apply_all_modifiers",
+                      "arguments": {
+                        "object_name": "Bin_Main"
+                      },
+                      "description": "[BRANCH stackable_bin] Bake left/right vent."
+                    }
+                  ],
+                  "description": "[BRANCH stackable_bin] Skip vent under the divider rail."
+                }
+              ]
+            }
+          ],
+          "description": "[BRANCH stackable_bin] Vent hole rows, zone 2."
+        }
+      ],
+      "description": "[BRANCH stackable_bin] Vent-hole zone 2 gate (flag=${bin_holes_3})."
+    },
+    {
+      "tool": "create_curve",
+      "arguments": {
+        "name": "C_Cavity",
+        "segments": [
+          {
+            "type": "line",
+            "points": [
+              [
+                "((${bin_wall}) + 0 + (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+                "((${bin_wall}) + 0) + 0"
+              ],
+              [
+                "((${bin_wall}) + 0 + (${bin_width} - 2 * ${bin_wall}) + 0 - (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+                "((${bin_wall}) + 0) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "((${bin_wall}) + 0 + (${bin_width} - 2 * ${bin_wall}) + 0 - (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+              "((${bin_wall}) + 0 + (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0"
+            ],
+            "radius": "((max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+            "start_deg": -90,
+            "end_deg": 0
+          },
+          {
+            "type": "line",
+            "points": [
+              [
+                "((${bin_wall}) + 0 + (${bin_width} - 2 * ${bin_wall}) + 0) + 0",
+                "((${bin_wall}) + 0 + (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0"
+              ],
+              [
+                "((${bin_wall}) + 0 + (${bin_width} - 2 * ${bin_wall}) + 0) + 0",
+                "((${bin_wall}) + 0 + (${bin_depth} - 2 * ${bin_wall}) + 0 - (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "((${bin_wall}) + 0 + (${bin_width} - 2 * ${bin_wall}) + 0 - (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+              "((${bin_wall}) + 0 + (${bin_depth} - 2 * ${bin_wall}) + 0 - (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0"
+            ],
+            "radius": "((max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+            "start_deg": 0,
+            "end_deg": 90
+          },
+          {
+            "type": "line",
+            "points": [
+              [
+                "((${bin_wall}) + 0 + (${bin_width} - 2 * ${bin_wall}) + 0 - (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+                "((${bin_wall}) + 0 + (${bin_depth} - 2 * ${bin_wall}) + 0) + 0"
+              ],
+              [
+                "((${bin_wall}) + 0 + (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+                "((${bin_wall}) + 0 + (${bin_depth} - 2 * ${bin_wall}) + 0) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "((${bin_wall}) + 0 + (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+              "((${bin_wall}) + 0 + (${bin_depth} - 2 * ${bin_wall}) + 0 - (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0"
+            ],
+            "radius": "((max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+            "start_deg": 90,
+            "end_deg": 180
+          },
+          {
+            "type": "line",
+            "points": [
+              [
+                "((${bin_wall}) + 0) + 0",
+                "((${bin_wall}) + 0 + (${bin_depth} - 2 * ${bin_wall}) + 0 - (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0"
+              ],
+              [
+                "((${bin_wall}) + 0) + 0",
+                "((${bin_wall}) + 0 + (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "((${bin_wall}) + 0 + (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+              "((${bin_wall}) + 0 + (max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0"
+            ],
+            "radius": "((max(${bin_radius} - ${bin_wall}, 0.5)) + 0) + 0",
+            "start_deg": 180,
+            "end_deg": 270
+          }
+        ],
+        "cyclic": true,
+        "dimensions": "2D",
+        "fill_mode": "BOTH",
+        "extrude": "(${bin_height}) + 0",
+        "resolution_u": 12,
+        "location": [
+          0,
+          0,
+          "(${bin_foot_chamfer} + ${bin_wall}) + 0"
+        ]
+      },
+      "description": "[BRANCH stackable_bin] Step 5: rounded interior cavity (overshoots +z to open the top)."
+    },
+    {
+      "tool": "convert_to_mesh",
+      "arguments": {
+        "object_name": "C_Cavity"
+      },
+      "description": "[BRANCH stackable_bin] Mesh C_Cavity."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Bin_Main",
+        "object_b": "C_Cavity",
+        "operation": "DIFFERENCE"
+      },
+      "description": "[BRANCH stackable_bin] Carve interior cavity."
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "Bin_Main"
+      },
+      "description": "[BRANCH stackable_bin] Bake cavity."
+    },
+    {
+      "tool": "for_each",
+      "arguments": {
+        "var": "dv",
+        "start": "1",
+        "end": "(ceil(min(1, max(0, ${bin_divider_frac})))) + 0",
+        "step": "1"
+      },
+      "body": [
+        {
+          "tool": "create_polygon",
+          "arguments": {
+            "name": "B_RailLA",
+            "vertices": [
+              [
+                "(((${bin_wall})) - (0.5)) + 0",
+                "(((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) - ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 - (${bin_rail_width})) - (${bin_rail_ramp})) + 0"
+              ],
+              [
+                "(((${bin_wall})) + (${bin_rail_proud})) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) - ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 - (${bin_rail_width})) + 0"
+              ],
+              [
+                "(((${bin_wall})) + (${bin_rail_proud})) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) - ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2) + 0"
+              ],
+              [
+                "(((${bin_wall})) - (0.5)) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) - ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2) + 0"
+              ]
+            ],
+            "location": [
+              0,
+              0,
+              "((${bin_foot_chamfer}) + (${bin_wall})) + 0"
+            ],
+            "extrude": "(((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_foot_chamfer}) + (${bin_wall})) - (${bin_sep_lid_gap}) - (${bin_lid_skirt})) + 0"
+          },
+          "description": "[BRANCH stackable_bin] Tapered divider rail LA."
+        },
+        {
+          "tool": "boolean_operation",
+          "arguments": {
+            "object_a": "Bin_Main",
+            "object_b": "B_RailLA",
+            "operation": "UNION"
+          },
+          "description": "[BRANCH stackable_bin] Weld rail LA."
+        },
+        {
+          "tool": "apply_all_modifiers",
+          "arguments": {
+            "object_name": "Bin_Main"
+          },
+          "description": "[BRANCH stackable_bin] Bake rail LA."
+        },
+        {
+          "tool": "create_polygon",
+          "arguments": {
+            "name": "B_RailLB",
+            "vertices": [
+              [
+                "(((${bin_wall})) - (0.5)) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) + ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2) + 0"
+              ],
+              [
+                "(((${bin_wall})) + (${bin_rail_proud})) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) + ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2) + 0"
+              ],
+              [
+                "(((${bin_wall})) + (${bin_rail_proud})) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) + ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 + (${bin_rail_width})) + 0"
+              ],
+              [
+                "(((${bin_wall})) - (0.5)) + 0",
+                "(((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) + ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 + (${bin_rail_width})) + (${bin_rail_ramp})) + 0"
+              ]
+            ],
+            "location": [
+              0,
+              0,
+              "((${bin_foot_chamfer}) + (${bin_wall})) + 0"
+            ],
+            "extrude": "(((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_foot_chamfer}) + (${bin_wall})) - (${bin_sep_lid_gap}) - (${bin_lid_skirt})) + 0"
+          },
+          "description": "[BRANCH stackable_bin] Tapered divider rail LB."
+        },
+        {
+          "tool": "boolean_operation",
+          "arguments": {
+            "object_a": "Bin_Main",
+            "object_b": "B_RailLB",
+            "operation": "UNION"
+          },
+          "description": "[BRANCH stackable_bin] Weld rail LB."
+        },
+        {
+          "tool": "apply_all_modifiers",
+          "arguments": {
+            "object_name": "Bin_Main"
+          },
+          "description": "[BRANCH stackable_bin] Bake rail LB."
+        },
+        {
+          "tool": "create_polygon",
+          "arguments": {
+            "name": "B_RailRA",
+            "vertices": [
+              [
+                "(((${bin_width}) - (${bin_wall})) + (0.5)) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) - ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2) + 0"
+              ],
+              [
+                "(((${bin_width}) - (${bin_wall})) - (${bin_rail_proud})) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) - ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2) + 0"
+              ],
+              [
+                "(((${bin_width}) - (${bin_wall})) - (${bin_rail_proud})) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) - ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 - (${bin_rail_width})) + 0"
+              ],
+              [
+                "(((${bin_width}) - (${bin_wall})) + (0.5)) + 0",
+                "(((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) - ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 - (${bin_rail_width})) - (${bin_rail_ramp})) + 0"
+              ]
+            ],
+            "location": [
+              0,
+              0,
+              "((${bin_foot_chamfer}) + (${bin_wall})) + 0"
+            ],
+            "extrude": "(((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_foot_chamfer}) + (${bin_wall})) - (${bin_sep_lid_gap}) - (${bin_lid_skirt})) + 0"
+          },
+          "description": "[BRANCH stackable_bin] Tapered divider rail RA."
+        },
+        {
+          "tool": "boolean_operation",
+          "arguments": {
+            "object_a": "Bin_Main",
+            "object_b": "B_RailRA",
+            "operation": "UNION"
+          },
+          "description": "[BRANCH stackable_bin] Weld rail RA."
+        },
+        {
+          "tool": "apply_all_modifiers",
+          "arguments": {
+            "object_name": "Bin_Main"
+          },
+          "description": "[BRANCH stackable_bin] Bake rail RA."
+        },
+        {
+          "tool": "create_polygon",
+          "arguments": {
+            "name": "B_RailRB",
+            "vertices": [
+              [
+                "(((${bin_width}) - (${bin_wall})) + (0.5)) + 0",
+                "(((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) + ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 + (${bin_rail_width})) + (${bin_rail_ramp})) + 0"
+              ],
+              [
+                "(((${bin_width}) - (${bin_wall})) - (${bin_rail_proud})) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) + ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2 + (${bin_rail_width})) + 0"
+              ],
+              [
+                "(((${bin_width}) - (${bin_wall})) - (${bin_rail_proud})) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) + ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2) + 0"
+              ],
+              [
+                "(((${bin_width}) - (${bin_wall})) + (0.5)) + 0",
+                "((((${bin_wall})) + (((${bin_depth}) - (${bin_wall})) - ((${bin_wall}))) * (min(max(${bin_divider_frac}, 0.12), 0.88))) + ((${bin_sep_thickness}) + (${bin_sep_clearance})) / 2) + 0"
+              ]
+            ],
+            "location": [
+              0,
+              0,
+              "((${bin_foot_chamfer}) + (${bin_wall})) + 0"
+            ],
+            "extrude": "(((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_foot_chamfer}) + (${bin_wall})) - (${bin_sep_lid_gap}) - (${bin_lid_skirt})) + 0"
+          },
+          "description": "[BRANCH stackable_bin] Tapered divider rail RB."
+        },
+        {
+          "tool": "boolean_operation",
+          "arguments": {
+            "object_a": "Bin_Main",
+            "object_b": "B_RailRB",
+            "operation": "UNION"
+          },
+          "description": "[BRANCH stackable_bin] Weld rail RB."
+        },
+        {
+          "tool": "apply_all_modifiers",
+          "arguments": {
+            "object_name": "Bin_Main"
+          },
+          "description": "[BRANCH stackable_bin] Bake rail RB."
+        }
+      ],
+      "description": "[BRANCH stackable_bin] Divider rail gate (bin_divider)."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "C_*"
+      },
+      "description": "[BRANCH stackable_bin] Delete temporary cutters."
+    },
+    {
+      "tool": "repair_mesh",
+      "arguments": {
+        "object_name": "Bin_Main"
+      },
+      "description": "[BRANCH stackable_bin] Remove doubles and recalculate normals."
+    },
+    {
+      "tool": "check_mesh_for_printing",
+      "arguments": {
+        "object_name": "Bin_Main"
+      },
+      "description": "[BRANCH stackable_bin] Watertight manifold check."
+    },
+    {
+      "tool": "export_model",
+      "arguments": {
+        "filepath": "../community/stackable_bin/assets/stackable_bin.stl",
+        "format": "STL",
+        "object_name": "Bin_Main"
+      },
+      "description": "[BRANCH stackable_bin] *** END OF bin_stackable_bin *** Export rounded stackable bin."
+    },
+    {
+      "tool": "create_cube",
+      "arguments": {
+        "name": "Separator",
+        "location": [
+          "((${bin_width}) / 2) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "((${bin_sep_thickness}) / 2) + 0"
+        ],
+        "dimensions": [
+          "(((${bin_width}) - (${bin_wall})) - ((${bin_wall})) - (${bin_sep_clearance})) + 0",
+          "(((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_foot_chamfer}) + (${bin_wall})) - (${bin_sep_lid_gap}) - (${bin_lid_skirt})) + 0",
+          "(${bin_sep_thickness}) + 0"
+        ]
+      },
+      "description": "[BRANCH stackable_bin] Separator plate blank (lies flat for printing)."
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "Separator"
+      },
+      "description": "[BRANCH stackable_bin] Bake blank."
+    },
+    {
+      "tool": "for_each",
+      "arguments": {
+        "var": "sep_v",
+        "start": "1",
+        "end": "(${bin_sep_holes}) + 0",
+        "step": "1"
+      },
+      "body": [
+        {
+          "tool": "for_each",
+          "arguments": {
+            "var": "sr",
+            "start": "0",
+            "end": "(floor(((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_foot_chamfer}) + (${bin_wall})) - (${bin_sep_lid_gap}) - (${bin_lid_skirt})) - 2 * (${bin_sep_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+            "step": "1"
+          },
+          "body": [
+            {
+              "tool": "for_each",
+              "arguments": {
+                "var": "sc",
+                "start": "0",
+                "end": "(floor(((((${bin_width}) - (${bin_wall})) - ((${bin_wall})) - (${bin_sep_clearance})) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1",
+                "step": "1"
+              },
+              "body": [
+                {
+                  "tool": "create_cube",
+                  "arguments": {
+                    "name": "C_SepHole_${sr}_${sc}",
+                    "location": [
+                      "(((${bin_width}) / 2 - (((${bin_width}) - (${bin_wall})) - ((${bin_wall})) - (${bin_sep_clearance})) / 2) + (((((${bin_width}) - (${bin_wall})) - ((${bin_wall})) - (${bin_sep_clearance})) - ((floor(((((${bin_width}) - (${bin_wall})) - ((${bin_wall})) - (${bin_sep_clearance})) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((((${bin_width}) - (${bin_wall})) - ((${bin_wall})) - (${bin_sep_clearance})) - 2 * (${bin_hole_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${sc} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0",
+                      "(((${bin_depth}) / 2 - (((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_foot_chamfer}) + (${bin_wall})) - (${bin_sep_lid_gap}) - (${bin_lid_skirt})) / 2) + (((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_foot_chamfer}) + (${bin_wall})) - (${bin_sep_lid_gap}) - (${bin_lid_skirt})) - ((floor(((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_foot_chamfer}) + (${bin_wall})) - (${bin_sep_lid_gap}) - (${bin_lid_skirt})) - 2 * (${bin_sep_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) * (${bin_hole_size}) + ((floor(((((${bin_height}) - (${bin_rim_chamfer})) - ((${bin_foot_chamfer}) + (${bin_wall})) - (${bin_sep_lid_gap}) - (${bin_lid_skirt})) - 2 * (${bin_sep_margin}) + (${bin_hole_gap})) / ((${bin_hole_size}) + (${bin_hole_gap})))) - 1) * (${bin_hole_gap}))) / 2) + (${bin_hole_size}) / 2 + ${sr} * ((${bin_hole_size}) + (${bin_hole_gap}))) + 0",
+                      "((${bin_sep_thickness}) / 2) + 0"
+                    ],
+                    "dimensions": [
+                      "(${bin_hole_size}) + 0",
+                      "(${bin_hole_size}) + 0",
+                      "((${bin_sep_thickness}) + 10) + 0"
+                    ]
+                  },
+                  "description": "[BRANCH separator] Vent hole ${sr}/${sc}."
+                },
+                {
+                  "tool": "boolean_operation",
+                  "arguments": {
+                    "object_a": "Separator",
+                    "object_b": "C_SepHole_${sr}_${sc}",
+                    "operation": "DIFFERENCE"
+                  },
+                  "description": "[BRANCH separator] Cut vent ${sr}/${sc}."
+                },
+                {
+                  "tool": "apply_all_modifiers",
+                  "arguments": {
+                    "object_name": "Separator"
+                  },
+                  "description": "[BRANCH separator] Bake vent ${sr}/${sc}."
+                }
+              ]
+            }
+          ],
+          "description": "[BRANCH separator] Vent hole grid."
+        }
+      ],
+      "description": "[BRANCH separator] Vent gate (bin_sep_holes)."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "C_*"
+      },
+      "description": "[BRANCH stackable_bin] Delete separator cutters."
+    },
+    {
+      "tool": "repair_mesh",
+      "arguments": {
+        "object_name": "Separator"
+      },
+      "description": "[BRANCH stackable_bin] Remove doubles and recalculate normals."
+    },
+    {
+      "tool": "check_mesh_for_printing",
+      "arguments": {
+        "object_name": "Separator"
+      },
+      "description": "[BRANCH stackable_bin] Watertight manifold check."
+    },
+    {
+      "tool": "export_model",
+      "arguments": {
+        "filepath": "../community/stackable_bin/assets/stackable_bin_separator.stl",
+        "format": "STL",
+        "object_name": "Separator"
+      },
+      "description": "[BRANCH stackable_bin] *** END OF separator *** Export separator plate."
+    },
+    {
+      "tool": "create_curve",
+      "arguments": {
+        "name": "Lid",
+        "segments": [
+          {
+            "type": "line",
+            "points": [
+              [
+                "(((${bin_lid_clearance}) / 2) + 0 + (${bin_radius}) + 0) + 0",
+                "(((${bin_lid_clearance}) / 2) + 0) + 0"
+              ],
+              [
+                "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_width}) - (${bin_lid_clearance})) + 0 - (${bin_radius}) + 0) + 0",
+                "(((${bin_lid_clearance}) / 2) + 0) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_width}) - (${bin_lid_clearance})) + 0 - (${bin_radius}) + 0) + 0",
+              "(((${bin_lid_clearance}) / 2) + 0 + (${bin_radius}) + 0) + 0"
+            ],
+            "radius": "((${bin_radius}) + 0) + 0",
+            "start_deg": -90,
+            "end_deg": 0
+          },
+          {
+            "type": "line",
+            "points": [
+              [
+                "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_width}) - (${bin_lid_clearance})) + 0) + 0",
+                "(((${bin_lid_clearance}) / 2) + 0 + (${bin_radius}) + 0) + 0"
+              ],
+              [
+                "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_width}) - (${bin_lid_clearance})) + 0) + 0",
+                "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_depth}) - (${bin_lid_clearance})) + 0 - (${bin_radius}) + 0) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_width}) - (${bin_lid_clearance})) + 0 - (${bin_radius}) + 0) + 0",
+              "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_depth}) - (${bin_lid_clearance})) + 0 - (${bin_radius}) + 0) + 0"
+            ],
+            "radius": "((${bin_radius}) + 0) + 0",
+            "start_deg": 0,
+            "end_deg": 90
+          },
+          {
+            "type": "line",
+            "points": [
+              [
+                "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_width}) - (${bin_lid_clearance})) + 0 - (${bin_radius}) + 0) + 0",
+                "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_depth}) - (${bin_lid_clearance})) + 0) + 0"
+              ],
+              [
+                "(((${bin_lid_clearance}) / 2) + 0 + (${bin_radius}) + 0) + 0",
+                "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_depth}) - (${bin_lid_clearance})) + 0) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "(((${bin_lid_clearance}) / 2) + 0 + (${bin_radius}) + 0) + 0",
+              "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_depth}) - (${bin_lid_clearance})) + 0 - (${bin_radius}) + 0) + 0"
+            ],
+            "radius": "((${bin_radius}) + 0) + 0",
+            "start_deg": 90,
+            "end_deg": 180
+          },
+          {
+            "type": "line",
+            "points": [
+              [
+                "(((${bin_lid_clearance}) / 2) + 0) + 0",
+                "(((${bin_lid_clearance}) / 2) + 0 + ((${bin_depth}) - (${bin_lid_clearance})) + 0 - (${bin_radius}) + 0) + 0"
+              ],
+              [
+                "(((${bin_lid_clearance}) / 2) + 0) + 0",
+                "(((${bin_lid_clearance}) / 2) + 0 + (${bin_radius}) + 0) + 0"
+              ]
+            ]
+          },
+          {
+            "type": "arc",
+            "center": [
+              "(((${bin_lid_clearance}) / 2) + 0 + (${bin_radius}) + 0) + 0",
+              "(((${bin_lid_clearance}) / 2) + 0 + (${bin_radius}) + 0) + 0"
+            ],
+            "radius": "((${bin_radius}) + 0) + 0",
+            "start_deg": 180,
+            "end_deg": 270
+          }
+        ],
+        "cyclic": true,
+        "dimensions": "2D",
+        "fill_mode": "BOTH",
+        "extrude": "(0.001) + 0",
+        "resolution_u": 12,
+        "location": [
+          0,
+          0,
+          "(${bin_rim_chamfer}) + 0"
+        ]
+      },
+      "description": "[BRANCH stackable_bin] Lid sheet (the underside inset below extrudes it into the finished lid)."
+    },
+    {
+      "tool": "convert_to_mesh",
+      "arguments": {
+        "object_name": "Lid"
+      },
+      "description": "[BRANCH stackable_bin] Mesh Lid."
+    },
+    {
+      "tool": "inset_faces",
+      "arguments": {
+        "object_name": "Lid",
+        "thickness": "(${bin_rim_chamfer}) + 0",
+        "depth": "(${bin_rim_chamfer}) + 0",
+        "filter_normal": [
+          0,
+          0,
+          -1
+        ],
+        "angle_threshold": 0.3
+      },
+      "description": "[BRANCH stackable_bin] Lid underside 45-degree taper (mates with the rim funnel)."
+    },
+    {
+      "tool": "for_each",
+      "arguments": {
+        "var": "sk",
+        "start": "1",
+        "end": "(ceil(min(1, max(0, ${bin_lid_skirt})))) + 0",
+        "step": "1"
+      },
+      "body": [
+        {
+          "tool": "create_curve",
+          "arguments": {
+            "name": "B_SkirtO",
+            "segments": [
+              {
+                "type": "line",
+                "points": [
+                  [
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0) + 0"
+                  ],
+                  [
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0 - (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0) + 0"
+                  ]
+                ]
+              },
+              {
+                "type": "arc",
+                "center": [
+                  "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0 - (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                  "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0"
+                ],
+                "radius": "((max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                "start_deg": -90,
+                "end_deg": 0
+              },
+              {
+                "type": "line",
+                "points": [
+                  [
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0) + 0",
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0"
+                  ],
+                  [
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0) + 0",
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0 - (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0"
+                  ]
+                ]
+              },
+              {
+                "type": "arc",
+                "center": [
+                  "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0 - (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                  "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0 - (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0"
+                ],
+                "radius": "((max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                "start_deg": 0,
+                "end_deg": 90
+              },
+              {
+                "type": "line",
+                "points": [
+                  [
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0 - (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0) + 0"
+                  ],
+                  [
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0) + 0"
+                  ]
+                ]
+              },
+              {
+                "type": "arc",
+                "center": [
+                  "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                  "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0 - (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0"
+                ],
+                "radius": "((max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                "start_deg": 90,
+                "end_deg": 180
+              },
+              {
+                "type": "line",
+                "points": [
+                  [
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0) + 0",
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + ((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) + 0 - (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0"
+                  ],
+                  [
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0) + 0",
+                    "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0"
+                  ]
+                ]
+              },
+              {
+                "type": "arc",
+                "center": [
+                  "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                  "(((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + 0 + (max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0"
+                ],
+                "radius": "((max(${bin_radius} - (${bin_wall}), 0.5)) + 0) + 0",
+                "start_deg": 180,
+                "end_deg": 270
+              }
+            ],
+            "cyclic": true,
+            "dimensions": "2D",
+            "fill_mode": "BOTH",
+            "extrude": "((${bin_lid_skirt}) + (${bin_rim_chamfer})) + 0",
+            "resolution_u": 12,
+            "location": [
+              0,
+              0,
+              "(0 - (${bin_lid_skirt})) + 0"
+            ]
+          },
+          "description": "[BRANCH lid] Retaining skirt, outer wall."
+        },
+        {
+          "tool": "convert_to_mesh",
+          "arguments": {
+            "object_name": "B_SkirtO"
+          },
+          "description": "[BRANCH lid] Mesh skirt outer."
+        },
+        {
+          "tool": "create_curve",
+          "arguments": {
+            "name": "C_SkirtI",
+            "segments": [
+              {
+                "type": "line",
+                "points": [
+                  [
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0) + 0"
+                  ],
+                  [
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0 - (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0) + 0"
+                  ]
+                ]
+              },
+              {
+                "type": "arc",
+                "center": [
+                  "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0 - (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                  "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0"
+                ],
+                "radius": "((max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                "start_deg": -90,
+                "end_deg": 0
+              },
+              {
+                "type": "line",
+                "points": [
+                  [
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0) + 0",
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0"
+                  ],
+                  [
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0) + 0",
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0 - (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0"
+                  ]
+                ]
+              },
+              {
+                "type": "arc",
+                "center": [
+                  "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0 - (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                  "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0 - (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0"
+                ],
+                "radius": "((max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                "start_deg": 0,
+                "end_deg": 90
+              },
+              {
+                "type": "line",
+                "points": [
+                  [
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_width}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0 - (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0) + 0"
+                  ],
+                  [
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0) + 0"
+                  ]
+                ]
+              },
+              {
+                "type": "arc",
+                "center": [
+                  "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                  "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0 - (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0"
+                ],
+                "radius": "((max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                "start_deg": 90,
+                "end_deg": 180
+              },
+              {
+                "type": "line",
+                "points": [
+                  [
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0) + 0",
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (((${bin_depth}) - 2 * (${bin_wall}) - (${bin_lid_skirt_clearance})) - 2 * (${bin_lid_skirt_wall})) + 0 - (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0"
+                  ],
+                  [
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0) + 0",
+                    "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0"
+                  ]
+                ]
+              },
+              {
+                "type": "arc",
+                "center": [
+                  "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                  "((((${bin_wall}) + (${bin_lid_skirt_clearance}) / 2) + (${bin_lid_skirt_wall})) + 0 + (max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0"
+                ],
+                "radius": "((max(${bin_radius} - (${bin_wall}) - (${bin_lid_skirt_wall}), 0.5)) + 0) + 0",
+                "start_deg": 180,
+                "end_deg": 270
+              }
+            ],
+            "cyclic": true,
+            "dimensions": "2D",
+            "fill_mode": "BOTH",
+            "extrude": "((${bin_lid_skirt}) + (${bin_rim_chamfer}) + 4) + 0",
+            "resolution_u": 12,
+            "location": [
+              0,
+              0,
+              "((0 - (${bin_lid_skirt})) - 2) + 0"
+            ]
+          },
+          "description": "[BRANCH lid] Skirt inner void."
+        },
+        {
+          "tool": "convert_to_mesh",
+          "arguments": {
+            "object_name": "C_SkirtI"
+          },
+          "description": "[BRANCH lid] Mesh skirt void."
+        },
+        {
+          "tool": "boolean_operation",
+          "arguments": {
+            "object_a": "B_SkirtO",
+            "object_b": "C_SkirtI",
+            "operation": "DIFFERENCE"
+          },
+          "description": "[BRANCH lid] Hollow the skirt."
+        },
+        {
+          "tool": "apply_all_modifiers",
+          "arguments": {
+            "object_name": "B_SkirtO"
+          },
+          "description": "[BRANCH lid] Bake skirt."
+        },
+        {
+          "tool": "boolean_operation",
+          "arguments": {
+            "object_a": "Lid",
+            "object_b": "B_SkirtO",
+            "operation": "UNION"
+          },
+          "description": "[BRANCH lid] Weld the skirt to the lid."
+        },
+        {
+          "tool": "apply_all_modifiers",
+          "arguments": {
+            "object_name": "Lid"
+          },
+          "description": "[BRANCH lid] Bake skirt union."
+        }
+      ],
+      "description": "[BRANCH lid] Retaining skirt gate (bin_lid_skirt)."
+    },
+    {
+      "tool": "for_each",
+      "arguments": {
+        "var": "kn",
+        "start": "1",
+        "end": "(ceil(min(1, max(0, ${bin_lid_knob})))) + 0",
+        "step": "1"
+      },
+      "body": [
+        {
+          "tool": "create_cylinder",
+          "arguments": {
+            "name": "B_Knob",
+            "location": [
+              "((${bin_width}) / 2) + 0",
+              "((${bin_depth}) / 2) + 0",
+              "((${bin_rim_chamfer}) + (${bin_lid_knob_height}) / 2) + 0"
+            ],
+            "radius": "((${bin_lid_knob}) / 2) + 0",
+            "depth": "(${bin_lid_knob_height}) + 0",
+            "vertices": 32
+          },
+          "description": "[BRANCH lid] Grip knob."
+        },
+        {
+          "tool": "boolean_operation",
+          "arguments": {
+            "object_a": "Lid",
+            "object_b": "B_Knob",
+            "operation": "UNION"
+          },
+          "description": "[BRANCH lid] Weld knob to the lid."
+        },
+        {
+          "tool": "apply_all_modifiers",
+          "arguments": {
+            "object_name": "Lid"
+          },
+          "description": "[BRANCH lid] Bake knob."
+        }
+      ],
+      "description": "[BRANCH lid] Knob gate (bin_lid_knob = diameter, 0 = flat)."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "B_*"
+      },
+      "description": "[BRANCH stackable_bin] Delete lid helpers."
+    },
+    {
+      "tool": "repair_mesh",
+      "arguments": {
+        "object_name": "Lid"
+      },
+      "description": "[BRANCH stackable_bin] Remove doubles and recalculate normals."
+    },
+    {
+      "tool": "check_mesh_for_printing",
+      "arguments": {
+        "object_name": "Lid"
+      },
+      "description": "[BRANCH stackable_bin] Watertight manifold check."
+    },
+    {
+      "tool": "export_model",
+      "arguments": {
+        "filepath": "../community/stackable_bin/assets/stackable_bin_lid.stl",
+        "format": "STL",
+        "object_name": "Lid"
+      },
+      "description": "[BRANCH stackable_bin] *** END OF lid *** Export lid."
+    },
+    {
+      "tool": "create_light",
+      "arguments": {
+        "name": "V_L1",
+        "type": "SUN",
+        "location": [
+          "((${bin_width}) / 2) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "(((${bin_height}) / 2) + 400) + 0"
+        ],
+        "rotation": [
+          55,
+          0,
+          0
+        ],
+        "energy": 3.5
+      },
+      "description": "[BRANCH stackable_bin] Lighting rig: V_L1."
+    },
+    {
+      "tool": "create_light",
+      "arguments": {
+        "name": "V_L2",
+        "type": "SUN",
+        "location": [
+          "((${bin_width}) / 2) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "(((${bin_height}) / 2) + 400) + 0"
+        ],
+        "rotation": [
+          55,
+          0,
+          90
+        ],
+        "energy": 3.0
+      },
+      "description": "[BRANCH stackable_bin] Lighting rig: V_L2."
+    },
+    {
+      "tool": "create_light",
+      "arguments": {
+        "name": "V_L3",
+        "type": "SUN",
+        "location": [
+          "((${bin_width}) / 2) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "(((${bin_height}) / 2) + 400) + 0"
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "energy": 2.0
+      },
+      "description": "[BRANCH stackable_bin] Lighting rig: V_L3."
+    },
+    {
+      "tool": "create_light",
+      "arguments": {
+        "name": "V_L4",
+        "type": "SUN",
+        "location": [
+          "((${bin_width}) / 2) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "(((${bin_height}) / 2) + 400) + 0"
+        ],
+        "rotation": [
+          65,
+          0,
+          215
+        ],
+        "energy": 1.2
+      },
+      "description": "[BRANCH stackable_bin] Lighting rig: V_L4."
+    },
+    {
+      "tool": "create_camera",
+      "arguments": {
+        "name": "V_Cam",
+        "location": [
+          "((${bin_width}) / 2) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "(((${bin_height}) / 2) + (((max(${bin_width}, ${bin_depth})) * 1.45) * 50 / 36)) + 0"
+        ],
+        "lens": 50.0,
+        "type": "PERSP"
+      },
+      "description": "[BRANCH stackable_bin] Camera for the top view."
+    },
+    {
+      "tool": "camera_look_at",
+      "arguments": {
+        "camera_name": "V_Cam",
+        "target_location": [
+          "((${bin_width}) / 2) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "((${bin_height}) / 2) + 0"
+        ]
+      },
+      "description": "[BRANCH stackable_bin] Aim at the part centre."
+    },
+    {
+      "tool": "set_active_camera",
+      "arguments": {
+        "camera_name": "V_Cam"
+      },
+      "description": "[BRANCH stackable_bin] Make it active."
+    },
+    {
+      "tool": "configure_render_settings",
+      "arguments": {
+        "engine": "BLENDER_EEVEE",
+        "samples": 32
+      },
+      "description": "[BRANCH stackable_bin] Render settings."
+    },
+    {
+      "tool": "render_frame",
+      "arguments": {
+        "output_path": "views/stackable_bin_top.png"
+      },
+      "description": "[BRANCH stackable_bin] Render the top view."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "V_Cam"
+      },
+      "description": "[BRANCH stackable_bin] Drop the camera."
+    },
+    {
+      "tool": "create_camera",
+      "arguments": {
+        "name": "V_Cam",
+        "location": [
+          "((${bin_width}) / 2) + 0",
+          "(((${bin_depth}) / 2) - (((max(${bin_width}, ${bin_height})) * 1.45) * 50 / 36)) + 0",
+          "((${bin_height}) / 2) + 0"
+        ],
+        "lens": 50.0,
+        "type": "PERSP"
+      },
+      "description": "[BRANCH stackable_bin] Camera for the front view."
+    },
+    {
+      "tool": "camera_look_at",
+      "arguments": {
+        "camera_name": "V_Cam",
+        "target_location": [
+          "((${bin_width}) / 2) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "((${bin_height}) / 2) + 0"
+        ]
+      },
+      "description": "[BRANCH stackable_bin] Aim at the part centre."
+    },
+    {
+      "tool": "set_active_camera",
+      "arguments": {
+        "camera_name": "V_Cam"
+      },
+      "description": "[BRANCH stackable_bin] Make it active."
+    },
+    {
+      "tool": "configure_render_settings",
+      "arguments": {
+        "engine": "BLENDER_EEVEE",
+        "samples": 32
+      },
+      "description": "[BRANCH stackable_bin] Render settings."
+    },
+    {
+      "tool": "render_frame",
+      "arguments": {
+        "output_path": "views/stackable_bin_front.png"
+      },
+      "description": "[BRANCH stackable_bin] Render the front view."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "V_Cam"
+      },
+      "description": "[BRANCH stackable_bin] Drop the camera."
+    },
+    {
+      "tool": "create_camera",
+      "arguments": {
+        "name": "V_Cam",
+        "location": [
+          "(((${bin_width}) / 2) + (((max(${bin_depth}, ${bin_height})) * 1.45) * 50 / 36)) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "((${bin_height}) / 2) + 0"
+        ],
+        "lens": 50.0,
+        "type": "PERSP"
+      },
+      "description": "[BRANCH stackable_bin] Camera for the side view."
+    },
+    {
+      "tool": "camera_look_at",
+      "arguments": {
+        "camera_name": "V_Cam",
+        "target_location": [
+          "((${bin_width}) / 2) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "((${bin_height}) / 2) + 0"
+        ]
+      },
+      "description": "[BRANCH stackable_bin] Aim at the part centre."
+    },
+    {
+      "tool": "set_active_camera",
+      "arguments": {
+        "camera_name": "V_Cam"
+      },
+      "description": "[BRANCH stackable_bin] Make it active."
+    },
+    {
+      "tool": "configure_render_settings",
+      "arguments": {
+        "engine": "BLENDER_EEVEE",
+        "samples": 32
+      },
+      "description": "[BRANCH stackable_bin] Render settings."
+    },
+    {
+      "tool": "render_frame",
+      "arguments": {
+        "output_path": "views/stackable_bin_side.png"
+      },
+      "description": "[BRANCH stackable_bin] Render the side view."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "V_Cam"
+      },
+      "description": "[BRANCH stackable_bin] Drop the camera."
+    },
+    {
+      "tool": "create_camera",
+      "arguments": {
+        "name": "V_Cam",
+        "location": [
+          "(((${bin_width}) / 2) + (((max(max(${bin_width}, ${bin_depth}), ${bin_height}) * 1.4) * 1.45) * 50 / 36) * 0.58) + 0",
+          "(((${bin_depth}) / 2) - (((max(max(${bin_width}, ${bin_depth}), ${bin_height}) * 1.4) * 1.45) * 50 / 36) * 0.58) + 0",
+          "(((${bin_height}) / 2) + (((max(max(${bin_width}, ${bin_depth}), ${bin_height}) * 1.4) * 1.45) * 50 / 36) * 0.58) + 0"
+        ],
+        "lens": 50.0,
+        "type": "PERSP"
+      },
+      "description": "[BRANCH stackable_bin] Camera for the iso view."
+    },
+    {
+      "tool": "camera_look_at",
+      "arguments": {
+        "camera_name": "V_Cam",
+        "target_location": [
+          "((${bin_width}) / 2) + 0",
+          "((${bin_depth}) / 2) + 0",
+          "((${bin_height}) / 2) + 0"
+        ]
+      },
+      "description": "[BRANCH stackable_bin] Aim at the part centre."
+    },
+    {
+      "tool": "set_active_camera",
+      "arguments": {
+        "camera_name": "V_Cam"
+      },
+      "description": "[BRANCH stackable_bin] Make it active."
+    },
+    {
+      "tool": "configure_render_settings",
+      "arguments": {
+        "engine": "BLENDER_EEVEE",
+        "samples": 32
+      },
+      "description": "[BRANCH stackable_bin] Render settings."
+    },
+    {
+      "tool": "render_frame",
+      "arguments": {
+        "output_path": "views/stackable_bin_iso.png"
+      },
+      "description": "[BRANCH stackable_bin] Render the iso view."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "V_Cam"
+      },
+      "description": "[BRANCH stackable_bin] Drop the camera."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "V_L*"
+      },
+      "description": "[BRANCH stackable_bin] Remove the lighting rig."
+    }
+  ],
+  "branches": {
+    "stackable_bin": {
+      "ranges": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          17
+        ]
+      ]
+    },
+    "separator": {
+      "ranges": [
+        [
+          0,
+          1
+        ],
+        [
+          18,
+          24
+        ]
+      ]
+    },
+    "lid": {
+      "ranges": [
+        [
+          0,
+          1
+        ],
+        [
+          25,
+          33
+        ]
+      ]
+    },
+    "views": {
+      "ranges": [
+        [
+          34,
+          62
+        ]
+      ]
+    }
+  },
+  "parameters": {
+    "bin_width": "80",
+    "bin_depth": "100",
+    "bin_height": "50",
+    "bin_wall": "2",
+    "bin_radius": "6",
+    "bin_rim_chamfer": "3",
+    "bin_foot_chamfer": "1.5",
+    "bin_holes_1": "0",
+    "bin_holes_2": "0",
+    "bin_holes_3": "0",
+    "bin_hole_gap": "3",
+    "bin_hole_margin": "8",
+    "bin_hole_size": "6",
+    "bin_rib_height": "4",
+    "bin_divider_frac": "0",
+    "bin_rail_proud": "4",
+    "bin_rail_width": "1.2",
+    "bin_rail_ramp": "3",
+    "bin_sep_thickness": "1.6",
+    "bin_sep_clearance": "0.8",
+    "bin_sep_margin": "4",
+    "bin_sep_holes": "0",
+    "bin_sep_lid_gap": "0.5",
+    "bin_lid_clearance": "0.3",
+    "bin_lid_knob": "0",
+    "bin_lid_knob_height": "6",
+    "bin_lid_skirt": "4",
+    "bin_lid_skirt_wall": "1.6",
+    "bin_lid_skirt_clearance": "0.25"
+  },
+  "parameter_ui": {
+    "bin_width": {
+      "type": "slider",
+      "min": 40,
+      "max": 250,
+      "step": 5,
+      "unit": "mm",
+      "label": "Width"
+    },
+    "bin_depth": {
+      "type": "slider",
+      "min": 40,
+      "max": 250,
+      "step": 5,
+      "unit": "mm",
+      "label": "Depth"
+    },
+    "bin_height": {
+      "type": "slider",
+      "min": 20,
+      "max": 250,
+      "step": 5,
+      "unit": "mm",
+      "label": "Height"
+    },
+    "bin_wall": {
+      "type": "slider",
+      "min": 1.2,
+      "max": 4,
+      "step": 0.2,
+      "unit": "mm",
+      "label": "Wall thickness"
+    },
+    "bin_radius": {
+      "type": "slider",
+      "min": 0,
+      "max": 15,
+      "step": 0.5,
+      "unit": "mm",
+      "label": "Corner radius"
+    },
+    "bin_rim_chamfer": {
+      "type": "slider",
+      "min": 1,
+      "max": 6,
+      "step": 0.5,
+      "unit": "mm",
+      "label": "Rim funnel depth"
+    },
+    "bin_foot_chamfer": {
+      "type": "slider",
+      "min": 0.5,
+      "max": 4,
+      "step": 0.5,
+      "unit": "mm",
+      "label": "Foot taper"
+    },
+    "bin_rib_height": {
+      "type": "slider",
+      "min": 2,
+      "max": 10,
+      "step": 0.5,
+      "unit": "mm",
+      "label": "Vent band height"
+    },
+    "bin_holes_1": {
+      "type": "checkbox",
+      "on": "1",
+      "off": "0",
+      "label": "Vent band 1"
+    },
+    "bin_holes_2": {
+      "type": "checkbox",
+      "on": "1",
+      "off": "0",
+      "label": "Vent band 2"
+    },
+    "bin_holes_3": {
+      "type": "checkbox",
+      "on": "1",
+      "off": "0",
+      "label": "Vent band 3"
+    },
+    "bin_hole_size": {
+      "type": "slider",
+      "min": 2,
+      "max": 12,
+      "step": 0.5,
+      "unit": "mm",
+      "label": "Hole size"
+    },
+    "bin_hole_gap": {
+      "type": "slider",
+      "min": 1,
+      "max": 10,
+      "step": 0.5,
+      "unit": "mm",
+      "label": "Hole gap"
+    },
+    "bin_hole_margin": {
+      "type": "slider",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "unit": "mm",
+      "label": "Corner margin"
+    },
+    "bin_divider_frac": {
+      "type": "slider",
+      "min": 0,
+      "max": 0.88,
+      "step": 0.01,
+      "label": "Divider position (0 = none)"
+    },
+    "bin_rail_ramp": {
+      "type": "slider",
+      "min": 0,
+      "max": 8,
+      "step": 0.5,
+      "unit": "mm",
+      "label": "Rail ramp"
+    },
+    "bin_sep_holes": {
+      "type": "checkbox",
+      "on": "1",
+      "off": "0",
+      "label": "Vent the separator"
+    },
+    "bin_lid_knob": {
+      "type": "slider",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "mm",
+      "label": "Lid knob \u00d8 (0 = flat)"
+    }
+  }
+}

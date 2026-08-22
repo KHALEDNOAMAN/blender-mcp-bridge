@@ -1,3 +1,5 @@
+// studio/src/components/Modal.jsx
+
 import { useEffect } from 'react';
 
 /**

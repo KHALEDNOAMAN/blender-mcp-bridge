@@ -1,3 +1,5 @@
+// studio/src/lib/demoApi.js
+
 /**
  * Demo mode: a drop-in stand-in for `runCommand` (lib/api.js) used when no
  * real Blender bridge is reachable — e.g. Studio deployed standalone on

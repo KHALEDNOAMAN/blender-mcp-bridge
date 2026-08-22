@@ -1,3 +1,5 @@
+// studio/src/components/DynamicArgsForm.jsx
+
 import { useEffect, useMemo, useState } from 'react';
 import { TOOL_CATEGORIES, HIDDEN_TOOLS } from '../lib/toolCategories';
 import { stringifyCompact } from '../lib/uiUtils';

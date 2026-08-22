@@ -1,4 +1,7 @@
+// studio/src/components/SchemaField.jsx
+
 import AutoExpandTextarea from './AutoExpandTextarea';
+import { defaultLabel } from '../lib/uiUtils';
 import { extractParamName, isParametric } from '../lib/params';
 import { looksLikeExpression, collectParamNames, evaluateExpression, candidateStringsForField } from '../lib/expr';
 
@@ -199,38 +202,47 @@ export default function SchemaField({
             </div>
         );
     } else if (prop.enum) {
+        // Same ghost-default rule as booleans: without an explicit empty
+        // option, value='' matches no <option> and the browser silently
+        // displays (and would save) the first enum member.
+        const isUnset = values[fieldPath] === undefined || values[fieldPath] === '';
         input = (
             <select
                 className="form-select"
                 name={fieldPath}
                 data-type="enum"
-                value={values[fieldPath] ?? ''}
+                value={isUnset ? '' : values[fieldPath]}
                 onChange={(e) => onChange(fieldPath, e.target.value, 'enum')}
-                style={borderStyle}
+                style={{ ...borderStyle, ...(isUnset ? { opacity: 0.6, fontStyle: 'italic' } : undefined) }}
             >
+                <option value="">{defaultLabel(prop, isRequired)}</option>
                 {prop.enum.map((v) => (
                     <option key={v} value={v}>{v}</option>
                 ))}
             </select>
         );
     } else if (prop.type === 'boolean') {
-        const defaultVal = prop.default !== undefined ? prop.default.toString() : 'true';
+        // An unset optional boolean stays EMPTY rather than pre-selecting the
+        // schema default as though the user had chosen it (see defaultLabel).
+        // The default is offered as a distinct non-value option so the field
+        // reads honestly and getArgs() can drop it.
+        const isUnset = values[fieldPath] === undefined || values[fieldPath] === '';
         input = (
             <select
                 className="form-select"
                 name={fieldPath}
                 data-type="boolean"
-                value={values[fieldPath] ?? defaultVal}
+                value={isUnset ? '' : values[fieldPath]}
                 onChange={(e) => onChange(fieldPath, e.target.value, 'boolean')}
-                style={borderStyle}
+                style={{ ...borderStyle, ...(isUnset ? { opacity: 0.6, fontStyle: 'italic' } : undefined) }}
             >
+                <option value="">{defaultLabel(prop, isRequired)}</option>
                 <option value="true">true</option>
                 <option value="false">false</option>
             </select>
         );
     } else {
-        const defaultVal = prop.default !== undefined ? String(prop.default) : '';
-        const currentVal = values[fieldPath] ?? defaultVal;
+        const currentVal = values[fieldPath] ?? '';
         // A number/integer field must fall back to a text input while it
         // holds a "${name}" token or an arithmetic expression — a native
         // <input type="number"> can't display non-numeric text and would
@@ -245,14 +257,25 @@ export default function SchemaField({
                 spellCheck={false}
                 required={isRequired}
                 value={currentVal}
+                placeholder={defaultLabel(prop, isRequired)}
                 onChange={(e) => onChange(fieldPath, e.target.value, prop.type)}
-                style={borderStyle}
+                // width:100% is needed as well as the row's data-full: widening
+                // the grid cell alone leaves the input at its intrinsic size,
+                // so a long expression stays clipped in a half-empty row.
+                style={{ ...borderStyle, width: '100%' }}
             />
         );
     }
 
+    // A long expression (e.g. a for_each bound like
+    // "(ceil(min(1, max(0, ${bin_lid_knob})))) + 0") overflows a half-width
+    // input and is silently clipped mid-token, which makes it unreadable and
+    // un-auditable. Let such a field span the full row, the same affordance
+    // arrays already use.
+    const needsFullWidth = typeof fieldValue === 'string' && fieldValue.length > 24;
+
     return (
-        <div className="arg-field">
+        <div className="arg-field" data-full={needsFullWidth ? 'true' : undefined}>
             {label}
             {input}
             <ParamTokenHint fieldValue={fieldValue} parameters={parameters} pendingParams={pendingParams} onCreateParam={onCreateParam} />

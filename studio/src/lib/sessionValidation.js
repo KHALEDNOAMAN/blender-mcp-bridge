@@ -1,3 +1,5 @@
+// studio/src/lib/sessionValidation.js
+
 // Shared session shape validation — see docs/studio_design_v1.md §6.3.
 // Not JSON-mode-only: runBranch() also calls validateBranches() before
 // dispatching, since nothing previously guarded a branch's ranges against

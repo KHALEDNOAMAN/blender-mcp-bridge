@@ -1,37 +1,99 @@
-# Blender MCP Server for n8n
+# Blender MCP Server
 
-A Model Context Protocol (MCP) server that exposes Blender's 3D modeling capabilities to n8n workflows.
+Give an AI agent hands-on control of Blender: build geometry, apply materials,
+render, and check that a mesh is printable — 98 tools over the Model Context
+Protocol.
+
+Works with **Claude Desktop, Claude Code, n8n**, or any MCP client.
+
+```bash
+uvx blender-mcp-bridge serve
+```
+
+That is the server. It drives a small **addon inside Blender**, which does the
+actual work — see [Installation](#installation), a one-time step.
 
 ## System Architecture
 
-To avoid confusion, this project consists of two core components:
+Two components, deliberately separate:
 
-1.  **Blender MCP Addon**: A plugin installed *inside* Blender. It acts as the local execution engine, receiving commands and manipulating the 3D scene.
-2.  **MCP Bridge Server**: A standalone Python server (`src/`) that acts as the gateway. Clients like **n8n** connect to this Bridge, which then forwards commands to the active Blender Addon.
+1.  **Blender MCP Addon**: a plugin installed *inside* Blender. The local
+    execution engine — it receives commands and manipulates the 3D scene.
+2.  **MCP Bridge Server**: a standalone Python server (`blender_mcp_bridge/`) that acts
+    as the gateway. MCP clients connect to the Bridge, which forwards commands on
+    to the running Blender addon.
 
 ```mermaid
 graph LR
-    n8n[n8n / AI Agent] -- "MCP (HTTP Streamable)" --> Bridge[MCP Bridge Server]
-    Bridge -- "Local WebSockets" --> Addon[Blender MCP Addon]
+    Client[Claude / n8n / any MCP client] -- "MCP (HTTP Streamable)" --> Bridge[MCP Bridge Server]
+    Bridge -- "Local TCP socket" --> Addon[Blender MCP Addon]
     Addon -- "Python API" --> Blender[Blender Engine]
 ```
 
+## Design rules for printable geometry
+
+`data/design-rules.json` carries 3D-printing design rules — overhang limits, wall
+minimums, clearances — extracted from video sources by the sibling
+[`print-kb`](../print-kb) project, each citing the video and second it came from.
+It is plain self-contained JSON: no database, no dependency on that project at
+runtime.
+
+See [`docs/design-rules.md`](docs/design-rules.md) for the schema, how to read it,
+and the MCP tools worth building on top.
+
 ## Quick Start
 
-### 1. Install Dependencies
+### 1. Install the Blender addon
 
-We recommend using [`uv`](https://docs.astral.sh/uv/) for fast virtual environment management and package installation:
+The addon is what actually touches Blender, so install it first — full steps
+under [Installation](#installation). In Blender:
+**Edit → Preferences → Add-ons → Install**, pick the zipped `blender_mcp_addon`
+folder, enable it, then press **Start MCP Server** in the sidebar
+(`N` → *Blender MCP*).
+
+### 2. Run the bridge
 
 ```bash
-# 1. Sync dependencies (automatically creates .venv if missing)
-uv sync
-
-# 2. Activate it
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
+uvx blender-mcp-bridge serve
 ```
+
+No clone, no virtualenv. It listens on `http://127.0.0.1:8008/mcp/`.
+
+To hack on it instead, clone the repo and use [`uv`](https://docs.astral.sh/uv/):
+
+```bash
+uv sync
+uv run blender-mcp-bridge serve
+```
+
+### 3. Point a client at it
+
+This server speaks **HTTP streamable**, not stdio, so clients connect by URL
+rather than by spawning a command.
+
+**Claude Code** — one command:
+
+```bash
+claude mcp add --transport http blender http://127.0.0.1:8008/mcp/
+```
+
+**Claude Desktop** — in `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "blender": {
+      "type": "streamable-http",
+      "url": "http://127.0.0.1:8008/mcp/"
+    }
+  }
+}
+```
+
+**n8n** — add an *MCP Client* node pointing at the same URL.
+
+Then ask your agent to *"create a 20 mm cube and check whether it is printable"*.
+It should appear in the Blender viewport.
 
 ## Configuration
 
@@ -45,6 +107,16 @@ Create a `.env` file in the root directory to customize your setup:
 | `BLENDER_ADDON_PORT` | Port Blender addon is listening on | `8888` |
 | `BLENDER_ASSETS_DIR` | Directory to resolve relative textures/HDRIs | (Optional) |
 
+Only needed for the [AI Assistant panel](#ai-assistant-panel-n8n-free-alternative) —
+each provider is offered in the UI only if one of its keys is set here (or pasted
+into the panel at runtime):
+
+| Variable | Provider |
+|---|---|
+| `ANTHROPIC_API_KEY` | Anthropic (Claude) |
+| `GEMINI_API_KEY` *or* `GOOGLE_API_KEY` | Google (Gemini) |
+| `OPENROUTER_API_KEY` | OpenRouter |
+
 ## Installation
 
 ### Method 1: Zip & Install (Recommended)
@@ -55,14 +127,22 @@ Create a `.env` file in the root directory to customize your setup:
 4. Search for "Blender MCP" and enable the checkbox.
 
 ### Method 2: Manual Copy (Developer)
-1. Copy the `blender_mcp_addon` folder to your Blender addons directory:
-   - **Windows**: `%USERPROFILE%\AppData\Roaming\Blender Foundation\Blender\4.x\scripts\addons`
-   - **macOS**: `~/Library/Application Support/Blender/4.x/scripts/addons`
+1. Copy the `blender_mcp_addon` folder to your Blender addons directory (substitute
+   your actual Blender version for `<version>`, e.g. `4.2` or `5.0`):
+   - **Windows**: `%USERPROFILE%\AppData\Roaming\Blender Foundation\Blender\<version>\scripts\addons`
+   - **macOS**: `~/Library/Application Support/Blender/<version>/scripts/addons`
 2. Restart Blender.
 3. Enable "Blender MCP" in Preferences.
 
+> [!NOTE]
+> `bl_info` declares a minimum of Blender **4.0**, but STL import/export use the
+> `wm.stl_import` / `wm.stl_export` operators introduced in **4.2** — so the
+> 3D-print tools need 4.2 or newer. Developed against 5.0.
+
 ## Why a folder instead of a single file?
-As the addon grows, a single 1800+ line file becomes unmaintainable. We've split the logic into functional modules (`modeling`, `materials`, `anim`, etc.) to make it professional, readable, and easier to extend.
+As the addon grows, a single-file addon becomes unmaintainable — it is now ~6,400
+lines across 22 modules. We've split the logic into functional packages (`modeling`,
+`materials`, `anim`, etc.) to make it professional, readable, and easier to extend.
 
 ## Usage
 
@@ -76,10 +156,10 @@ As the addon grows, a single 1800+ line file becomes unmaintainable. We've split
 
 ```bash
 # Standard mode
-uv run python -m src.main serve
+uv run python -m blender_mcp_bridge.main serve
 
 # Recording mode (Save all commands to a file)
-uv run python -m src.main serve --record my_session.json --name "Building My House"
+uv run python -m blender_mcp_bridge.main serve --record my_session.json --name "Building My House"
 ```
 
 The server will start on `http://localhost:8008` with HTTP Streamable endpoint at `/mcp`. It uses detailed logging to show exactly which tools are being called and their results.
@@ -91,7 +171,7 @@ The **Bridge Sessions** feature allows you to record yours or an AI's tool calls
 ### Recording a Session
 To record all tool calls made to the bridge while the server is running:
 ```bash
-uv run python -m src.main serve --record path/to/session.json --name "My Project" --description "Optional description"
+uv run python -m blender_mcp_bridge.main serve --record path/to/session.json --name "My Project" --description "Optional description"
 ```
 Any tool calls made by n8n or other clients will be automatically saved to the JSON file.
 
@@ -100,11 +180,22 @@ Any tool calls made by n8n or other clients will be automatically saved to the J
 To playback a previously recorded session:
 ```bash
 # Default (Stateful - HTTP Streamable) - Recommended for speed
-uv run python -m src.main play path/to/session.json
+uv run python -m blender_mcp_bridge.main play path/to/session.json
 
 # Stateless mode (Standard HTTP) - Slower due to handshake overhead
-uv run python -m src.main play path/to/session.json --transport stateless
+uv run python -m blender_mcp_bridge.main play path/to/session.json --transport stateless
+
+# Play a single branch (see Session Format below)
+uv run python -m blender_mcp_bridge.main play path/to/session.json --branch sail_rig
+
+# Override session parameters without editing the file (repeatable)
+uv run python -m blender_mcp_bridge.main play path/to/session.json --param box_height=40 --param wall=2.4
 ```
+
+> [!NOTE]
+> If a session defines branches and `--branch` is omitted, the **first branch plays
+> automatically** rather than the whole command list. Any parameter not overridden by
+> `--param` falls back to the session's own default from its `parameters` block.
 
 > [!TIP]
 > **Performance Note**: Stateful mode is significantly faster for playback because it maintains a persistent connection. Stateless mode requires a full MCP handshake (Initialize/Discover) for *every* individual tool call in the recording, leading to noticeable overhead.
@@ -145,12 +236,24 @@ before deploying:
 npm run preview
 ```
 
+Both `dev` and `build` first run `npm run prebuild-assets`, which regenerates two sets
+of static assets — you don't invoke these directly:
+
+| Script | What it does |
+|---|---|
+| `sync-community` | Copies every `community/*/session.json` into `studio/public/community/` and writes an `index.json` manifest, so the **Load Community Sample** dropdown can fetch a static list (static hosts like GitHub Pages can't do directory listings). Also **prunes** copies whose source folder is gone, so deleting or renaming a project doesn't leave a stale session in the build. |
+| `gen-demo-tools` | Regenerates the static tool catalog used by [Demo Mode](#demo-mode-no-bridge-required). |
+
+The copies are generated rather than committed, so they can never drift from the
+`community/` source of truth. Add a new community folder with a `session.json` and it
+shows up in the dropdown on the next `npm run dev`/`build` — no manual step.
+
 Once built, the Bridge Server also serves Studio directly at **`http://localhost:8008/studio/`**
 (no separate `npm run dev` needed) — if `studio/dist/` doesn't exist yet, that route
 returns a short message with the build command instead of failing.
 
 Studio talks directly to the MCP Bridge Server over HTTP (same `/mcp` endpoint used
-by n8n), so **the Bridge Server must be running** (`uv run python -m src.main serve`)
+by n8n), so **the Bridge Server must be running** (`uv run python -m blender_mcp_bridge.main serve`)
 for Studio to connect. It auto-detects the bridge on `localhost:8008` then
 `localhost:8000`.
 
@@ -211,7 +314,7 @@ was designed almost entirely through this panel — including the print-design f
 
 ### Demo Mode (No Bridge Required)
 
-**[Live demo on GitHub Pages](https://seehiong.github.io/blender-mcp-n8n/)** —
+**[Live demo on GitHub Pages](https://seehiong.github.io/blender-mcp-bridge/)** —
 auto-deployed by [`.github/workflows/deploy-studio.yml`](.github/workflows/deploy-studio.yml)
 on every push to `main` that touches `studio/`.
 
@@ -228,11 +331,11 @@ on every push to `main` that touches `studio/`.
 >   automatic — a genuinely offline bridge is never silently mistaken for a
 >   working connection.
 >
-> Either way, no one visiting the Pages demo can ever reach *another visitor's*
+> In all cases, no one visiting the Pages demo can ever reach *another visitor's*
 > Blender instance — the browser only ever talks to `localhost` on the machine
 > it's running on.
 
-Either way, once in Demo Mode:
+Once in Demo Mode:
 - Loads a static tool catalog (`studio/src/lib/demoTools.js`) so the guided forms,
   schema validation, and the **+ New Command** / **Edit Command** modals all work
   normally.
@@ -262,21 +365,22 @@ If you modify the addon code or the MCP server logic, follow these steps to ensu
 
 1. **Reload Scripts**: In Blender, press `F3` and type **"Reload Scripts"** (or use the shortcut `Alt + R` if configured).
 2. **Restart Blender Server**: In the N-Panel, click **Stop MCP Server** and then **Start MCP Server** again.
-3. **Restart Python Server**: Stop and restart the server with `uv run python -m src.main serve`.
+3. **Restart Python Server**: Stop and restart the server with `uv run python -m blender_mcp_bridge.main serve`.
 
 > [!IMPORTANT]
 > All Blender operations now run on the main thread via a command queue, ensuring stability and preventing dependency graph errors.
 
 ## Available Tools
 
-The server exposes **93 Blender tools** — the full reference with descriptions and
+The server exposes **98 tools** — 95 forwarded to Blender, plus 3 answered locally
+from the design-rule export. The full reference with descriptions and
 parameters lives in [docs/tools.md](docs/tools.md) (auto-generated from the tool
 schemas; regenerate with `uv run python scripts/gen_tools_doc.py`, which also fails
 loudly if the bridge schemas and the addon dispatch table ever drift apart).
 
 | Category | Tools | Highlights |
 |---|---|---|
-| Modeling | 47 | primitives, booleans, modifiers, `create_curve` 2D drafting (lines + true arcs), `create_watertight_plate`, room shells |
+| Modeling | 48 | primitives, booleans, modifiers (incl. `BEVEL` with edge-selection control, `SCREW` lathe/spin and `SIMPLE_DEFORM` twist/bend/taper), `create_curve` 2D drafting (lines + true arcs), `create_watertight_plate`, room shells |
 | Materials | 7 | PBR materials, hex colors, texture assignment |
 | Collections | 7 | create/move/organize collections |
 | Sculpting | 7 | brush-based sculpt strokes and remeshing |
@@ -285,8 +389,9 @@ loudly if the bridge schemas and the addon dispatch table ever drift apart).
 | Animation | 4 | keyframes, playback range |
 | Lighting & World | 3 | lights, light editing, HDRI/sky/color world background |
 | Camera | 3 | cameras, look-at, active camera |
-| Rendering | 3 | engine setup, frame renders |
+| Rendering | 4 | engine setup, frame renders, `generate_views` one-call top/front/side/iso previews |
 | History / Undo | 2 | undo / redo |
+| Design Rules | 3 | `check_design`, `get_design_rules`, `list_design_topics` — answered locally from the print-kb export, never forwarded to Blender |
 
 ## Example Usage in n8n
 
@@ -325,14 +430,28 @@ loudly if the bridge schemas and the addon dispatch table ever drift apart).
 
 ## Community Showcase
 
-This project is powered by its community! Explore recorded sessions and documentation created by users to see what's possible with the Blender MCP:
+Real parts, modelled by an agent driving this bridge. Two are in this repo so
+you can try one immediately:
 
-*   [**Community Gallery**](community/README.md): Browse all user-submitted projects and learn how to contribute your own recordings.
-*   [**Condominium Tower**](community/condominium_tower/README.md): A complete guide to creating a procedural 20-story building with glass facade and balconies.
-*   [**Boolean Pavilion**](community/boolean_pavilion/README.md): Demonstrates boolean operations, unified structures, and advanced lighting/camera setup.
+| project | what it shows |
+|---|---|
+| [**Cable Comb**](community/cable_comb/README.md) | a two-part pin joint built to measured 3D-printing design rules |
+| [**Stackable Bin**](community/stackable_bin/README.md) | a parametric bin that nests into the one below it |
+
+```bash
+blender-mcp-bridge play community/cable_comb/session.json
+```
+
+The full gallery — the benchy, architectural scenes, the modular profile rack,
+threaded bolts, the Y-zipper teardown and more — lives in its own repository, so
+installing the bridge does not mean downloading a print archive:
+
+**[blender-mcp-community](https://github.com/seehiong/blender-mcp-community)**
 
 > [!TIP]
-> **Share Your Work**: Have you built something cool? Check out our [**Contribution Guide**](community/README.md) to learn how to record, clean, and share your session with the community!
+> **Share your work**: recorded something good? The
+> [contribution guide](https://github.com/seehiong/blender-mcp-community#how-to-share-your-project)
+> covers how to record, clean and submit a session.
 
 ## ⚡ POWER TIPS: Avoiding Rate Limits
 
@@ -351,7 +470,7 @@ If you need 10 objects, don't create them one-by-one. Use `create_and_array` or 
 
 ## Architecture & Technical Design
 
-This project uses a modular `src/` structure to ensure maintainability:
+This project uses the modular `blender_mcp_bridge/` package to ensure maintainability:
 
 ```mermaid
 graph TD
@@ -363,6 +482,8 @@ graph TD
     B --> G[connection.py]
     B --> I[sessions.py]
     B --> J[assistant.py]
+    I --> K[params.py]
+    A --> L[config.py]
     G --> H[Blender]
 ```
 
@@ -433,6 +554,18 @@ uv run python tests/run_integration.py run --scenario filament_tag
 
 See the [Integration Testing Guide](docs/integration_tests.md) for full details on verification and benchmarking.
 
+### Unit Tests
+
+The scenarios above need a live Blender. Two pure-Python suites don't — they cover the
+session record/replay round-trip and schema hygiene across all 94 tool definitions:
+
+```bash
+uv run --with pytest python -m pytest tests/ -q
+```
+
+See the [Unit Testing Guide](docs/unit_tests.md). Note these are not run by CI, which
+covers only ruff and mypy.
+
 ## Code Quality & Standards
 
 We enforce code quality standards using [Ruff](https://docs.astral.sh/ruff/) and [Mypy](https://mypy.readthedocs.io/). These are run automatically on GitHub Actions CI.
@@ -441,16 +574,16 @@ To run these checks locally:
 
 ```bash
 # 1. Format code (strict black-compatible formatting)
-uv run ruff format src/ tests/ blender_mcp_addon/
+uv run ruff format blender_mcp_bridge/ tests/ blender_mcp_addon/
 
 # 2. Run linter and check code complexity (McCabe <= 12)
-uv run ruff check src/ tests/ blender_mcp_addon/
+uv run ruff check blender_mcp_bridge/ tests/ blender_mcp_addon/
 
 # 3. Auto-fix standard lint issues
-uv run ruff check src/ tests/ blender_mcp_addon/ --fix
+uv run ruff check blender_mcp_bridge/ tests/ blender_mcp_addon/ --fix
 
 # 4. Run static type checking
-uv run mypy src/
+uv run mypy blender_mcp_bridge/
 ```
 
 ## Troubleshooting

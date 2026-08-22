@@ -1,3 +1,5 @@
+// studio/src/hooks/useModal.js
+
 import { useCallback, useRef, useState } from 'react';
 
 /**

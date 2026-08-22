@@ -1,0 +1,5056 @@
+{
+  "schema_version": 3,
+  "generated": "2026-08-20",
+  "counts": {
+    "rules": 259,
+    "measured": 40,
+    "defaulted": 84,
+    "actionable": 124,
+    "sources": 25,
+    "conflicting": 0,
+    "aging": 46,
+    "by_topic": {
+      "modeling": 119,
+      "tolerances": 72,
+      "orientation": 29,
+      "supports": 18,
+      "slicer": 7,
+      "post-processing": 5,
+      "hardware": 4,
+      "materials": 3,
+      "bed-adhesion": 2
+    }
+  },
+  "notes": {
+    "audience": "designer-facing rules only; operator advice is excluded",
+    "value_source": "'source' = the video stated this number; 'default' = filled from defaults.json and safe to override; 'none' = no value applies",
+    "timestamp_unverified": "the citation could not be confirmed against the captions",
+    "conflicts_with": "rules judged incompatible with this one; both are kept so the disagreement is visible rather than averaged away",
+    "aging": "the source is more than 3 years old"
+  },
+  "rules": [
+    {
+      "rule": "Chamfer the bottom face of the part to improve bed adhesion on the build plate.",
+      "topic": "bed-adhesion",
+      "value": {
+        "low": 8.0,
+        "high": 8.0,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "8mm",
+      "source": {
+        "title": "Fusion Print-in-Place Hinge Tutorial (No Supports) for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=wFejArLliwg&t=391s",
+        "timestamp": "06:31",
+        "published": "2026-01-28",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Ensure no wall has a thickness less than 1 mm.",
+      "topic": "modeling",
+      "value": {
+        "low": 1.0,
+        "high": 1.0,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "1 mm",
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=11s",
+        "timestamp": "00:11",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design every feature to be at least 2x nozzle width for reliable wall quality.",
+      "topic": "modeling",
+      "value": {
+        "low": 2.0,
+        "high": 2.0,
+        "unit": "xnozzle",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "2x nozzle width",
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=26s",
+        "timestamp": "00:26",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design parts to be at least 1 mm thick in the vertical direction for reliability and strength.",
+      "topic": "modeling",
+      "value": {
+        "low": 1.0,
+        "high": 1.0,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "1 mm",
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=28s",
+        "timestamp": "00:28",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Keep bridges to 10 millimeters or less to avoid stringy bottoms or the need for supports.",
+      "topic": "modeling",
+      "value": {
+        "low": 10.0,
+        "high": 10.0,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "10 millimeters",
+      "source": {
+        "title": "3D Printing Design Rules",
+        "url": "https://www.youtube.com/watch?v=2PJa5gyDKOk&t=47s",
+        "timestamp": "00:47",
+        "published": "2022-08-26",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Keep the diameter of any pin feature to at least 3 millimeters to prevent it from breaking off.",
+      "topic": "modeling",
+      "value": {
+        "low": 3.0,
+        "high": 3.0,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "3 millimeters",
+      "source": {
+        "title": "3D Printing Design Rules",
+        "url": "https://www.youtube.com/watch?v=2PJa5gyDKOk&t=80s",
+        "timestamp": "01:20",
+        "published": "2022-08-26",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Deboss or emboss text at least 1 millimeter deep or high.",
+      "topic": "modeling",
+      "value": {
+        "low": 1.0,
+        "high": 1.0,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "1 millimeter",
+      "source": {
+        "title": "3D Printing Design Rules",
+        "url": "https://www.youtube.com/watch?v=2PJa5gyDKOk&t=115s",
+        "timestamp": "01:55",
+        "published": "2022-08-26",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a taper or angle away from the build plate instead of a true arc for small hinge features in the 5 to 10 mm range.",
+      "topic": "modeling",
+      "value": {
+        "low": 5.0,
+        "high": 10.0,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "5 to 10 mm",
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=253s",
+        "timestamp": "04:13",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design micro-features such as ribs at approximately 0.2mm wide so slicers detect them but the walls fuse together during printing.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.2mm",
+      "source": {
+        "title": "3x Part Strength Without Slicer Settings",
+        "url": "https://www.youtube.com/watch?v=Lq-SoGgKOcQ&t=147s",
+        "timestamp": "02:27",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add threads directly to the model at 0.2mm with a very low thread pitch for surprisingly good results.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.2mm",
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=243s",
+        "timestamp": "04:03",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Change circular holes to a teardrop shape to maintain a constant 45-degree slope.",
+      "topic": "modeling",
+      "value": {
+        "low": 45.0,
+        "high": 45.0,
+        "unit": "deg",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "45 degrees",
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=332s",
+        "timestamp": "05:32",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Give a chamfer to the tip of the pin rather than a fillet, because a chamfer maintains a constant 45° overhang while a fillet goes from infinite overhang to nothing.",
+      "topic": "modeling",
+      "value": {
+        "low": 45.0,
+        "high": 45.0,
+        "unit": "deg",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "45 degrees",
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1110s",
+        "timestamp": "18:30",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use 0.2 mm slots in the model to create solid micro-features inside the part.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.2 mm",
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1835s",
+        "timestamp": "30:35",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a 1.2 mm fillet for nicely rounded edges on 3D printed parts.",
+      "topic": "modeling",
+      "value": {
+        "low": 1.2,
+        "high": 1.2,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "1.2mm",
+      "source": {
+        "title": "Fusion Print-in-Place Hinge Tutorial (No Supports) for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=wFejArLliwg&t=201s",
+        "timestamp": "03:21",
+        "published": "2026-01-28",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Choose fillet radii that are multiples of your layer height for clean prints.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.4,
+        "high": 0.4,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.4mm",
+      "source": {
+        "title": "Fusion Print-in-Place Hinge Tutorial (No Supports) for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=wFejArLliwg&t=372s",
+        "timestamp": "06:12",
+        "published": "2026-01-28",
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Keep unsupported overhang angles at 45–50 degrees or less to print without supports.",
+      "topic": "modeling",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "45-50 degrees",
+      "source": {
+        "title": "How to 3D PRINT Parts that FIT Together - Maker Software",
+        "url": "https://www.youtube.com/watch?v=z-HtbxqkYT0&t=318s",
+        "timestamp": "05:18",
+        "published": "2021-08-31",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Keep overhang angles at 50 degrees or less to print without supports.",
+      "topic": "orientation",
+      "value": {
+        "low": 50.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "50 degrees",
+      "source": {
+        "title": "3D Printing Tips & Tricks I Wish I Knew Sooner",
+        "url": "https://www.youtube.com/watch?v=ESeq0AGCIeM&t=30s",
+        "timestamp": "00:30",
+        "published": "2025-03-02",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Be aware that very small gaps may be adjusted or flagged as defects by slicers and modeling systems.",
+      "topic": "slicer",
+      "value": {
+        "low": 0.3,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.3mm",
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=343s",
+        "timestamp": "05:43",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design overhangs no steeper than 50 degrees to print without supports.",
+      "topic": "supports",
+      "value": {
+        "low": 50.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "50 degrees",
+      "source": {
+        "title": "3D Printing Pro TIPS & TRICKS (ACTUALLY WORKS GREAT)",
+        "url": "https://www.youtube.com/watch?v=HYjo5yDE9no&t=306s",
+        "timestamp": "05:06",
+        "published": "2026-08-13",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Keep overhang angles between 45 and 50 degrees to print without supports.",
+      "topic": "supports",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "45 to 50 degrees",
+      "source": {
+        "title": "AMcademy Quick Tips #33 - design tips - minimum unsupported overhang angle",
+        "url": "https://www.youtube.com/watch?v=mQnO0qimz8I&t=36s",
+        "timestamp": "00:36",
+        "published": "2021-07-13",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Keep overhangs within 45 degrees to avoid needing support structures.",
+      "topic": "supports",
+      "value": {
+        "low": 45.0,
+        "high": 45.0,
+        "unit": "deg",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "45 degrees",
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=76s",
+        "timestamp": "01:16",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design custom supports with tiny contact areas of 0.4 or 0.8 mm thick.",
+      "topic": "supports",
+      "value": {
+        "low": 0.4,
+        "high": 0.4,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.4 or 0.8 mm",
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=353s",
+        "timestamp": "05:53",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Leave a gap of around 0.2 mm between custom supports and the part for easy removal.",
+      "topic": "supports",
+      "value": {
+        "low": 0.2,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.2 mm",
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=371s",
+        "timestamp": "06:11",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a 0.5 millimeter clearance between parts that are meant to fit together.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.5,
+        "high": 0.5,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.5 millimeter",
+      "source": {
+        "title": "3D Printing Design Rules",
+        "url": "https://www.youtube.com/watch?v=2PJa5gyDKOk&t=90s",
+        "timestamp": "01:30",
+        "published": "2022-08-26",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Offset the inner face down by 0.5 mm to create clearance for a sliding fit.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.5,
+        "high": 0.5,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.5mm",
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=380s",
+        "timestamp": "06:20",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a 0.125 mm gap between mating pieces to achieve a tight joint.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.125,
+        "high": 0.125,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.125mm",
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=601s",
+        "timestamp": "10:01",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "A 0.6 mm offset provides a good transition fit on the calibrated machine",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.6,
+        "high": 0.6,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.6 millimeters",
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=468s",
+        "timestamp": "07:48",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "0.55 mm is the maximum reasonable interference fit without needing a hammer",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.55,
+        "high": 0.55,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.55 millimeters",
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=727s",
+        "timestamp": "12:07",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "On a MakerBot 2 in draft mode, use a 0.3 mm offset for an interference fit",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.3,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.3 millimeters",
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=773s",
+        "timestamp": "12:53",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a gap of about 0.3mm underneath compliant features to ensure the part prints at any resolution.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.3,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.3mm",
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=333s",
+        "timestamp": "05:33",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "You can increase compliant feature gaps up to 0.5mm for more flexibility",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.5,
+        "high": 0.5,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.5mm",
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=365s",
+        "timestamp": "06:05",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Make the hole about 0.25 mm larger than the pin to allow margin for material shrinkage.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.25,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.25 mm",
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1554s",
+        "timestamp": "25:54",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Increase clearance to up to a half a millimeter for materials with higher shrinkage.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.5,
+        "high": 0.5,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "a half a millimeter",
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1562s",
+        "timestamp": "26:02",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Offset the cone face by 0.2 mm to make the hinge tighter and reduce play.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.2mm",
+      "source": {
+        "title": "Fusion Print-in-Place Hinge Tutorial (No Supports) for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=wFejArLliwg&t=284s",
+        "timestamp": "04:44",
+        "published": "2026-01-28",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a 0.1 mm tolerance for mating faces between two 3D printed parts.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.1,
+        "high": 0.1,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.1mm",
+      "source": {
+        "title": "How to 3D PRINT Parts that FIT Together - Maker Software",
+        "url": "https://www.youtube.com/watch?v=z-HtbxqkYT0&t=203s",
+        "timestamp": "03:23",
+        "published": "2021-08-31",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a 0.2 mm tolerance parameter when modeling holes for standard 3 mm fasteners.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.2mm",
+      "source": {
+        "title": "How to 3D PRINT Parts that FIT Together - Maker Software",
+        "url": "https://www.youtube.com/watch?v=z-HtbxqkYT0&t=210s",
+        "timestamp": "03:30",
+        "published": "2021-08-31",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a 0.2 to 0.25mm tolerance for less precise 3D printers.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.2 to 0.25mm",
+      "source": {
+        "title": "How to 3D PRINT Parts that FIT Together - Maker Software",
+        "url": "https://www.youtube.com/watch?v=z-HtbxqkYT0&t=232s",
+        "timestamp": "03:52",
+        "published": "2021-08-31",
+        "aging": true,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use tighter tolerances where contact area is minimal, such as only near the center of a gear.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.1,
+        "high": 0.1,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.1 mm",
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=189s",
+        "timestamp": "03:09",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a larger clearance where there is more contact surface area that needs to break free, so the part does not get stuck.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.3,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.3 mm",
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=204s",
+        "timestamp": "03:24",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use 0.4 mm as the print-in-place gap to make the model printable on nearly any printer without ideal settings.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.4,
+        "high": 0.4,
+        "unit": "mm",
+        "is_range": false
+      },
+      "value_source": "source",
+      "default_name": null,
+      "stated_as": "0.4 mm",
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=267s",
+        "timestamp": "04:27",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid horizontal overhangs on parts.",
+      "topic": "modeling",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=48s",
+        "timestamp": "00:48",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid thin features that can cause layer lines to unzip.",
+      "topic": "modeling",
+      "value": {
+        "low": 2.0,
+        "high": 2.0,
+        "unit": "xnozzle",
+        "is_range": false
+      },
+      "value_source": "default",
+      "default_name": "min_wall",
+      "stated_as": null,
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=183s",
+        "timestamp": "03:03",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Split a part in the middle and connect the halves with a thin bridge, then fold it after printing to achieve a stronger and more efficient result.",
+      "topic": "modeling",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=939s",
+        "timestamp": "15:39",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Press-fit metal parts such as hex nuts or screws into printed parts to create custom handles and reinforcements.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "How to 3D print stronger parts that look great too!",
+        "url": "https://www.youtube.com/watch?v=JjMInODbFhw&t=294s",
+        "timestamp": "04:54",
+        "published": "2024-02-28",
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Make tapered areas smaller to make assembly of snap-fit parts easier",
+      "topic": "modeling",
+      "value": {
+        "low": 0.5,
+        "high": 1.0,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "snap_fit_engagement",
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=1164s",
+        "timestamp": "19:24",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add fillets on inside corners of snap-fit parts to prevent stress concentration",
+      "topic": "modeling",
+      "value": {
+        "low": 0.5,
+        "high": 1.0,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "snap_fit_engagement",
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=1192s",
+        "timestamp": "19:52",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "For cantilevered beams, increase wall thickness to place more material in the compression and flexure zones.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.5,
+        "high": 1.0,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "snap_fit_engagement",
+      "stated_as": null,
+      "source": {
+        "title": "3x Part Strength Without Slicer Settings",
+        "url": "https://www.youtube.com/watch?v=Lq-SoGgKOcQ&t=42s",
+        "timestamp": "00:42",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use ribs (thin features along the outer edge) as the most effective approach for strengthening 3D printed rods.",
+      "topic": "modeling",
+      "value": {
+        "low": 2.0,
+        "high": 2.0,
+        "unit": "xnozzle",
+        "is_range": false
+      },
+      "value_source": "default",
+      "default_name": "min_wall",
+      "stated_as": null,
+      "source": {
+        "title": "3x Part Strength Without Slicer Settings",
+        "url": "https://www.youtube.com/watch?v=Lq-SoGgKOcQ&t=124s",
+        "timestamp": "02:04",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Convert edges to construction geometry before using an extruded cut to create offset holes.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=868s",
+        "timestamp": "14:28",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Model grip fins by extruding them into the wall and cutting out underneath so they are free to flex.",
+      "topic": "modeling",
+      "value": {
+        "low": 2.0,
+        "high": 2.0,
+        "unit": "xnozzle",
+        "is_range": false
+      },
+      "value_source": "default",
+      "default_name": "min_wall",
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=641s",
+        "timestamp": "10:41",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Combine a press-fitted hex nut or screw with a printed pot to make custom handles.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=416s",
+        "timestamp": "06:56",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Prefer non-print-in-place designs over print-in-place for cleaner geometry.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.3,
+        "high": 0.4,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "print_in_place_gap",
+      "stated_as": null,
+      "source": {
+        "title": "5 Easy Bambu Studio Settings for Smoother 3D Prints",
+        "url": "https://www.youtube.com/watch?v=dhQ1ZQDUT30&t=566s",
+        "timestamp": "09:26",
+        "published": "2025-12-06",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add chamfering and rounding to edges and follow basic design rules so parts press together and fit perfectly regardless of material or color.",
+      "topic": "modeling",
+      "value": {
+        "low": 1.0,
+        "high": 2.0,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "fillet_radius",
+      "stated_as": null,
+      "source": {
+        "title": "Your Prints Won’t Stick? Here’s the Fix for Bambu Lab Printers!",
+        "url": "https://www.youtube.com/watch?v=nAS-HnQ3o84&t=317s",
+        "timestamp": "05:17",
+        "published": "2025-02-25",
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Chamfer and round the top of press-fit pins for reliable, repeatable assembly.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=437s",
+        "timestamp": "07:17",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Do not increase part thickness solely to reduce flex in snap connections; use a different connector design instead.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.5,
+        "high": 1.0,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "snap_fit_engagement",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=161s",
+        "timestamp": "02:41",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Make the S bracket symmetric so you can replicate the hole throughout the part and adjust connector size to increase compression.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=172s",
+        "timestamp": "02:52",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design tapered holes that get wider as they go in, made in large numbers and small size, to allow glue to flow into the part rather than spreading it apart.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=901s",
+        "timestamp": "15:01",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Give holes a small chamfer on top to prevent them from sagging and compressing during printing without causing a tolerance issue.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1146s",
+        "timestamp": "19:06",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Turn circular pins into slots so side compression of the hole is the only thing interfacing with the tab, allowing better fit tuning.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1256s",
+        "timestamp": "20:56",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Chamfer rectangular extrusions so that you do not create overhangs in the resulting hole.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1273s",
+        "timestamp": "21:13",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Make parts thicker to create a robust design that works across different materials and processes.",
+      "topic": "modeling",
+      "value": {
+        "low": 2.0,
+        "high": 2.0,
+        "unit": "xnozzle",
+        "is_range": false
+      },
+      "value_source": "default",
+      "default_name": "min_wall",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1283s",
+        "timestamp": "21:23",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Taper tabs so the entry is narrower than the bottom, creating an interference fit that tightens as the part is inserted.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1298s",
+        "timestamp": "21:38",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add small bumps and corresponding holes inside slots so the parts interlock and retain under load.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1389s",
+        "timestamp": "23:09",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Increase the diameter of a pin to make it stronger and less likely to break off.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1577s",
+        "timestamp": "26:17",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add clearance between mating parts to allow them to fit together correctly.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1612s",
+        "timestamp": "26:52",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Make the pin cross-section wider than the hole and the top narrower so it guides into place during press-fit.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1742s",
+        "timestamp": "29:02",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid direct wall-to-wall binding between pin and hole to eliminate the need for precise clearance.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1762s",
+        "timestamp": "29:22",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add chamfers and rounds to press-fit edges so the parts fit reliably regardless of material or color.",
+      "topic": "modeling",
+      "value": {
+        "low": 1.0,
+        "high": 2.0,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "fillet_radius",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1882s",
+        "timestamp": "31:22",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Make the hinge flange thickness approximately half the pin diameter.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": "half the diameter",
+      "source": {
+        "title": "Fusion Print-in-Place Hinge Tutorial (No Supports) for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=wFejArLliwg&t=181s",
+        "timestamp": "03:01",
+        "published": "2026-01-28",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Round sharp corners that are under stress to avoid stress concentrations.",
+      "topic": "modeling",
+      "value": {
+        "low": 1.0,
+        "high": 2.0,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "fillet_radius",
+      "stated_as": null,
+      "source": {
+        "title": "5 must-know 3D printing tips & tricks. (stronger and better looking prints)",
+        "url": "https://www.youtube.com/watch?v=wLBsO1UzIL0&t=55s",
+        "timestamp": "00:55",
+        "published": "2023-02-05",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use the press/pull or chamfer feature to adjust hole sizes for print tolerances.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "How to 3D PRINT Parts that FIT Together - Maker Software",
+        "url": "https://www.youtube.com/watch?v=z-HtbxqkYT0&t=186s",
+        "timestamp": "03:06",
+        "published": "2021-08-31",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Adjust the top of the corresponding hole to come towards a point and add a small radius at the very top to avoid bridging trouble.",
+      "topic": "modeling",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=338s",
+        "timestamp": "05:38",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Keep overhang angles below approximately 45° to avoid printing into thin air or exposing infill.",
+      "topic": "orientation",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": "45°",
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=681s",
+        "timestamp": "11:21",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Orient parts on the bed to minimize overhangs and reduce the need for supports.",
+      "topic": "orientation",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "3D Printing Tips & Tricks I Wish I Knew Sooner",
+        "url": "https://www.youtube.com/watch?v=ESeq0AGCIeM&t=266s",
+        "timestamp": "04:26",
+        "published": "2025-03-02",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Face higher overhangs away from the coater for easier printing.",
+      "topic": "orientation",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "AMcademy Quick Tips #33 - design tips - minimum unsupported overhang angle",
+        "url": "https://www.youtube.com/watch?v=mQnO0qimz8I&t=62s",
+        "timestamp": "01:02",
+        "published": "2021-07-13",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Orient the part so that holes are in the vertical standing position to avoid overhang droop.",
+      "topic": "orientation",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=290s",
+        "timestamp": "04:50",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Assemble snap-fit parts while the PLA is still warm to avoid permanently deforming the material",
+      "topic": "post-processing",
+      "value": {
+        "low": 0.5,
+        "high": 1.0,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "snap_fit_engagement",
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=1184s",
+        "timestamp": "19:44",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a larger layer height when printing overhangs, as smaller layer heights increase energy density and make overhangs harder to print.",
+      "topic": "slicer",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "3D Printing Tips & Tricks I Wish I Knew Sooner",
+        "url": "https://www.youtube.com/watch?v=ESeq0AGCIeM&t=260s",
+        "timestamp": "04:20",
+        "published": "2025-03-02",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use larger layer heights when printing overhangs, as smaller layer heights increase energy density and make overhangs harder to print.",
+      "topic": "slicer",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "AMcademy Quick Tips #33 - design tips - minimum unsupported overhang angle",
+        "url": "https://www.youtube.com/watch?v=mQnO0qimz8I&t=49s",
+        "timestamp": "00:49",
+        "published": "2021-07-13",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use larger layer heights when printing parts with steep overhangs, as finer layer heights make overhangs harder to print.",
+      "topic": "slicer",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "How to 3D PRINT Parts that FIT Together - Maker Software",
+        "url": "https://www.youtube.com/watch?v=z-HtbxqkYT0&t=4s",
+        "timestamp": "00:04",
+        "published": "2021-08-31",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a larger layer height when printing overhangs, as finer layers make them harder to print.",
+      "topic": "supports",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "3D Printing Pro TIPS & TRICKS (ACTUALLY WORKS GREAT)",
+        "url": "https://www.youtube.com/watch?v=HYjo5yDE9no&t=28s",
+        "timestamp": "00:28",
+        "published": "2026-08-13",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use support structures for overhang areas that cannot be deposited over air",
+      "topic": "supports",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "FDM 3D Printing Guide - All You Need to Know About Fused Deposition Modeling",
+        "url": "https://www.youtube.com/watch?v=SI59pi_FG2M&t=339s",
+        "timestamp": "05:39",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Check all parts on your plate for overhangs before printing to identify where supports may be needed.",
+      "topic": "supports",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "Your Prints Won’t Stick? Here’s the Fix for Bambu Lab Printers!",
+        "url": "https://www.youtube.com/watch?v=nAS-HnQ3o84&t=54s",
+        "timestamp": "00:54",
+        "published": "2025-02-25",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add a one-layer-thick layer of material into a hole to create a removable support.",
+      "topic": "supports",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": "one layer thick",
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=185s",
+        "timestamp": "03:05",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a clever arrangement of bridges to support overhanging shapes without supports.",
+      "topic": "supports",
+      "value": {
+        "low": 45.0,
+        "high": 50.0,
+        "unit": "deg",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "max_overhang",
+      "stated_as": null,
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=231s",
+        "timestamp": "03:51",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Ensure support is placed underneath pins to keep them crisp.",
+      "topic": "supports",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1065s",
+        "timestamp": "17:45",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Taper the top of holes to an angle below your support threshold to prevent support material from being generated inside the hole.",
+      "topic": "supports",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "How to 3D PRINT Parts that FIT Together - Maker Software",
+        "url": "https://www.youtube.com/watch?v=z-HtbxqkYT0&t=364s",
+        "timestamp": "06:04",
+        "published": "2021-08-31",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a camera and a ruler to capture dimensions for FDM tolerance design instead of calipers.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "My Secret To Perfectly Fitting 3D Prints",
+        "url": "https://www.youtube.com/watch?v=0VCss6i7HAk&t=21s",
+        "timestamp": "00:21",
+        "published": "2023-08-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Identify the main mating face before starting tolerance design.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "My Secret To Perfectly Fitting 3D Prints",
+        "url": "https://www.youtube.com/watch?v=0VCss6i7HAk&t=36s",
+        "timestamp": "00:36",
+        "published": "2023-08-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add approximately 0.1mm of clearance to all mating surfaces for FDM printing.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": "0.1",
+      "source": {
+        "title": "My Secret To Perfectly Fitting 3D Prints",
+        "url": "https://www.youtube.com/watch?v=0VCss6i7HAk&t=161s",
+        "timestamp": "02:41",
+        "published": "2023-08-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Keep in mind the final fabrication process when designing for tolerances.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "My Secret To Perfectly Fitting 3D Prints",
+        "url": "https://www.youtube.com/watch?v=0VCss6i7HAk&t=303s",
+        "timestamp": "05:03",
+        "published": "2023-08-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "For press-fit designs, aim for tolerances just tight enough that the part does not fall out on its own.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "How to 3D print stronger parts that look great too!",
+        "url": "https://www.youtube.com/watch?v=JjMInODbFhw&t=294s",
+        "timestamp": "04:54",
+        "published": "2024-02-28",
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a 0.125 gap for print-in-place joints and adjust based on your specific printer",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.3,
+        "high": 0.4,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "print_in_place_gap",
+      "stated_as": "0.125",
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=1128s",
+        "timestamp": "18:48",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use larger gaps and tolerances for print-in-place designs compared to separately printed pieces.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.3,
+        "high": 0.4,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "print_in_place_gap",
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=1236s",
+        "timestamp": "20:36",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Size press-fit tolerances tight enough that the part does not fall out on its own.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "3x Part Strength Without Slicer Settings",
+        "url": "https://www.youtube.com/watch?v=Lq-SoGgKOcQ&t=240s",
+        "timestamp": "04:00",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Introduce fit into your dimensions to compensate for tolerance stacking when both mating parts are manufactured.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=268s",
+        "timestamp": "04:28",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add spacers when a lid or cover is inset to compensate for the gap.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=422s",
+        "timestamp": "07:02",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Specify a clearance fit when parts need to slide or rotate freely within another part.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=422s",
+        "timestamp": "07:02",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Increase the clearance offset for freer movement or decrease it for a resisted sliding fit.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=444s",
+        "timestamp": "07:24",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a fit block to determine the tolerance values for your specific machine",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=515s",
+        "timestamp": "08:35",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "When you get a new printer, run your fit testing block again to recalibrate your tolerances.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=693s",
+        "timestamp": "11:33",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "When adding clearance to a hole, increase both the width and the depth by the clearance amount",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=888s",
+        "timestamp": "14:48",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Intentionally design parts to account for tolerance variations across different machines, materials, and settings.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=40s",
+        "timestamp": "00:40",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use multiple dimensions via a chamfer so the part starts easily and then presses in for the full fit.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.5,
+        "high": 1.0,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "chamfer_size",
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=147s",
+        "timestamp": "02:27",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Adjust the chamfer angle or size to control the tightness of the press fit.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=153s",
+        "timestamp": "02:33",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Cut out the inner cavity of a base to use thin walls, reducing infill's effect on dimensional accuracy.",
+      "topic": "tolerances",
+      "value": {
+        "low": 2.0,
+        "high": 2.0,
+        "unit": "xnozzle",
+        "is_range": false
+      },
+      "value_source": "default",
+      "default_name": "min_wall",
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=226s",
+        "timestamp": "03:46",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Adjust Z offset as a last resort for tolerance issues, but do so with caution.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=264s",
+        "timestamp": "04:24",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Cut out material underneath flexing walls to create a compliant mechanism that absorbs dimensional errors.",
+      "topic": "tolerances",
+      "value": {
+        "low": 2.0,
+        "high": 2.0,
+        "unit": "xnozzle",
+        "is_range": false
+      },
+      "value_source": "default",
+      "default_name": "min_wall",
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=304s",
+        "timestamp": "05:04",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Cut out corners to reduce contact area between mating parts for more reliable and consistent fits.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=486s",
+        "timestamp": "08:06",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Adjust the stiffness of compliant features by making them thicker or pushing them out so they squash more.",
+      "topic": "tolerances",
+      "value": {
+        "low": 2.0,
+        "high": 2.0,
+        "unit": "xnozzle",
+        "is_range": false
+      },
+      "value_source": "default",
+      "default_name": "min_wall",
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=648s",
+        "timestamp": "10:48",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use compliant features in your design to create reliable fits that always work",
+      "topic": "tolerances",
+      "value": {
+        "low": 2.0,
+        "high": 2.0,
+        "unit": "xnozzle",
+        "is_range": false
+      },
+      "value_source": "default",
+      "default_name": "min_wall",
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=681s",
+        "timestamp": "11:21",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a tighter fit for permanent screw installations in plastic to increase friction and self-locking.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=251s",
+        "timestamp": "04:11",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "For permanent screw-in-place applications, use a tight fit since the metal screw will force its way into the material.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=261s",
+        "timestamp": "04:21",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Do not make press fits too tight or you risk breaking the plastic part.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=435s",
+        "timestamp": "07:15",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Increase the surface area of the press-fitted part to gain more friction without tightening the tolerance further.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=439s",
+        "timestamp": "07:19",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add clearance between mating parts so they fit together reliably.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=108s",
+        "timestamp": "01:48",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Prefer locking tab designs that use less material, are more reliable, easier to assemble, and easier to tolerance.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=771s",
+        "timestamp": "12:51",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use side walls as the primary tension interface for pin-and-hole joints rather than relying on the top and bottom of the pin, as side walls have much higher tolerance.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.1,
+        "high": 0.2,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "pin_fit_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1230s",
+        "timestamp": "20:30",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Create offset construction planes using a tolerance parameter to define the print-in-place gap on both sides of the hinge.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.3,
+        "high": 0.4,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "print_in_place_gap",
+      "stated_as": null,
+      "source": {
+        "title": "3D Print in Place Hinge with Parametric Pin Modeled in Fusion 360 Tutorial",
+        "url": "https://www.youtube.com/watch?v=w1o48laHAos&t=213s",
+        "timestamp": "03:33",
+        "published": "2022-02-21",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use section analysis to verify that tolerance is consistent around the entire piece.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "3D Print in Place Hinge with Parametric Pin Modeled in Fusion 360 Tutorial",
+        "url": "https://www.youtube.com/watch?v=w1o48laHAos&t=364s",
+        "timestamp": "06:04",
+        "published": "2022-02-21",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Offset all touching faces to create clearance for a functional print-in-place hinge.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.3,
+        "high": 0.4,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "print_in_place_gap",
+      "stated_as": null,
+      "source": {
+        "title": "Fusion Print-in-Place Hinge Tutorial (No Supports) for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=wFejArLliwg&t=255s",
+        "timestamp": "04:15",
+        "published": "2026-01-28",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Introduce fit into your dimensions to account for manufacturing tolerance.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "5 must-know 3D printing tips & tricks. (stronger and better looking prints)",
+        "url": "https://www.youtube.com/watch?v=wLBsO1UzIL0&t=151s",
+        "timestamp": "02:31",
+        "published": "2023-02-05",
+        "aging": true,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Re-run your fit test file on a new printer to calibrate tolerances.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.3,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "mating_clearance",
+      "stated_as": null,
+      "source": {
+        "title": "5 must-know 3D printing tips & tricks. (stronger and better looking prints)",
+        "url": "https://www.youtube.com/watch?v=wLBsO1UzIL0&t=151s",
+        "timestamp": "02:31",
+        "published": "2023-02-05",
+        "aging": true,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Model holes larger than the nominal fastener diameter to account for 3D printing tolerances.",
+      "topic": "tolerances",
+      "value": {
+        "low": 0.2,
+        "high": 0.25,
+        "unit": "mm",
+        "is_range": true
+      },
+      "value_source": "default",
+      "default_name": "hole_oversize",
+      "stated_as": null,
+      "source": {
+        "title": "How to 3D PRINT Parts that FIT Together - Maker Software",
+        "url": "https://www.youtube.com/watch?v=z-HtbxqkYT0&t=1s",
+        "timestamp": "00:01",
+        "published": "2021-08-31",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Create a flat edge by extending your model below the build plate to improve bed adhesion.",
+      "topic": "bed-adhesion",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to 3D print stronger parts that look great too!",
+        "url": "https://www.youtube.com/watch?v=JjMInODbFhw&t=162s",
+        "timestamp": "02:42",
+        "published": "2024-02-28",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Consider build volume as a primary criterion when choosing a 3D printer.",
+      "topic": "hardware",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "FDM 3D Printing Guide - All You Need to Know About Fused Deposition Modeling",
+        "url": "https://www.youtube.com/watch?v=SI59pi_FG2M&t=238s",
+        "timestamp": "03:58",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Place hardware perpendicular to layer lines to reinforce 3D printed parts, similar to rebar in concrete.",
+      "topic": "hardware",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=32s",
+        "timestamp": "00:32",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use press-fit metal inserts as an alternative to heated inserts for reinforcing 3D printed parts.",
+      "topic": "hardware",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=327s",
+        "timestamp": "05:27",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Source stainless metal rods with integrated threads from cable railing hardware for press-fit reinforcement.",
+      "topic": "hardware",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=360s",
+        "timestamp": "06:00",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use glass-fiber or carbon-fiber filled materials for parts that need to be placed on any surface.",
+      "topic": "materials",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3D Printing Pro TIPS & TRICKS (ACTUALLY WORKS GREAT)",
+        "url": "https://www.youtube.com/watch?v=HYjo5yDE9no&t=44s",
+        "timestamp": "00:44",
+        "published": "2026-08-13",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use PETG for hinge parts to reduce squeaking.",
+      "topic": "materials",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Beginner's Guide to Fit and Tolerance in Fusion 360 - Get the Perfect Fit from Your 3D Printer / CNC",
+        "url": "https://www.youtube.com/watch?v=Re4tKegVfqs&t=434s",
+        "timestamp": "07:14",
+        "published": "2022-09-03",
+        "aging": true,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Print hinges in PETG to reduce squeaking",
+      "topic": "materials",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=254s",
+        "timestamp": "04:14",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use rounded corners instead of sharp corners to allow smooth nozzle travel.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=82s",
+        "timestamp": "01:22",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Do not design cavities in parts; use infill to fill volumes instead.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=154s",
+        "timestamp": "02:34",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add more volume for strength rather than removing material.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=175s",
+        "timestamp": "02:55",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Do not design features that require higher resolution as it increases cost.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=197s",
+        "timestamp": "03:17",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Apply a texture to the part surface to hide layer lines.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=200s",
+        "timestamp": "03:20",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid spikes, fine points, hairs, or strings in your design.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3D Printing Design Rules",
+        "url": "https://www.youtube.com/watch?v=2PJa5gyDKOk&t=68s",
+        "timestamp": "01:08",
+        "published": "2022-08-26",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Create a fit testing block to try out different offsets and determine parameters for different fits.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3D Printing Design Rules",
+        "url": "https://www.youtube.com/watch?v=2PJa5gyDKOk&t=140s",
+        "timestamp": "02:20",
+        "published": "2022-08-26",
+        "aging": true,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Analyze how the part will be loaded and adapt the geometry to avoid the need for supports.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=850s",
+        "timestamp": "14:10",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Incorporate the flat edge into the rest of the object's design to help it blend in visually.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to 3D print stronger parts that look great too!",
+        "url": "https://www.youtube.com/watch?v=JjMInODbFhw&t=232s",
+        "timestamp": "03:52",
+        "published": "2024-02-28",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use millimeter units when designing for FDM 3D printing.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=31s",
+        "timestamp": "00:31",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use straight lines instead of arcs for print-in-place hinge segments to improve print quality.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=224s",
+        "timestamp": "03:44",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a new body when extruding features that should remain separate from the original part to avoid unintended joining.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=317s",
+        "timestamp": "05:17",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid keeping intersecting cylindrical features as the same body to prevent knife edges where they meet.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=350s",
+        "timestamp": "05:50",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid extruding directly from a face where it would create a knife edge at the junction with another cylinder.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=352s",
+        "timestamp": "05:52",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "When building geometry off a center line, account for the center line offset so the final extruded size is correct.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=634s",
+        "timestamp": "10:34",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Hold down control while extruding to snap to other geometry for precise dimensions.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=713s",
+        "timestamp": "11:53",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use flat edges or tapers instead of curved surfaces for better 3D print results",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=802s",
+        "timestamp": "13:22",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use design features rather than slicer settings to strengthen 3D printed parts.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3x Part Strength Without Slicer Settings",
+        "url": "https://www.youtube.com/watch?v=Lq-SoGgKOcQ&t=7s",
+        "timestamp": "00:07",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use press-fit to insert metal hardware into 3D printed parts for reinforcement.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3x Part Strength Without Slicer Settings",
+        "url": "https://www.youtube.com/watch?v=Lq-SoGgKOcQ&t=11s",
+        "timestamp": "00:11",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design around the inherent weakness of layer lines instead of trying to eliminate them.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3x Part Strength Without Slicer Settings",
+        "url": "https://www.youtube.com/watch?v=Lq-SoGgKOcQ&t=21s",
+        "timestamp": "00:21",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Introduce micro-structures into a part to direct the slicer to place more material in specific areas for controlled strength and lightweighting.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3x Part Strength Without Slicer Settings",
+        "url": "https://www.youtube.com/watch?v=Lq-SoGgKOcQ&t=224s",
+        "timestamp": "03:44",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Press-fit inserts work with any shape that is not flared in or out.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3x Part Strength Without Slicer Settings",
+        "url": "https://www.youtube.com/watch?v=Lq-SoGgKOcQ&t=240s",
+        "timestamp": "04:00",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Split larger objects into parts printed in several sessions and glued afterwards",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "FDM 3D Printing Guide - All You Need to Know About Fused Deposition Modeling",
+        "url": "https://www.youtube.com/watch?v=SI59pi_FG2M&t=258s",
+        "timestamp": "04:18",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Chamfer the bottom of the part and round all inner corners for better 3D printability.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=470s",
+        "timestamp": "07:50",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Account for reduced strength in the layers where a hex shape is embossed into the part.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=178s",
+        "timestamp": "02:58",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add fillets on inside corners of your model to avoid stress risers.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "5 Easy Bambu Studio Settings for Smoother 3D Prints",
+        "url": "https://www.youtube.com/watch?v=dhQ1ZQDUT30&t=117s",
+        "timestamp": "01:57",
+        "published": "2025-12-06",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design your CAD to be reliable independent of print settings so it can be produced on any machine without tuning or tweaking slicer settings.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Your Prints Won’t Stick? Here’s the Fix for Bambu Lab Printers!",
+        "url": "https://www.youtube.com/watch?v=nAS-HnQ3o84&t=256s",
+        "timestamp": "04:16",
+        "published": "2025-02-25",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add a fillet to the top of a hole so a pin can be funneled into it.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=48s",
+        "timestamp": "00:48",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Make pins as short as possible to reduce torsional stress on the base.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=48s",
+        "timestamp": "00:48",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Round off all edges of mating parts to allow reliable insertion.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=113s",
+        "timestamp": "01:53",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a cross-shaped cross-section instead of a round one for pins to increase inter-layer adhesion and strength.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=290s",
+        "timestamp": "04:50",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a wrinkled or lobed outer edge on a pin to maximize inter-layer contact area.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=297s",
+        "timestamp": "04:57",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design your CAD to be reliable independent of slicer settings so it can be produced on any machine without tuning.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=391s",
+        "timestamp": "06:31",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add fillets to inside corners to avoid stress risers.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=446s",
+        "timestamp": "07:26",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Prefer non-print-in-place designs when cleaner geometry is desired.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=446s",
+        "timestamp": "07:26",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Split the model into multiple components so different regions can be printed with different settings like more perimeters or higher infill density.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=574s",
+        "timestamp": "09:34",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Always add fillets to reduce stress concentration at sharp internal corners or sudden transitions.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=636s",
+        "timestamp": "10:36",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid using round pegs in round holes for joining 3D printed parts.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=54s",
+        "timestamp": "00:54",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Taper the ends of pegs so they slide in and get tighter as they go in, connecting better with the walls of the part.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=113s",
+        "timestamp": "01:53",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design an S bracket that slides into a hole and snaps into a slot inside the part for precise, strong joining.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=161s",
+        "timestamp": "02:41",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Round all corners on connector pieces so they have easy corners and are easy to print.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=184s",
+        "timestamp": "03:04",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Chamfer the insert of a tongue-and-slot joint so it wedges into the main slot and layer lines lock the parts together.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=302s",
+        "timestamp": "05:02",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design with a simple square first layer with filleted outer edges, placing complexity later in the print to avoid bed adhesion and warping issues.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=432s",
+        "timestamp": "07:12",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Do not connect grip fins to the roof of the slot.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=573s",
+        "timestamp": "09:33",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design internal recesses with locking bumps on either side to create joints that cannot be machined or molded by any other process.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=693s",
+        "timestamp": "11:33",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Combine multiple joint features into a single part that can only be manufactured with 3D printing.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=845s",
+        "timestamp": "14:05",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design surface features into 3D printed parts to improve glue adhesion beyond what sandpaper can achieve.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=850s",
+        "timestamp": "14:10",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design patterns on the part surface to direct where glue should be placed, reducing production errors.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=915s",
+        "timestamp": "15:15",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add ribs or patterned geometry to glue slots to make them more durable.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=964s",
+        "timestamp": "16:04",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use relief cuts or channels as tracks for running a bead of hot glue or similar adhesive along a joint.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=967s",
+        "timestamp": "16:07",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Create internal channels in parts to deliver glue to specific areas after assembly, allowing you to shoot glue from the top without worrying about orientation.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=986s",
+        "timestamp": "16:26",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid designing a simple circular pin straight out the side with a standard circular hole, as the holes will sag and become oblong.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1075s",
+        "timestamp": "17:55",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Chamfer the bottom and round the edges of pins instead of using a simple cube with a circular pin.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1095s",
+        "timestamp": "18:15",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Fillet the holes so that pins can slide in easily.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1168s",
+        "timestamp": "19:28",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Mirror the chamfer on the opposite side of the pin to create a keyhole shape that improves rigidity.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1221s",
+        "timestamp": "20:21",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add a fillet to the top of a hole so that a pin is funneled in when pressed.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1547s",
+        "timestamp": "25:47",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Fillet the base of a pin to prevent it from breaking off at the root.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1588s",
+        "timestamp": "26:28",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Round off the top of a pin so it inserts reliably into the hole instead of a sharp pin trying to find a sharp hole.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1597s",
+        "timestamp": "26:37",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Make pins as short as possible to reduce torsion on the base.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1655s",
+        "timestamp": "27:35",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Maximize material on the outer edge of a pin where cracks would want to form to increase crack resistance.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1828s",
+        "timestamp": "30:28",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design your CAD model to be reliable and independent of slicer settings so it can be produced on any machine without tuning.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1890s",
+        "timestamp": "31:30",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use collinear constraints to maintain symmetry between corresponding features.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3D Print in Place Hinge with Parametric Pin Modeled in Fusion 360 Tutorial",
+        "url": "https://www.youtube.com/watch?v=w1o48laHAos&t=56s",
+        "timestamp": "00:56",
+        "published": "2022-02-21",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a symmetric revolve to ensure the hinge pin is perfectly centered in the part.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3D Print in Place Hinge with Parametric Pin Modeled in Fusion 360 Tutorial",
+        "url": "https://www.youtube.com/watch?v=w1o48laHAos&t=167s",
+        "timestamp": "02:47",
+        "published": "2022-02-21",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use parametric expressions for fillet radii so they update automatically when design parameters change.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3D Print in Place Hinge with Parametric Pin Modeled in Fusion 360 Tutorial",
+        "url": "https://www.youtube.com/watch?v=w1o48laHAos&t=200s",
+        "timestamp": "03:20",
+        "published": "2022-02-21",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use section analysis to verify there is no interference in print-in-place designs.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Fusion Print-in-Place Hinge Tutorial (No Supports) for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=wFejArLliwg&t=434s",
+        "timestamp": "07:14",
+        "published": "2026-01-28",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Round the corner where an axle meets a gear to prevent it from breaking.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "5 must-know 3D printing tips & tricks. (stronger and better looking prints)",
+        "url": "https://www.youtube.com/watch?v=wLBsO1UzIL0&t=100s",
+        "timestamp": "01:40",
+        "published": "2023-02-05",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid narrow cross sections as they create the weakest point in a 3D print.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "5 must-know 3D printing tips & tricks. (stronger and better looking prints)",
+        "url": "https://www.youtube.com/watch?v=wLBsO1UzIL0&t=111s",
+        "timestamp": "01:51",
+        "published": "2023-02-05",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add chamfers where connecting rods meet geared sides to prevent bonding.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=209s",
+        "timestamp": "03:29",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Chamfer the edges touching the build plate on any motion parts.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=279s",
+        "timestamp": "04:39",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use central shafts in hinge designs for added strength.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=315s",
+        "timestamp": "05:15",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid having bridging on the lowest layer of pins and corresponding holes, as some slicers handle this poorly.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=321s",
+        "timestamp": "05:21",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Give a proper flat bridge area to the bottom of the pin so slicers do not make a mess inside.",
+      "topic": "modeling",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=325s",
+        "timestamp": "05:25",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Minimize bed surface contact area for mass production.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=245s",
+        "timestamp": "04:05",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Cut round or curvy parts in half, print with the cut side down on the print bed, and join them with super glue.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3D Printing Design Rules",
+        "url": "https://www.youtube.com/watch?v=2PJa5gyDKOk&t=103s",
+        "timestamp": "01:43",
+        "published": "2022-08-26",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Choose the correct orientation when printing a part rather than overlooking it.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=28s",
+        "timestamp": "00:28",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Do not rely solely on the slicer's auto-orientation feature, as it optimizes for bed contact and minimal supports but not necessarily for part strength.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=47s",
+        "timestamp": "00:47",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Orient parts so that expected loading stresses are aligned with the print lines to maximize strength.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=335s",
+        "timestamp": "05:35",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Be cautious when printing warp-prone materials on their side, as the ends can lift and cause print issues.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=345s",
+        "timestamp": "05:45",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid placing countersunk holes where layer lines run directly through them, as screw tightening force can split the part along the layers.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=363s",
+        "timestamp": "06:03",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "A 30° print angle can yield higher tensile strength than a 60° angle.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": "30°",
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=424s",
+        "timestamp": "07:04",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Angle parts between horizontal and vertical to balance strength in multiple directions when no single orientation is ideal.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=452s",
+        "timestamp": "07:32",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Print the part at an angle so all surfaces have perimeters and look and feel uniform.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=627s",
+        "timestamp": "10:27",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Tilt the part to reduce stair-stepping on curved or organic surfaces.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=655s",
+        "timestamp": "10:55",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Print at a slight angle to reduce shrink lines, since the connecting geometry is then printed gradually over many layers instead of all at once.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=750s",
+        "timestamp": "12:30",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Consider that a part printed flat may be strong in one direction but prone to splitting 90° to it.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=786s",
+        "timestamp": "13:06",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid orientations that place layer boundaries perpendicular to the load at stress concentration points.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=802s",
+        "timestamp": "13:22",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Angle your part to improve strength when the load direction does not align with the layer direction.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=807s",
+        "timestamp": "13:27",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "When downloading a model, re-evaluate the default slicer orientation and align the part to match your functional requirements.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=834s",
+        "timestamp": "13:54",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "When designing a part from scratch, consider print orientation from the first sketch.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=850s",
+        "timestamp": "14:10",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Lay parts flat when possible because Z-direction printing is slower than XY-direction printing.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3D Printing Tips & Tricks I Wish I Knew Sooner",
+        "url": "https://www.youtube.com/watch?v=ESeq0AGCIeM&t=316s",
+        "timestamp": "05:16",
+        "published": "2025-03-02",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "The weakest layer lines in a 3D print are those oriented horizontally.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to 3D print stronger parts that look great too!",
+        "url": "https://www.youtube.com/watch?v=JjMInODbFhw&t=38s",
+        "timestamp": "00:38",
+        "published": "2024-02-28",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Orient your model so the XY plane aligns with the build plate to make snapping and design easier.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How To Design a Print in Place 3D Printed Hinge in Plasticity",
+        "url": "https://www.youtube.com/watch?v=JnptZpu7fHg&t=132s",
+        "timestamp": "02:12",
+        "published": "2024-07-03",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Screw directly into plastic perpendicular to the layer lines for a strong mechanical connection that resists bending.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Virtually indestructible 3D prints across layer lines - 3 ways to stronger parts",
+        "url": "https://www.youtube.com/watch?v=cC5KlelZlx4&t=195s",
+        "timestamp": "03:15",
+        "published": "2024-04-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Place the object on the build plate to minimize layer lines and support material.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "5 must-know 3D printing tips & tricks. (stronger and better looking prints)",
+        "url": "https://www.youtube.com/watch?v=wLBsO1UzIL0&t=76s",
+        "timestamp": "01:16",
+        "published": "2023-02-05",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Orient round features horizontally to achieve smooth surfaces without layer lines.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "5 must-know 3D printing tips & tricks. (stronger and better looking prints)",
+        "url": "https://www.youtube.com/watch?v=wLBsO1UzIL0&t=82s",
+        "timestamp": "01:22",
+        "published": "2023-02-05",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Consider part orientation when slicing objects.",
+      "topic": "orientation",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "5 must-know 3D printing tips & tricks. (stronger and better looking prints)",
+        "url": "https://www.youtube.com/watch?v=wLBsO1UzIL0&t=120s",
+        "timestamp": "02:00",
+        "published": "2023-02-05",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Plan for post-processing on FDM printouts to improve finish and surface quality.",
+      "topic": "post-processing",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "FDM 3D Printing Guide - All You Need to Know About Fused Deposition Modeling",
+        "url": "https://www.youtube.com/watch?v=SI59pi_FG2M&t=190s",
+        "timestamp": "03:10",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Flex PLA parts while the material is still warm to avoid permanently deforming them.",
+      "topic": "post-processing",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "5 Easy Bambu Studio Settings for Smoother 3D Prints",
+        "url": "https://www.youtube.com/watch?v=dhQ1ZQDUT30&t=271s",
+        "timestamp": "04:31",
+        "published": "2025-12-06",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Flex print-in-place parts while the material is still warm to avoid permanent deformation.",
+      "topic": "post-processing",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=310s",
+        "timestamp": "05:10",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Deburr and remove sharp corners from printed parts to allow correct insertion.",
+      "topic": "post-processing",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=1614s",
+        "timestamp": "26:54",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Be aware that very small cuts can cause slicer artifacts that close up the holes.",
+      "topic": "slicer",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=365s",
+        "timestamp": "06:05",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Reinforce high-stress connection areas with additional perimeters.",
+      "topic": "slicer",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=584s",
+        "timestamp": "09:44",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Turn all fans up to max to prevent surfaces from bonding too well on print-in-place models.",
+      "topic": "slicer",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": "Max",
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=150s",
+        "timestamp": "02:30",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Be aware that embossed or debossed text on vertical faces may sag without supports.",
+      "topic": "supports",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3D Printing Design Rules",
+        "url": "https://www.youtube.com/watch?v=2PJa5gyDKOk&t=132s",
+        "timestamp": "02:12",
+        "published": "2022-08-26",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design custom supports that are only rigidly connected at a few points to prevent warping from lifting the part.",
+      "topic": "supports",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=590s",
+        "timestamp": "09:50",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Minimize the use of support structures to a reasonable limit to preserve surface quality.",
+      "topic": "supports",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "FDM 3D Printing Guide - All You Need to Know About Fused Deposition Modeling",
+        "url": "https://www.youtube.com/watch?v=SI59pi_FG2M&t=370s",
+        "timestamp": "06:10",
+        "published": null,
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Adjust print settings and cooling fan to determine reliable bridge lengths.",
+      "topic": "supports",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stronger 3D Prints & Less Supports - How to Design for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=vRA776CtTw0&t=238s",
+        "timestamp": "03:58",
+        "published": "2025-07-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design print-in-place hinges so the entire assembly prints without supports.",
+      "topic": "supports",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Fusion Print-in-Place Hinge Tutorial (No Supports) for 3D Printing",
+        "url": "https://www.youtube.com/watch?v=wFejArLliwg&t=7s",
+        "timestamp": "00:07",
+        "published": "2026-01-28",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add supports in locations where they may not be immediately obvious.",
+      "topic": "supports",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=76s",
+        "timestamp": "01:16",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Position the object far enough from the camera so it appears flat when zoomed in as far as possible.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "My Secret To Perfectly Fitting 3D Prints",
+        "url": "https://www.youtube.com/watch?v=0VCss6i7HAk&t=46s",
+        "timestamp": "00:46",
+        "published": "2023-08-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use the longest focal length available to make the captured image as orthographic as possible.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "My Secret To Perfectly Fitting 3D Prints",
+        "url": "https://www.youtube.com/watch?v=0VCss6i7HAk&t=58s",
+        "timestamp": "00:58",
+        "published": "2023-08-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Photograph a different face of the part to capture depth dimensions using the same workflow.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "My Secret To Perfectly Fitting 3D Prints",
+        "url": "https://www.youtube.com/watch?v=0VCss6i7HAk&t=190s",
+        "timestamp": "03:10",
+        "published": "2023-08-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Account for one to two decimal places of inaccuracy inherent in FDM printing.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": "one to two decimal places",
+      "source": {
+        "title": "My Secret To Perfectly Fitting 3D Prints",
+        "url": "https://www.youtube.com/watch?v=0VCss6i7HAk&t=307s",
+        "timestamp": "05:07",
+        "published": "2023-08-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use grip fins or edge cutouts to make holes compliant.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "8 Essential Design Rules for Mass Production 3D Printing",
+        "url": "https://www.youtube.com/watch?v=1n_R8shlGcs&t=235s",
+        "timestamp": "03:55",
+        "published": "2023-11-18",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Ensure correct dimensions when re-printing parts at different orientations to prevent failure during installation.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Stop Printing Flat - The 45° Secret for Stronger Parts",
+        "url": "https://www.youtube.com/watch?v=7aJ4dDyyf20&t=899s",
+        "timestamp": "14:59",
+        "published": "2025-10-26",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add a chamfer to one side of a mating part to create a starter edge for easier insertion.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=131s",
+        "timestamp": "02:11",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Slightly expand dimensions to create a sliding interlocking fit for one-directional lids.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=160s",
+        "timestamp": "02:40",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use a chamfered design for one-directional lids that press together and resist coming apart.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=171s",
+        "timestamp": "02:51",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Avoid solid inner bases in mating parts because infill direction and type cause variable shrinkage.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=216s",
+        "timestamp": "03:36",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design walls to contact only at the outer corners to allow easier insertion and some flex.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=276s",
+        "timestamp": "04:36",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Be cautious with splits in the plane of layer lines as they can cause splitting and delamination.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=545s",
+        "timestamp": "09:05",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use grip fins to achieve consistent press-fit force independent of print settings.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "How to Design a Print with Perfect Tolerance EVERY Time",
+        "url": "https://www.youtube.com/watch?v=XKrDUnZCmQQ&t=614s",
+        "timestamp": "10:14",
+        "published": "2025-07-31",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Design pin cross-sections to allow wear-in rather than binding for repeated use.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design Unbreakable Pins with Perfect Tolerances",
+        "url": "https://www.youtube.com/watch?v=uMA-Wt-z_BU&t=183s",
+        "timestamp": "03:03",
+        "published": "2025-08-15",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Keep the I-slot tongue circle dead center dimensionally to the mating circle to simplify tolerancing.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Ultimate Guide to Connecting 3D Printed Parts",
+        "url": "https://www.youtube.com/watch?v=vsHpiHhB3RU&t=490s",
+        "timestamp": "08:10",
+        "published": "2025-11-21",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Use parametric modeling features in Fusion 360 to set tolerances for print-in-place hinges.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "3D Print in Place Hinge with Parametric Pin Modeled in Fusion 360 Tutorial",
+        "url": "https://www.youtube.com/watch?v=w1o48laHAos&t=4s",
+        "timestamp": "00:04",
+        "published": "2022-02-21",
+        "aging": true,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Create a fit testing block to try out different offsets and determine fit parameters.",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "5 must-know 3D printing tips & tricks. (stronger and better looking prints)",
+        "url": "https://www.youtube.com/watch?v=wLBsO1UzIL0&t=151s",
+        "timestamp": "02:31",
+        "published": "2023-02-05",
+        "aging": true,
+        "timestamp_unverified": true
+      },
+      "conflicts_with": []
+    },
+    {
+      "rule": "Add spacers when a lid is inset to improve fit",
+      "topic": "tolerances",
+      "value": null,
+      "value_source": "none",
+      "default_name": null,
+      "stated_as": null,
+      "source": {
+        "title": "Design AND Print your own PRINT IN PLACE - Feat. Creality K1",
+        "url": "https://www.youtube.com/watch?v=zEKWZbtndX4&t=425s",
+        "timestamp": "07:05",
+        "published": "2023-10-14",
+        "aging": false,
+        "timestamp_unverified": false
+      },
+      "conflicts_with": []
+    }
+  ]
+}

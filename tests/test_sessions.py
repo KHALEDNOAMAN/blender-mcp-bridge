@@ -3,7 +3,7 @@
 import json
 import os
 
-from src.sessions import BridgeSession, SessionMetadata, SessionRecorder
+from blender_mcp_bridge.sessions import BridgeSession, SessionMetadata, SessionRecorder
 
 
 def test_session_lifecycle():

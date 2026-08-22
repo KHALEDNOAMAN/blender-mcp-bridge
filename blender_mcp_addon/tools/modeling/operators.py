@@ -186,6 +186,7 @@ class ModelingOperators:
             res.name = new_name
         return {
             "success": True,
+            "name": res.name,
             "message": f"Joined objects into '{res.name}'",
         }
 
@@ -592,6 +593,64 @@ class ModelingOperators:
             "verified": True,
             "object": object_name,
             "message": f"'{object_name}' visibility updated ({settings}).",
+        }
+
+    def separate_loose_parts(self, object_name, prefix=None):
+        """Split one mesh's disconnected shells into separate objects.
+
+        A boolean that cuts a part into pieces leaves ONE object holding
+        several disconnected shells — delete_object works per object, so the
+        pieces cannot be handled individually until they are separated. This
+        wraps Blender's `mesh.separate(type='LOOSE')`.
+
+        Returns the new object names, sorted, so the caller can address each
+        piece. With `prefix`, the results are renamed `<prefix>_0`, `_1`, ...
+        in that sorted order.
+        """
+        if bpy.context.mode != "OBJECT":
+            bpy.ops.object.mode_set(mode="OBJECT")
+
+        obj = get_object(object_name)
+        if obj.type != "MESH":
+            return {
+                "success": False,
+                "error": f"Object '{object_name}' is not a mesh (type: {obj.type}).",
+            }
+
+        before = {o.name for o in bpy.data.objects}
+
+        bpy.ops.object.select_all(action="DESELECT")
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+
+        bpy.ops.object.mode_set(mode="EDIT")
+        bpy.ops.mesh.select_all(action="SELECT")
+        bpy.ops.mesh.separate(type="LOOSE")
+        bpy.ops.object.mode_set(mode="OBJECT")
+
+        created = sorted({o.name for o in bpy.data.objects} - before)
+        names = sorted([object_name] + created)
+
+        if prefix:
+            renamed = []
+            # Two passes: park under a temporary name first, so a target name
+            # that collides with an as-yet-unrenamed piece cannot clobber it.
+            for i, n in enumerate(names):
+                bpy.data.objects[n].name = f"__sep_tmp_{i}"
+            for i in range(len(names)):
+                final = f"{prefix}_{i}"
+                bpy.data.objects[f"__sep_tmp_{i}"].name = final
+                renamed.append(final)
+            names = renamed
+
+        return {
+            "success": True,
+            "source": object_name,
+            "part_count": len(names),
+            "parts": names,
+            "message": (
+                f"Separated '{object_name}' into {len(names)} loose parts: {', '.join(names)}."
+            ),
         }
 
     def convert_to_mesh(self, object_name):

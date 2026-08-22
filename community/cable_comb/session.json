@@ -1,0 +1,500 @@
+{
+  "metadata": {
+    "name": "Cable Comb - pin-jointed desk cable organiser",
+    "model": "claude-opus-5",
+    "description": "Two-part desk cable organiser built to the design rules exported by print-kb. The comb lies flat and the base caps it, pins pointing down through the comb's holes, turning the five slots into enclosed cable channels. Both parts print flat on Z=0 side by side with no supports; the base is flipped over to assemble. Every dimension is cited to a rule in assets/design_v1.md."
+  },
+  "commands": [
+    {
+      "tool": "set_scene_units",
+      "arguments": {
+        "system": "METRIC",
+        "length_unit": "MILLIMETERS",
+        "scale": 0.001
+      },
+      "description": "Millimetres, so slicer dimensions are absolute."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "*"
+      },
+      "description": "Wipe scene for an idempotent replay."
+    },
+    {
+      "tool": "create_cube",
+      "arguments": {
+        "name": "Base",
+        "dimensions": [
+          70.0,
+          22.0,
+          4.0
+        ],
+        "location": [
+          0.0,
+          0.0,
+          2.0
+        ]
+      },
+      "description": "Base plate 70x22x4mm, sitting on the build plate."
+    },
+    {
+      "tool": "create_cylinder",
+      "arguments": {
+        "name": "PinL_Shaft",
+        "radius": 2.5,
+        "depth": 4.0,
+        "vertices": 64,
+        "location": [
+          -28.0,
+          0.0,
+          6.0
+        ]
+      },
+      "description": "Left pin shaft, 5.0mm diameter, 4mm of straight engagement above the plate."
+    },
+    {
+      "tool": "create_cone",
+      "arguments": {
+        "name": "PinL_Tip",
+        "radius1": 2.5,
+        "radius2": 1.5,
+        "depth": 1.0,
+        "vertices": 64,
+        "location": [
+          -28.0,
+          0.0,
+          8.5
+        ]
+      },
+      "description": "R2: 45-degree chamfered tip (2.5->1.5mm over 1mm rise). A chamfer, not a fillet, so the overhang stays constant."
+    },
+    {
+      "tool": "create_cylinder",
+      "arguments": {
+        "name": "PinR_Shaft",
+        "radius": 2.5,
+        "depth": 4.0,
+        "vertices": 64,
+        "location": [
+          28.0,
+          0.0,
+          6.0
+        ]
+      },
+      "description": "Right pin shaft, mirrored at x=+28."
+    },
+    {
+      "tool": "create_cone",
+      "arguments": {
+        "name": "PinR_Tip",
+        "radius1": 2.5,
+        "radius2": 1.5,
+        "depth": 1.0,
+        "vertices": 64,
+        "location": [
+          28.0,
+          0.0,
+          8.5
+        ]
+      },
+      "description": "R2: right pin chamfer."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Base",
+        "object_b": "PinL_Shaft",
+        "operation": "UNION"
+      },
+      "description": "Union left shaft onto the plate."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Base",
+        "object_b": "PinL_Tip",
+        "operation": "UNION"
+      },
+      "description": "Union left chamfer."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Base",
+        "object_b": "PinR_Shaft",
+        "operation": "UNION"
+      },
+      "description": "Union right shaft."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Base",
+        "object_b": "PinR_Tip",
+        "operation": "UNION"
+      },
+      "description": "Union right chamfer."
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "Base"
+      },
+      "description": "Modifiers are never applied automatically - bake all four unions."
+    },
+    {
+      "tool": "repair_mesh",
+      "arguments": {
+        "object_name": "Base"
+      },
+      "description": "Merge the seam vertices the unions leave behind."
+    },
+    {
+      "tool": "apply_modifier",
+      "arguments": {
+        "object_name": "Base",
+        "modifier_type": "BEVEL",
+        "width": 0.3,
+        "segments": 2,
+        "use_clamp_overlap": true
+      },
+      "description": "R6: 0.3mm fillet on the base. Narrow enough that it cannot eat into the 45-degree pin chamfer, which must stay a chamfer (R2)."
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "Base"
+      },
+      "description": "Bake the bevel."
+    },
+    {
+      "tool": "repair_mesh",
+      "arguments": {
+        "object_name": "Base"
+      },
+      "description": "Clean up after the bevel."
+    },
+    {
+      "tool": "create_cube",
+      "arguments": {
+        "name": "Comb",
+        "dimensions": [
+          70.0,
+          22.0,
+          6.0
+        ],
+        "location": [
+          0.0,
+          0.0,
+          53.0
+        ]
+      },
+      "description": "Comb plate 70x22x6mm, built well clear of the base so cutters cannot touch it."
+    },
+    {
+      "tool": "create_cylinder",
+      "arguments": {
+        "name": "HoleL",
+        "radius": 2.625,
+        "depth": 20.0,
+        "vertices": 64,
+        "location": [
+          -28.0,
+          0.0,
+          53.0
+        ]
+      },
+      "description": "R1: 5.25mm hole = 5.0mm pin + 0.25mm attested clearance. Cutter is 20mm deep against a 6mm plate, oversized so no face is coincident."
+    },
+    {
+      "tool": "create_cylinder",
+      "arguments": {
+        "name": "HoleR",
+        "radius": 2.625,
+        "depth": 20.0,
+        "vertices": 64,
+        "location": [
+          28.0,
+          0.0,
+          53.0
+        ]
+      },
+      "description": "R1: right hole."
+    },
+    {
+      "tool": "create_cube",
+      "arguments": {
+        "name": "Slot1",
+        "dimensions": [
+          4.0,
+          30.0,
+          8.0
+        ],
+        "location": [
+          -22.0,
+          0.0,
+          56.0
+        ]
+      },
+      "description": "Cable slot 1 of 5: 4mm wide, cutting 4mm down from the top face (top at z=56, cutter spans 54-62)."
+    },
+    {
+      "tool": "create_cube",
+      "arguments": {
+        "name": "Slot2",
+        "dimensions": [
+          4.0,
+          30.0,
+          8.0
+        ],
+        "location": [
+          -11.0,
+          0.0,
+          56.0
+        ]
+      },
+      "description": "Cable slot 2 of 5."
+    },
+    {
+      "tool": "create_cube",
+      "arguments": {
+        "name": "Slot3",
+        "dimensions": [
+          4.0,
+          30.0,
+          8.0
+        ],
+        "location": [
+          0.0,
+          0.0,
+          56.0
+        ]
+      },
+      "description": "Cable slot 3 of 5, centred."
+    },
+    {
+      "tool": "create_cube",
+      "arguments": {
+        "name": "Slot4",
+        "dimensions": [
+          4.0,
+          30.0,
+          8.0
+        ],
+        "location": [
+          11.0,
+          0.0,
+          56.0
+        ]
+      },
+      "description": "Cable slot 4 of 5."
+    },
+    {
+      "tool": "create_cube",
+      "arguments": {
+        "name": "Slot5",
+        "dimensions": [
+          4.0,
+          30.0,
+          8.0
+        ],
+        "location": [
+          22.0,
+          0.0,
+          56.0
+        ]
+      },
+      "description": "Cable slot 5 of 5."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Comb",
+        "object_b": "HoleL",
+        "operation": "DIFFERENCE"
+      },
+      "description": "Cut the left pin hole."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Comb",
+        "object_b": "HoleR",
+        "operation": "DIFFERENCE"
+      },
+      "description": "Cut the right pin hole."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Comb",
+        "object_b": "Slot1",
+        "operation": "DIFFERENCE"
+      },
+      "description": "Cut cable slot 1."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Comb",
+        "object_b": "Slot2",
+        "operation": "DIFFERENCE"
+      },
+      "description": "Cut cable slot 2."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Comb",
+        "object_b": "Slot3",
+        "operation": "DIFFERENCE"
+      },
+      "description": "Cut cable slot 3."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Comb",
+        "object_b": "Slot4",
+        "operation": "DIFFERENCE"
+      },
+      "description": "Cut cable slot 4."
+    },
+    {
+      "tool": "boolean_operation",
+      "arguments": {
+        "object_a": "Comb",
+        "object_b": "Slot5",
+        "operation": "DIFFERENCE"
+      },
+      "description": "Cut cable slot 5."
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "Comb"
+      },
+      "description": "Bake all seven cuts - nothing applies a modifier by itself."
+    },
+    {
+      "tool": "repair_mesh",
+      "arguments": {
+        "object_name": "Comb"
+      },
+      "description": "Clean up the boolean seams."
+    },
+    {
+      "tool": "apply_modifier",
+      "arguments": {
+        "object_name": "Comb",
+        "modifier_type": "BEVEL",
+        "width": 0.3,
+        "segments": 2,
+        "use_clamp_overlap": true
+      },
+      "description": "R5/R6: 0.3mm fillet. Funnels both hole mouths so the pin is guided in and rounds the slot floors against stress risers. Width kept at 0.3mm so the rounding of the bottom edge stays inside one 0.2mm layer; at 0.5mm it flared 0.21mm and read as a first-layer overhang."
+    },
+    {
+      "tool": "apply_all_modifiers",
+      "arguments": {
+        "object_name": "Comb"
+      },
+      "description": "Bake the bevel - a modifier is never applied by itself."
+    },
+    {
+      "tool": "repair_mesh",
+      "arguments": {
+        "object_name": "Comb"
+      },
+      "description": "Clean up after the bevel."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "Pin?_*"
+      },
+      "description": "Delete the four pin pieces the unions consumed. boolean_operation only HIDES its operand (hide_cutter defaults true), so without this they stay in the scene as hidden objects."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "Hole?"
+      },
+      "description": "Delete the consumed hole cutters."
+    },
+    {
+      "tool": "delete_object",
+      "arguments": {
+        "pattern": "Slot?"
+      },
+      "description": "Delete the consumed slot cutters, leaving only Base and Comb in the scene."
+    },
+    {
+      "tool": "check_mesh_for_printing",
+      "arguments": {
+        "object_name": "Base"
+      },
+      "description": "Gate: Base must be watertight with zero degenerates before export."
+    },
+    {
+      "tool": "check_mesh_for_printing",
+      "arguments": {
+        "object_name": "Comb"
+      },
+      "description": "Gate: Comb must be watertight with zero degenerates before export."
+    },
+    {
+      "tool": "export_model",
+      "arguments": {
+        "object_name": "Base",
+        "filepath": "../community/cable_comb/assets/cable_comb_base.stl",
+        "format": "STL"
+      },
+      "description": "Export the base."
+    },
+    {
+      "tool": "export_model",
+      "arguments": {
+        "object_name": "Comb",
+        "filepath": "../community/cable_comb/assets/cable_comb_comb.stl",
+        "format": "STL"
+      },
+      "description": "Export the comb."
+    },
+    {
+      "tool": "transform_object",
+      "arguments": {
+        "object_name": "Base",
+        "location": [
+          0.0,
+          -16.0,
+          2.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "description": "PRINT POSE: base on the build plate with its pins pointing UP, so they print self-supporting (R2/R3). Underside on Z=0."
+    },
+    {
+      "tool": "transform_object",
+      "arguments": {
+        "object_name": "Comb",
+        "location": [
+          0.0,
+          16.0,
+          3.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "description": "PRINT POSE: comb beside it, slots opening up, underside on Z=0. Both parts sit on the plate side by side - they are printed apart, then the base is flipped over to assemble."
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+// studio/src/lib/params.js
+
 // Global parameter resolution — see docs/studio_design_v1.md §4.
 // A "${name}" token inside a string arg value is substituted with the
 // matching parameter's raw string value, then coerced to the arg's
@@ -22,7 +24,15 @@ export function extractParamName(value) {
 }
 
 export function isParametric(value) {
-    return extractParamName(value) !== null || (typeof value === 'string' && looksLikeExpression(value));
+    // The third clause covers string interpolation ("bolt_M${bolt_major}.stl"):
+    // such a string is neither a bare token nor expression-shaped, but it still
+    // has to be routed through resolveValue() rather than passed through raw.
+    // Mirrors is_parametric() in src/params.py.
+    return (
+        extractParamName(value) !== null ||
+        (typeof value === 'string' && looksLikeExpression(value)) ||
+        (typeof value === 'string' && /\$\{[a-zA-Z_][a-zA-Z0-9_]*\}/.test(value))
+    );
 }
 
 /**
@@ -48,6 +58,27 @@ export function resolveValue(raw, parameters) {
         } catch (err) {
             return { ok: false, error: err.message };
         }
+    }
+    // Last resort: string interpolation, e.g. "bolt_M${bolt_major}_L${bolt_length}.stl".
+    // Mirrors resolve_value() in src/params.py. Deliberately AFTER the two numeric
+    // paths so nothing that already resolved as a bare token or an expression changes
+    // behaviour — a string only reaches here if looksLikeExpression() rejected it,
+    // i.e. it does not tokenize as arithmetic. Note "${a}-${b}" DOES tokenize (as
+    // subtraction) and is evaluated above; use "_" as a filename separator, not "-".
+    // Numeric values are trimmed ("6.0" -> "6") so filenames read M6, not M6.0.
+    if (typeof raw === 'string' && /\$\{[a-zA-Z_][a-zA-Z0-9_]*\}/.test(raw)) {
+        const missing = collectParamNames(raw).filter((n) => !(n in parameters));
+        if (missing.length > 0) return { ok: false, unresolved: missing };
+        const value = raw.replace(/\$\{([a-zA-Z_][a-zA-Z0-9_]*)\}/g, (_m, name) => {
+            const v = String(parameters[name]);
+            // Match src/params.py exactly: any numeric value that is a whole
+            // number renders without its fraction, so "6.0" -> "6" and a
+            // filename reads M6 in Studio and the CLI alike. Comparing
+            // String(f) === v instead would leave "6.0" untrimmed in JS only.
+            const f = Number(v);
+            return v.trim() !== '' && Number.isFinite(f) ? String(f) : v;
+        });
+        return { ok: true, value };
     }
     return { ok: true, value: raw };
 }

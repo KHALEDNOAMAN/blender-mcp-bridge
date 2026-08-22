@@ -1,3 +1,5 @@
+// studio/src/components/ActionBar.jsx
+
 /**
  * Command actionbar — playback transport + branch selection. See
  * docs/studio_design_v1.md §7.4, §7.5. Docked directly under the Command

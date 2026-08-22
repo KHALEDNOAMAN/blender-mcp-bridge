@@ -1,4 +1,8 @@
-/* Global reset — app visuals come from style.css (ported from session_editor) */
+/* 
+  studio/src/index.css
+  Global CSS for the Studio app.
+  This file is imported by main.jsx, which is the entry point for Vite.
+*/
 * {
   box-sizing: border-box;
 }

@@ -1,3 +1,10 @@
+/* 
+  studio/src/style.css
+  Main CSS for the Studio app.
+  This file is imported by App.jsx, which is the root component for the React app.
+  It contains the bulk of the visual styling, ported from session_editor/style.css.
+*/
+
 :root {
     /* Default Dark Theme Variables */
     --bg-color: #0d1117;
@@ -438,18 +445,68 @@ header {
 }
 
 .metadata-body {
-    overflow: hidden;
-    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 520px;
     transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease;
     opacity: 1;
     padding: 0 1.5rem 1.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 }
 
 .metadata-collapsible.collapsed .metadata-body {
     max-height: 0;
     opacity: 0;
     padding: 0 1.5rem;
+    overflow: hidden;
 }
+
+.params-table,
+.branches-list {
+    max-height: 460px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    margin-bottom: 0.75rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.params-table::-webkit-scrollbar,
+.branches-list::-webkit-scrollbar,
+.metadata-body::-webkit-scrollbar,
+.left-sidebar::-webkit-scrollbar,
+.json-editor-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.params-table::-webkit-scrollbar-track,
+.branches-list::-webkit-scrollbar-track,
+.metadata-body::-webkit-scrollbar-track,
+.left-sidebar::-webkit-scrollbar-track,
+.json-editor-sidebar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+}
+
+.params-table::-webkit-scrollbar-thumb,
+.branches-list::-webkit-scrollbar-thumb,
+.metadata-body::-webkit-scrollbar-thumb,
+.left-sidebar::-webkit-scrollbar-thumb,
+.json-editor-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.params-table::-webkit-scrollbar-thumb:hover,
+.branches-list::-webkit-scrollbar-thumb:hover,
+.metadata-body::-webkit-scrollbar-thumb:hover,
+.left-sidebar::-webkit-scrollbar-thumb:hover,
+.json-editor-sidebar::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color, #4f46e5);
+}
+
 
 /* Collapsible Commands Panel */
 .commands-collapsible {
@@ -1979,4 +2036,287 @@ footer {
 .assistant-input:focus {
     outline: none;
     border-color: var(--accent-color);
+}
+
+/* ── Typed parameter controls (slider / checkbox / select) ──────────────
+   Rendered by ParameterControl when the session carries a `parameter_ui`
+   entry for that parameter; otherwise the plain .params-row-value text
+   input is used and none of this applies.
+
+   Typed params use a STACKED row: the name/delete line sits above a
+   full-width control. The sidebar is only ~250px wide, and the inline
+   layout (name 40% + control + delete on one line) left the slider itself
+   about 60px — unusable. Stacking gives the control the full width. */
+.params-row-stacked {
+    display: block;
+    padding: 0.3rem 0.45rem 0.35rem;
+    margin-bottom: 0.3rem;
+    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.25));
+    border-radius: 6px;
+    background: rgba(128, 128, 128, 0.04);
+}
+
+/* Name and label share one line: the label is the human-readable text and
+   the name is the ${token} authors actually type, so both need to be visible
+   without spending a whole row each. */
+.params-row-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    margin-bottom: 0.1rem;
+}
+
+.params-row-name-stacked {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    padding: 0 0 0 0.1rem;
+    font-family: var(--mono-font, monospace);
+    font-size: 0.82em;
+    opacity: 0.75;
+}
+
+.params-row-name-stacked:focus {
+    outline: 1px solid var(--accent-color, #4a9eff);
+    border-radius: 3px;
+    opacity: 1;
+}
+
+.params-row-label {
+    flex: 0 1 auto;
+    min-width: 0;
+    font-size: 0.75em;
+    opacity: 0.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.params-control {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* inside a stacked row the control owns the whole width */
+.params-row-stacked .params-control {
+    width: 100%;
+}
+
+.params-control-slider input[type="range"] {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--accent-color, #4a9eff);
+}
+
+.params-control-number {
+    flex: 0 0 3.6rem;
+    min-width: 0;
+    text-align: right;
+    font-size: 0.85em;
+    padding: 0.15rem 0.25rem;
+}
+
+.params-control-unit {
+    flex: 0 0 auto;
+    opacity: 0.6;
+    font-size: 0.8em;
+}
+
+.params-control-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    font-family: var(--mono-font, monospace);
+    font-size: 0.9em;
+}
+
+.params-control-checkbox input[type="checkbox"] {
+    accent-color: var(--accent-color, #4a9eff);
+    cursor: pointer;
+}
+
+/* ── Views panel ────────────────────────────────────────────────────────
+   Thumbnails of whatever a session's `views` branch last rendered. Served
+   read-only from $BLENDER_ASSETS_DIR/views by the bridge. */
+.views-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    /* Six controls now (4 views + All 4 + Refresh) — wrap instead of
+       overflowing when the panel is docked narrow. */
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.5rem;
+}
+
+.views-gen-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-right: 0.1rem;
+}
+
+.views-empty {
+    opacity: 0.6;
+    font-size: 0.85em;
+    margin: 0.25rem 0;
+}
+
+.views-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.views-item {
+    margin: 0;
+    cursor: zoom-in;
+    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.25));
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(128, 128, 128, 0.06);
+    transition: border-color 0.15s;
+}
+
+.views-item:hover {
+    border-color: var(--accent-color, #4a9eff);
+}
+
+.views-item img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+.views-item figcaption {
+    padding: 0.25rem 0.35rem;
+    font-size: 0.72em;
+    opacity: 0.65;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.views-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+    padding: 2rem;
+}
+
+.views-lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* ── Main-pane tabs (Commands / Views) ──────────────────────────────── */
+.main-tabs {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.main-tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.35rem 0.75rem;
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: inherit;
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity 0.15s, border-color 0.15s;
+}
+
+.main-tab:hover { opacity: 0.8; }
+
+.main-tab.active {
+    opacity: 1;
+    border-bottom-color: var(--accent-color, #4a9eff);
+}
+
+.views-embedded { padding: 0.25rem 0; }
+
+/* In the main pane there is real width to use, so show larger thumbnails
+   than the 2-up sidebar grid. */
+.views-grid-wide {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.75rem;
+}
+
+/* ── 3D model viewer (three.js + STLLoader) ─────────────────────────── */
+.model-viewer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+    min-height: 420px;
+}
+
+.model-viewer-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.model-viewer-bar select {
+    flex: 0 1 22rem;
+    min-width: 0;
+}
+
+.model-viewer-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.85em;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.model-viewer-info {
+    margin-left: auto;
+    font-size: 0.8em;
+    opacity: 0.6;
+    font-family: var(--mono-font, monospace);
+    white-space: nowrap;
+}
+
+.model-viewer-canvas {
+    flex: 1;
+    min-height: 380px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color, rgba(128, 128, 128, 0.25));
+}
+
+.model-viewer-canvas canvas { display: block; }
+
+/* Placeholder while a code-split panel (ModelViewer / JsonSessionEditor)
+   fetches its chunk. Both are lazy-loaded to keep three.js and codemirror
+   out of the entry bundle. */
+.lazy-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    width: 100%;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
 }

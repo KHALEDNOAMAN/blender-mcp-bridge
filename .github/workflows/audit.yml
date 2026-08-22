@@ -1,10 +1,19 @@
 name: Dependency Audit
 
 on:
-  # Run weekly every Monday at 08:00 UTC
-  schedule:
-    - cron: "0 8 * * 1"
-  # Also allow manual trigger from the Actions tab
+  # Only when the dependencies themselves change. A schedule would re-audit an
+  # unchanged tree and fail on newly published CVEs, which reads as a broken
+  # build on a repo nobody has touched.
+  push:
+    paths:
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/audit.yml"
+  pull_request:
+    paths:
+      - "pyproject.toml"
+      - "uv.lock"
+  # Still runnable on demand from the Actions tab.
   workflow_dispatch:
 
 jobs:

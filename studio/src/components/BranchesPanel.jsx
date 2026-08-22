@@ -1,3 +1,5 @@
+// studio/src/components/BranchesPanel.jsx
+
 /**
  * Branches panel — saved feature branches (named ranges over commands[]).
  * See docs/studio_design_v1.md §5. Same collapsible-card pattern as

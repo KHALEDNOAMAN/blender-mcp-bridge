@@ -177,6 +177,10 @@ class BlenderMCPServer(
                                 "redo",
                                 "render_frame",
                                 "render_animation",
+                                # Creates and deletes its own temp camera/lights
+                                # and leaves the scene as it found it — pushing an
+                                # undo step would just clutter the user's history.
+                                "generate_views",
                                 "extract_sketch",
                             ]
                         ):
@@ -269,6 +273,7 @@ class BlenderMCPServer(
             "invert_mesh_selection": self.invert_mesh_selection,
             "set_object_visibility": self.set_object_visibility,
             "convert_to_mesh": self.convert_to_mesh,
+            "separate_loose_parts": self.separate_loose_parts,
             # Architectural (ArchBuilder)
             "build_room_shell": self.build_room_shell,
             "build_wall_segment": self.build_wall_segment,
@@ -288,6 +293,7 @@ class BlenderMCPServer(
             "configure_render_settings": self.configure_render_settings,
             "render_frame": self.render_frame,
             "render_animation": self.render_animation,
+            "generate_views": self.generate_views,
             # Material
             "create_material": self.create_material,
             "set_material_properties": self.set_material_properties,

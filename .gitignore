@@ -37,6 +37,22 @@ venv.bak/
 /assets/
 tmp/
 
+# Tool caches (regenerable; recreated on every mypy/pytest/ruff run)
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Scratch area — the untracked home for one-off scripts and temp files.
+# ALL throwaway scripts belong in here (or the session scratchpad), never at the
+# repo root: they hardcode absolute machine paths and go stale immediately.
+# temp_render.py was committed to the root in 1fa330a and pointed at a
+# now-meaningless per-session IDE brain directory; these patterns stop a repeat.
+scratch/
+/temp_*.py
+/tmp_*.py
+/drive.py
+/retry_*.json
+
 # Ignore all JSON files (session recordings, generated benchmark output,
 # etc.) EXCEPT the allowlist below. `studio/` is a normal npm project where
 # JSON is legitimate source (package.json, package-lock.json, .oxlintrc.json)
@@ -51,5 +67,45 @@ tmp/
 !tests/benchmarks/grid_expected.json
 !community/**/*.json
 
+# Editor/IDE local state. .vscode/settings.json was already swept up by the
+# blanket *.json rule above, so it was never tracked — this makes the intent
+# explicit and also covers the non-.json files VS Code drops there
+# (*.code-snippets, *.code-workspace, extension state).
+.vscode/
+.idea/
+
+# Claude Code local state. Both settings.json and settings.local.json here are
+# machine-specific permission allowlists — absolute f:\ paths, per-session
+# scratchpad dirs, one-off curl commands — so neither is useful to a clone.
+# (settings.json is conventionally the *shared* project file; if a genuinely
+# shared config is ever wanted, un-ignore it with `!.claude/settings.json`.)
+# Excluding the contents rather than the directory: git will not descend into an
+# excluded directory, so a negation inside one never applies.
+.claude/*
+# Skills are shared config, not machine-local state -- a skill only works for
+# someone who clones the repo if it is in the repo.
+!.claude/skills/
+
 # Ignore all log files
 *.log
+
+# Slicer project files. Regenerable from the exported STL, and large (a single
+# sh_benchy.3mf was 11.7MB) — a binary blob git stores in full on every revision.
+*.3mf
+
+# Benchy's two STLs are excluded by name (STLs are otherwise tracked — they're
+# the deliverable of a 3D-printing repo). These two are ~17MB and ~21MB: an
+# organic hull with almost no planar area, so voxel-remesh adaptivity only
+# halves them, unlike the rack connectors which shrank 92%. Regenerate with:
+#   python -m blender_mcp_bridge.main play community/benchy/session.json
+#   python -m blender_mcp_bridge.main play community/benchy/session.json --branch sail_rig
+community/benchy/assets/sh_benchy.stl
+community/benchy/assets/sh_benchy_sail.stl
+
+# Design rules handed over by the sibling print-kb project. Generated there, but
+# tracked here: this project reads it at runtime, so a clone without it cannot
+# answer a design question. See docs/design-rules.md.
+!data/design-rules.json
+# The same file bundled inside the package, so an installed wheel can answer a
+# design question with no repo present. Refreshed by scripts/sync_design_rules.py.
+!blender_mcp_bridge/data/design-rules.json

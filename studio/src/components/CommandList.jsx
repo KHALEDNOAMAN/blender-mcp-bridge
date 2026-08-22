@@ -1,3 +1,5 @@
+// studio/src/components/CommandList.jsx
+
 import { useEffect, useRef } from 'react';
 import CommandCard from './CommandCard';
 

@@ -2,10 +2,18 @@
 
 This guide explains how to run the integration test suite for the Blender MCP addon. The test suite uses a CLI tool to automate the creation of test scenes and verify the results against a benchmark.
 
+These tests drive a **live Blender instance** and are run by hand. For the pure-Python
+suites that need no Blender and run under pytest, see [Unit Tests](unit_tests.md).
+Neither set runs in CI.
+
 ## Prerequisites
 
 1.  **Blender MCP Addon**: Ensure Blender is open and the addon server is started (N-Panel > Blender MCP > Start Server).
-2.  **MCP Bridge Server**: Ensure the Python bridge is running (`python -m src.main`).
+2.  **MCP Bridge Server**: Ensure the Python bridge is running — the subcommand is
+    required, since bare `python -m blender_mcp_bridge.main` only prints help and starts nothing:
+    ```bash
+    uv run python -m blender_mcp_bridge.main serve
+    ```
 3.  **Dependencies**: Install the required Python packages:
     ```bash
     uv sync
@@ -56,10 +64,16 @@ python tests/run_integration.py run --scenario filament_tag
 3.  **Captures** the scene state to `tests/benchmarks/arch_last_run.json`.
 
 #### Print Scenario
-Tests 3D printing toolchain (STL export, mesh checking, support generation).
+Replicates a 3D-printing preparation pipeline (a "calibration Jack"): sets scene units
+to millimetres, builds intersecting sphere/cylinder primitives, fuses them with
+`join_objects` + `apply_voxel_remesh`, then gates on `check_mesh_for_printing` before
+`export_model`.
 
 #### Filament Tag Scenario
-Tests multi-material and filament assignment workflows.
+Generates a 4-piece filament name-tag & clip system (NameTagCard, AMSClip,
+StickonHolder, DeskStand) — raised `create_text` labels, `boolean_operation` cutouts
+with `apply_all_modifiers`, and STL export. Exercises text-to-mesh
+(`convert_to_mesh`) and boolean-heavy printable geometry rather than materials.
 
 ### Advanced Run Options
 
@@ -71,7 +85,35 @@ python tests/run_integration.py run -s grid --module modifiers
 python tests/run_integration.py verify -s arch
 ```
 
+`--module` accepts one of `primitives`, `modifiers`, `collections`, `operators`,
+`transforms`, `systems` — one per grid row. It is grid-only: passing it with
+`-s arch` raises a usage error, and passing it without `-s` auto-selects `grid`
+rather than running everything.
+
 If the scene matches the expected state, you will see verification output. If not, it will report missing or unexpected objects and property mismatches.
+
+> [!IMPORTANT]
+> **Only `grid` and `arch` ship a committed baseline.** `tests/benchmarks/` holds
+> `grid_expected.json` and `arch_expected.json`; every `*_last_run.json` is
+> git-ignored, and there is no `print_expected.json` or `filament_tag_expected.json`.
+>
+> So `verify -s print` and `verify -s filament_tag` cannot pass on a fresh clone —
+> they print `No benchmark file found ...` and exit **1**. That also means
+> `verify -s all` (the default) exits 1 even when grid and arch both pass:
+>
+> ```text
+> ✅ Verification Passed!          <- grid
+> ✅ Verification Passed!          <- arch
+> No benchmark file found at ...print_expected.json. Run 'approve' to bless.
+> No benchmark file found at ...filament_tag_expected.json. Run 'approve' to bless.
+> $ echo $?
+> 1
+> ```
+>
+> For those two scenarios, `run` is a smoke test (it fails on a tool error, but
+> nothing is diffed). To start diffing them, bless a known-good run with
+> `approve -s print` — but review the snapshot before committing it, since
+> `approve` blesses whatever last ran, correct or not.
 
 ### 2. Run and Verify in One Step
 
@@ -140,8 +182,21 @@ To add a new test module (e.g., `physics`):
 
 ### Structure
 
--   `tests/run_integration.py`: CLI entry point.
--   `tests/scenarios/grid_layout.py`: Main scenario orchestrator.
--   `tests/scenarios/modules/`: Individual test logic files (one per row).
+-   `tests/run_integration.py`: CLI entry point; the `SCENARIOS` dict maps each
+    `--scenario` key to its class.
+-   `tests/scenarios/grid_layout.py`: Main scenario orchestrator (the only one with
+    `--module` rows).
+-   `tests/scenarios/arch_layout.py`, `print_layout.py`, `filament_tag_layout.py`:
+    the other three scenarios, each a single self-contained class.
+-   `tests/scenarios/modules/`: Individual test logic files (one per grid row) —
+    `row_primitives`, `row_modifiers`, `row_collections`, `row_operators`,
+    `row_transforms`, `row_systems`.
 -   `tests/utils/`: shared utilities (`MCPClient`, `stateful_mcp_client`).
--   `tests/benchmarks/`: JSON snapshots of expected scene state.
+-   `tests/benchmarks/`: JSON snapshots of scene state. `*_expected.json` are the
+    committed baselines (grid and arch only); `*_last_run.json` are git-ignored
+    working output.
+
+> [!NOTE]
+> Registering a new scenario also means adding its key to the `type=click.Choice([...])`
+> list on **all three** commands (`run`, `verify`, `approve`) — they each declare
+> `--scenario` separately.

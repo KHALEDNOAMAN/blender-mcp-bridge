@@ -1,5 +1,7 @@
 # blender_mcp_addon/tools/modeling/modifiers.py
 
+import math
+
 import bpy  # type: ignore
 
 from ...utils import get_object
@@ -55,6 +57,24 @@ class ModelingModifiers:
                 mod.segments = kwargs["segments"]
             if "use_clamp_overlap" in kwargs:
                 mod.use_clamp_overlap = kwargs["use_clamp_overlap"]
+            # Without limit_method the modifier bevels by ANGLE at Blender's
+            # default 30 degrees, which rounds every hard edge on the part. For
+            # print work you usually want to widen that (round only sharp
+            # corners) or narrow it, so expose both the method and the angle.
+            if "limit_method" in kwargs:
+                mod.limit_method = kwargs["limit_method"]
+            if "angle_limit_deg" in kwargs:
+                # Blender stores this in radians; callers speak degrees, as with
+                # SCREW and SIMPLE_DEFORM below.
+                mod.angle_limit = math.radians(kwargs["angle_limit_deg"])
+            elif "angle_limit" in kwargs:
+                mod.angle_limit = kwargs["angle_limit"]
+            if "affect" in kwargs:
+                mod.affect = kwargs["affect"]
+            if "harden_normals" in kwargs:
+                mod.harden_normals = kwargs["harden_normals"]
+            if "miter_outer" in kwargs:
+                mod.miter_outer = kwargs["miter_outer"]
         elif modifier_type == "SOLIDIFY":
             if "thickness" in kwargs:
                 mod.thickness = kwargs["thickness"]
@@ -70,11 +90,95 @@ class ModelingModifiers:
                 mod.ratio = kwargs["ratio"]
             if "decimate_type" in kwargs:
                 mod.decimate_type = kwargs["decimate_type"]
+        elif modifier_type == "REMESH":
+            # Rebuilds the surface from a voxel/octree scan, so any sliver or
+            # multi-manifold mess in the input simply ceases to exist. Blunt:
+            # it re-derives the whole surface, which visibly facets curves and
+            # multiplies the vertex count. Prefer TRIANGULATE when the aim is
+            # only to clear boolean slivers.
+            if "mode" in kwargs:
+                mod.mode = kwargs["mode"]
+            if "octree_depth" in kwargs:
+                mod.octree_depth = int(kwargs["octree_depth"])
+            if "voxel_size" in kwargs:
+                mod.voxel_size = kwargs["voxel_size"]
+            if "adaptivity" in kwargs:
+                mod.adaptivity = kwargs["adaptivity"]
+            if "use_remove_disconnected" in kwargs:
+                mod.use_remove_disconnected = kwargs["use_remove_disconnected"]
+            if "use_smooth_shade" in kwargs:
+                mod.use_smooth_shade = kwargs["use_smooth_shade"]
+        elif modifier_type == "TRIANGULATE":
+            # Splits every n-gon into triangles WITHOUT moving a vertex, so the
+            # silhouette and volume are untouched. That makes it the gentle
+            # alternative to REMESH for clearing the sliver/multi-manifold
+            # faces a boolean leaves where two solids meet on a shared curved
+            # surface — REMESH fixes those too but re-derives the whole surface
+            # from a voxel grid, which visibly facets the arcs.
+            if "quad_method" in kwargs:
+                mod.quad_method = kwargs["quad_method"]
+            if "ngon_method" in kwargs:
+                mod.ngon_method = kwargs["ngon_method"]
+            if "min_vertices" in kwargs:
+                mod.min_vertices = kwargs["min_vertices"]
+            if "keep_custom_normals" in kwargs:
+                mod.keep_custom_normals = kwargs["keep_custom_normals"]
         elif modifier_type == "SMOOTH":
             if "factor" in kwargs:
                 mod.factor = kwargs["factor"]
             if "iterations" in kwargs:
                 mod.iterations = kwargs["iterations"]
+        elif modifier_type == "SCREW":
+            # Lathe / spin: revolve a 2D profile around an axis into a solid
+            # of revolution (cup, vase, bottle, bowl...). Profile should be a
+            # curve (converted to mesh) or mesh edge chain in the XZ plane,
+            # offset from the axis by the desired radius at each height.
+            if "axis" in kwargs:
+                mod.axis = kwargs["axis"]
+            if "angle_deg" in kwargs:
+                mod.angle = math.radians(kwargs["angle_deg"])
+            elif "angle" in kwargs:
+                mod.angle = kwargs["angle"]
+            if "steps" in kwargs:
+                # Also int-only; same float-from-expression coercion.
+                _steps = int(round(float(kwargs["steps"])))
+                mod.steps = _steps
+                mod.render_steps = _steps
+            if "screw_offset" in kwargs:
+                mod.screw_offset = kwargs["screw_offset"]
+            if "iterations" in kwargs:
+                # Blender requires an int here. Parametric sessions resolve
+                # expressions to floats, so coerce rather than raising
+                # "expected an int type, not float" mid-replay.
+                mod.iterations = int(round(float(kwargs["iterations"])))
+            if "use_merge_vertices" in kwargs:
+                mod.use_merge_vertices = kwargs["use_merge_vertices"]
+            if "merge_threshold" in kwargs:
+                mod.merge_threshold = kwargs["merge_threshold"]
+            if "use_normal_calculate" in kwargs:
+                mod.use_normal_calculate = kwargs["use_normal_calculate"]
+        elif modifier_type == "SIMPLE_DEFORM":
+            # Twist/bend/taper/stretch a mesh along an axis - e.g. a gentle
+            # TWIST on top of a lathed, fluted vase produces a spiral-fluted
+            # profile without any boolean/union step.
+            if "deform_method" in kwargs:
+                mod.deform_method = kwargs["deform_method"]
+            if "deform_axis" in kwargs:
+                mod.deform_axis = kwargs["deform_axis"]
+            if "angle_deg" in kwargs:
+                mod.angle = math.radians(kwargs["angle_deg"])
+            elif "angle" in kwargs:
+                mod.angle = kwargs["angle"]
+            if "factor" in kwargs:
+                mod.factor = kwargs["factor"]
+            if "origin" in kwargs:
+                mod.origin = get_object(kwargs["origin"])
+            if "limits" in kwargs:
+                mod.limits = kwargs["limits"]
+            if "lock_x" in kwargs:
+                mod.lock_x = kwargs["lock_x"]
+            if "lock_y" in kwargs:
+                mod.lock_y = kwargs["lock_y"]
         elif modifier_type == "BOOLEAN":
             if "object_b" in kwargs or "operand" in kwargs:
                 operand_name = kwargs.get("object_b") or kwargs.get("operand")

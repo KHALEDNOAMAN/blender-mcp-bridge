@@ -1,4 +1,5 @@
-// Ported from session_editor/api.js
+// studio/src/lib/api.js
+
 // Faithful port of the MCP JSON-RPC client, including response-unwrapping edge cases.
 
 // The bridge's root route (src/server.py `root_redirect`) always returns this

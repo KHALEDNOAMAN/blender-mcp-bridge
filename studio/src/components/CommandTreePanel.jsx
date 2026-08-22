@@ -1,3 +1,5 @@
+// studio/src/components/CommandTreePanel.jsx
+
 import { useEffect, useRef, useState } from 'react';
 import ActionBar from './ActionBar';
 

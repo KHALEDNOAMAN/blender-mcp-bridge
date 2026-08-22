@@ -1,3 +1,5 @@
+// studio/src/components/AssistantPanel.jsx
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AutoExpandTextarea from './AutoExpandTextarea';
 import { fetchProviders, streamChat, uploadModel } from '../lib/assistantApi';

@@ -7,7 +7,7 @@ import traceback
 
 import httpx
 
-from src.config import settings
+from blender_mcp_bridge.config import settings
 
 
 class MCPClient:
