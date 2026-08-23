@@ -68,7 +68,7 @@ def serve(host, port, record_path, name, model, description, doc_url):
         print(f"RECORDER ACTIVE: Saving to {record_path}")
 
     print("============================================================")
-    print("Starting High-Stability n8n MCP Server (Modular)")
+    print("Starting Blender MCP Bridge Server")
     print(f"HTTP Streamable: http://{host}:{port}/mcp")
     print("============================================================")
 

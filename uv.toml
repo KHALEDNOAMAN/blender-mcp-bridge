@@ -1,0 +1,6 @@
+# uv writes its cache wherever UV_CACHE_DIR points. If that variable is ever set
+# to this directory -- or inherited from a shell where it was -- uv treats the
+# repo as its cache and scatters bucket folders (sdists-v7/, wheels-v3/,
+# interpreter-v4/, CACHEDIR.TAG, ...) across the project root. Pinning it here
+# keeps the cache out of the repo regardless of the environment.
+cache-dir = "F:/uv-cache"

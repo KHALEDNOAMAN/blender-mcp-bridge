@@ -1094,7 +1094,7 @@ export default function App() {
             )}
 
             <footer>
-                <p>Blender MCP &bull; n8n Powered</p>
+                <p>Blender MCP Bridge</p>
             </footer>
 
             <Modal

@@ -6,12 +6,12 @@ from .server import BlenderMCPServer
 from .utils import DEFAULT_PORT
 
 bl_info = {
-    "name": "Blender MCP for n8n",
+    "name": "Blender MCP Bridge",
     "author": "seehiong",
-    "version": (0, 1, 2),
+    "version": (0, 1, 3),
     "blender": (4, 0, 0),
     "location": "View3D > Sidebar > MCP",
-    "description": "Blender Model Context Protocol (MCP) server for n8n",
+    "description": "Blender Model Context Protocol (MCP) server for AI agents",
     "category": "Development",
 }
 
@@ -50,16 +50,16 @@ class BLENDERMCP_OT_StopServer(bpy.types.Operator):
 class BLENDERMCP_PT_Panel(bpy.types.Panel):
     """MCP Control Panel"""
 
-    bl_label = "Blender MCP (n8n)"
+    bl_label = "Blender MCP Bridge"
     bl_idname = "BLENDERMCP_PT_panel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "Blender MCP (n8n)"
+    bl_category = "Blender MCP"
 
     def draw(self, context):
         global _server_instance
         layout = self.layout
-        layout.label(text="Blender MCP for n8n")
+        layout.label(text="Blender MCP Bridge")
 
         if _server_instance and _server_instance.running:
             row = layout.row()

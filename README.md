@@ -1,4 +1,4 @@
-# Blender MCP Server
+# Blender MCP Bridge
 
 Give an AI agent hands-on control of Blender: build geometry, apply materials,
 render, and check that a mesh is printable — 98 tools over the Model Context
@@ -34,9 +34,39 @@ graph LR
 
 `data/design-rules.json` carries 3D-printing design rules — overhang limits, wall
 minimums, clearances — extracted from video sources by the sibling
-[`print-kb`](../print-kb) project, each citing the video and second it came from.
+[`print-kb`](https://github.com/seehiong/print-kb) project, each citing the
+video and second it came from.
 It is plain self-contained JSON: no database, no dependency on that project at
 runtime.
+
+Three MCP tools read it, and they answer from the file alone — no LLM, no
+embedding model, no network call, and no `print-kb` checkout. A lookup returns in
+milliseconds:
+
+| Tool | Use it for |
+| --- | --- |
+| `check_design` | Describe a part in prose; get the rules bearing on it. |
+| `get_design_rules` | Filter by keyword, topic or unit. |
+| `list_design_topics` | What the knowledge base covers, before asking it. |
+
+These are the *before-modelling* half of the toolset, and an agent will happily
+skip them unless told not to, so say so:
+
+> Call `check_design` for a snap-fit enclosure lid in PLA with a 0.4 mm nozzle,
+> tell me the clearances it returns, then model to those numbers.
+
+Two things worth knowing when a dimension matters. Each rule carries a
+`value_source`: `source` means the number was stated in the cited video,
+`default` means it is a conventional FDM value filled in where the source gave
+none. Pass `measured_only` to get only the attested ones. And the rules are
+advisory — they do not check your geometry. `check_mesh_for_printing` verifies a
+mesh is manifold, which is a different question from whether two parts fit; for
+that, measure the mating faces.
+
+`DESIGN_RULES_PATH` overrides the location; otherwise it is
+`data/design-rules.json` when a checkout has one, else the copy bundled in the
+wheel. The file is re-read when its mtime changes, so a fresh export lands
+without restarting the bridge.
 
 See [`docs/design-rules.md`](docs/design-rules.md) for the schema, how to read it,
 and the MCP tools worth building on top.
@@ -83,17 +113,37 @@ claude mcp add --transport http blender http://127.0.0.1:8008/mcp/
 {
   "mcpServers": {
     "blender": {
-      "type": "streamable-http",
-      "url": "http://127.0.0.1:8008/mcp/"
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://127.0.0.1:8008/mcp/", "--allow-http"]
     }
   }
 }
 ```
 
+Claude Desktop launches MCP servers as local processes, so it reaches an HTTP
+server through [`mcp-remote`](https://www.npmjs.com/package/mcp-remote), a small
+stdio-to-HTTP shim. `npx` downloads it on first run, so the tools may take a few
+seconds to appear the first time. The shim is required: a direct
+`{"type": "streamable-http", "url": "..."}` entry is rejected at startup with
+*"Some MCP servers could not be loaded ... were skipped"* (tested on Claude
+Desktop for Windows, August 2026).
+
+After editing the file, **quit Claude Desktop completely and reopen it** — it
+only reads the config at launch, and closing the window leaves it running in the
+tray. If the config has a JSON syntax error, Claude Desktop reports "Could not
+load app settings" at startup and runs with *no* MCP servers at all.
+
+> **Not** Settings → Connectors → "Add custom connector". That path sends the URL
+> to Anthropic's cloud, which then dials the server itself — so it requires a
+> public HTTPS address and rejects `http://127.0.0.1`. Local servers go in
+> `claude_desktop_config.json`.
+
 **n8n** — add an *MCP Client* node pointing at the same URL.
 
 Then ask your agent to *"create a 20 mm cube and check whether it is printable"*.
-It should appear in the Blender viewport.
+It should appear in the Blender viewport — that is the real check. If you get an
+STL file but nothing happens in Blender, the client never reached the bridge and
+answered out of its own code instead.
 
 ## Configuration
 
@@ -156,10 +206,10 @@ lines across 22 modules. We've split the logic into functional packages (`modeli
 
 ```bash
 # Standard mode
-uv run python -m blender_mcp_bridge.main serve
+uv run blender-mcp-bridge serve
 
 # Recording mode (Save all commands to a file)
-uv run python -m blender_mcp_bridge.main serve --record my_session.json --name "Building My House"
+uv run blender-mcp-bridge serve --record my_session.json --name "Building My House"
 ```
 
 The server will start on `http://localhost:8008` with HTTP Streamable endpoint at `/mcp`. It uses detailed logging to show exactly which tools are being called and their results.
@@ -171,7 +221,7 @@ The **Bridge Sessions** feature allows you to record yours or an AI's tool calls
 ### Recording a Session
 To record all tool calls made to the bridge while the server is running:
 ```bash
-uv run python -m blender_mcp_bridge.main serve --record path/to/session.json --name "My Project" --description "Optional description"
+uv run blender-mcp-bridge serve --record path/to/session.json --name "My Project" --description "Optional description"
 ```
 Any tool calls made by n8n or other clients will be automatically saved to the JSON file.
 
@@ -180,16 +230,16 @@ Any tool calls made by n8n or other clients will be automatically saved to the J
 To playback a previously recorded session:
 ```bash
 # Default (Stateful - HTTP Streamable) - Recommended for speed
-uv run python -m blender_mcp_bridge.main play path/to/session.json
+uv run blender-mcp-bridge play path/to/session.json
 
 # Stateless mode (Standard HTTP) - Slower due to handshake overhead
-uv run python -m blender_mcp_bridge.main play path/to/session.json --transport stateless
+uv run blender-mcp-bridge play path/to/session.json --transport stateless
 
 # Play a single branch (see Session Format below)
-uv run python -m blender_mcp_bridge.main play path/to/session.json --branch sail_rig
+uv run blender-mcp-bridge play path/to/session.json --branch sail_rig
 
 # Override session parameters without editing the file (repeatable)
-uv run python -m blender_mcp_bridge.main play path/to/session.json --param box_height=40 --param wall=2.4
+uv run blender-mcp-bridge play path/to/session.json --param box_height=40 --param wall=2.4
 ```
 
 > [!NOTE]
@@ -253,7 +303,7 @@ Once built, the Bridge Server also serves Studio directly at **`http://localhost
 returns a short message with the build command instead of failing.
 
 Studio talks directly to the MCP Bridge Server over HTTP (same `/mcp` endpoint used
-by n8n), so **the Bridge Server must be running** (`uv run python -m blender_mcp_bridge.main serve`)
+by n8n), so **the Bridge Server must be running** (`uv run blender-mcp-bridge serve`)
 for Studio to connect. It auto-detects the bridge on `localhost:8008` then
 `localhost:8000`.
 
@@ -365,7 +415,7 @@ If you modify the addon code or the MCP server logic, follow these steps to ensu
 
 1. **Reload Scripts**: In Blender, press `F3` and type **"Reload Scripts"** (or use the shortcut `Alt + R` if configured).
 2. **Restart Blender Server**: In the N-Panel, click **Stop MCP Server** and then **Start MCP Server** again.
-3. **Restart Python Server**: Stop and restart the server with `uv run python -m blender_mcp_bridge.main serve`.
+3. **Restart Python Server**: Stop and restart the server with `uv run blender-mcp-bridge serve`.
 
 > [!IMPORTANT]
 > All Blender operations now run on the main thread via a command queue, ensuring stability and preventing dependency graph errors.

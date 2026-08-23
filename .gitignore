@@ -93,15 +93,6 @@ scratch/
 # sh_benchy.3mf was 11.7MB) — a binary blob git stores in full on every revision.
 *.3mf
 
-# Benchy's two STLs are excluded by name (STLs are otherwise tracked — they're
-# the deliverable of a 3D-printing repo). These two are ~17MB and ~21MB: an
-# organic hull with almost no planar area, so voxel-remesh adaptivity only
-# halves them, unlike the rack connectors which shrank 92%. Regenerate with:
-#   python -m blender_mcp_bridge.main play community/benchy/session.json
-#   python -m blender_mcp_bridge.main play community/benchy/session.json --branch sail_rig
-community/benchy/assets/sh_benchy.stl
-community/benchy/assets/sh_benchy_sail.stl
-
 # Design rules handed over by the sibling print-kb project. Generated there, but
 # tracked here: this project reads it at runtime, so a clone without it cannot
 # answer a design question. See docs/design-rules.md.
@@ -109,3 +100,16 @@ community/benchy/assets/sh_benchy_sail.stl
 # The same file bundled inside the package, so an installed wheel can answer a
 # design question with no repo present. Refreshed by scripts/sync_design_rules.py.
 !blender_mcp_bridge/data/design-rules.json
+
+# uv cache buckets. uv writes these into whatever UV_CACHE_DIR points at; if that
+# is ever the project root (or inherited from a shell where it was), they land
+# here. uv.toml pins the cache elsewhere, but a stale shell's env var still wins,
+# so ignore them rather than risk committing a cache.
+CACHEDIR.TAG
+/.lock
+/archive-v*/
+/builds-v*/
+/interpreter-v*/
+/sdists-v*/
+/simple-v*/
+/wheels-v*/

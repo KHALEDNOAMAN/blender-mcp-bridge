@@ -35,7 +35,7 @@ class BlenderMCPServer(
     PrintingTools,
     SculptingTools,
 ):
-    """Blender MCP Server for n8n with componentized tools"""
+    """Blender MCP addon server with componentized tools"""
 
     def __init__(self):
         self.server_socket: socket.socket | None = None
